@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
+import { TrendingTicker } from './components/TrendingTicker';
 import { PlaceCard } from './components/PlaceCard';
 import { PlaceDetailModal } from './components/PlaceDetailModal';
 import { OperatorsList } from './components/OperatorsList';
@@ -139,13 +140,18 @@ const App: React.FC = () => {
 
   const savedItemIds = savedItems.map(i => i.placeId);
 
+  const handleNavigate = (page: any) => {
+    setActivePage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-beige transition-all duration-500 overflow-x-hidden scrollbar-hide text-navy font-sans">
       <Navbar 
         user={userProfile} 
         onLogout={logout} 
         onOpenAuth={() => setIsAuthOpen(true)}
-        onNavigate={setActivePage}
+        onNavigate={handleNavigate}
         activePage={activePage}
         tripCount={savedItems.length}
       />
@@ -161,11 +167,18 @@ const App: React.FC = () => {
           >
             <Hero onSearch={setSearchQuery} trendingPlaces={trendingPlaces.length > 0 ? trendingPlaces : MOCK_PLACES.filter(p => p.isTrending)} />
             
+            <TrendingTicker 
+              places={trendingPlaces.length > 0 ? trendingPlaces : MOCK_PLACES.filter(p => p.isTrending)} 
+              onPlaceClick={(place) => {
+                setSelectedPlace(place);
+              }} 
+            />
+            
             <section className="max-w-7xl mx-auto px-4 py-20">
               <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-6">
                 <div className="space-y-4">
-                  <span className="text-safari font-bold uppercase tracking-widest text-sm">Curated Collection</span>
-                  <h2 className="text-4xl md:text-6xl font-serif font-bold leading-tight text-navy">Explore Categories</h2>
+                  <span className="text-safari font-bold uppercase tracking-widest text-sm">Get Inspired</span>
+                  <h2 className="text-4xl md:text-6xl font-serif font-bold leading-tight text-navy">Top Destinations in Kenya</h2>
                 </div>
                 <div className="flex flex-wrap gap-3">
                   <button 
@@ -337,35 +350,47 @@ const App: React.FC = () => {
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-safari/50 to-transparent"></div>
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-16 mb-16">
           <div className="col-span-1 md:col-span-2 space-y-8">
-                 <div className="flex items-center gap-4 group cursor-pointer" onClick={() => setActivePage('home')}>
-                  {LOGO}
-                  <span className="font-serif text-3xl font-bold text-white group-hover:text-safari transition-colors">PlacesInKenya</span>
+                 <div className="flex items-center gap-4 group cursor-pointer" onClick={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                   <div className="w-14 h-14 flex items-center justify-center rounded-xl overflow-hidden bg-white p-1.5 shadow-inner">
+                     <img 
+                       src="/logo.png" 
+                       alt="PlacesInKenya" 
+                       className="w-full h-full object-contain"
+                       onError={(e) => {
+                         e.currentTarget.src = 'https://via.placeholder.com/56?text=PK&bg=ffffff';
+                       }}
+                     />
+                   </div>
+                   <span className="font-serif text-3xl font-bold text-white group-hover:text-safari transition-colors">PlacesInKenya</span>
                 </div>
                 <p className="text-white/40 text-lg max-w-xl leading-relaxed font-light">
-                  Experience the most authentic Kenyan journeys through local eyes. From the plains of Maasai Mara to the shores of Diani.
+                  The world's largest Kenyan travel guidance platform. We help hundreds of travelers each month make every trip their best trip.
                 </p>
           </div>
           <div className="space-y-6">
-              <h4 className="font-black uppercase tracking-[0.3em] text-[10px] text-safari">Explore</h4>
-              <ul className="grid grid-cols-2 gap-y-4 text-white/60 font-medium md:block md:space-y-4">
-                <li><button onClick={() => setActivePage('home')} className="hover:text-white transition-colors">Destinations</button></li>
-                <li><button onClick={() => setActivePage('operators')} className="hover:text-white transition-colors">Safari Operators</button></li>
-                <li><button onClick={() => setActivePage('where-to-go')} className="hover:text-white transition-colors">Upcoming Events</button></li>
-                <li><button onClick={() => setActivePage('trips')} className="hover:text-white transition-colors">Trip Planner</button></li>
+              <h4 className="font-black uppercase tracking-[0.3em] text-[10px] text-safari font-sans">Explore</h4>
+              <ul className="grid grid-cols-1 gap-y-4 text-white/60 font-medium font-sans">
+                <li><button onClick={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-white transition-colors">Destinations</button></li>
+                <li><button onClick={() => { setActivePage('operators'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-white transition-colors">Safari Operators</button></li>
+                <li><button onClick={() => { setActivePage('where-to-go'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-white transition-colors">Upcoming Events</button></li>
+                <li><button onClick={() => { setActivePage('trips'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-white transition-colors">Trip Planner</button></li>
               </ul>
           </div>
           <div className="space-y-6">
-              <h4 className="font-black uppercase tracking-[0.3em] text-[10px] text-safari">Platform</h4>
-              <ul className="space-y-4 text-white/60 font-medium">
-                <li><button onClick={() => setActivePage('onboarding')} className="hover:text-white transition-colors text-left flex items-center gap-2 group">Partner With Us <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" /></button></li>
+              <h4 className="font-black uppercase tracking-[0.3em] text-[10px] text-safari font-sans">Business</h4>
+              <ul className="space-y-4 text-white/60 font-medium font-sans">
+                <li><button onClick={() => { setActivePage('onboarding'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-white transition-colors text-left flex items-center gap-2 group">Partner With Us <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" /></button></li>
+                <li><button className="hover:text-white transition-colors">Write a Review</button></li>
+                <li><button className="hover:text-white transition-colors">Add a Place</button></li>
               </ul>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-white/20 text-xs font-black uppercase tracking-widest">
-          <p>&copy; 2024 PlacesInKenya. All rights reserved.</p>
+        <div className="max-w-7xl mx-auto pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-white/20 text-xs font-black uppercase tracking-widest font-sans">
+          <p>&copy; 2024 PlacesInKenya. A travel community project.</p>
           <div className="flex gap-10">
-             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-             <a href="#" className="hover:text-white transition-colors">Terms of Experience</a>
+             <a href="#" className="hover:text-white transition-colors capitalize">Privacy</a>
+             <a href="#" className="hover:text-white transition-colors capitalize">Terms</a>
+             <a href="#" className="hover:text-white transition-colors capitalize">Cookies</a>
           </div>
         </div>
       </footer>

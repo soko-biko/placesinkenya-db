@@ -66,8 +66,8 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
     <div className="space-y-12 animate-fade-in">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-16">
         <div className="space-y-3">
-          <h1 className="text-5xl md:text-7xl font-serif font-bold tracking-tight text-navy">Planned Events</h1>
-          <p className="text-navy/40 text-lg md:text-xl font-light">Your curated calendar of Kenyan experiences.</p>
+          <h1 className="text-5xl md:text-7xl font-serif font-bold tracking-tight text-navy">Ways to Experience Kenya</h1>
+          <p className="text-navy/40 text-lg md:text-xl font-light">Plan your days with top-rated local events and experiences.</p>
         </div>
         
         <div className="flex items-center gap-6 bg-navy p-4 rounded-[2.5rem] shadow-2xl shadow-navy/30">
@@ -143,7 +143,7 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
           </div>
         </div>
 
-        <div className="hidden lg:grid grid-cols-7 gap-6">
+        <div className="hidden lg:grid grid-cols-7 gap-6 overflow-x-auto pb-8 scrollbar-hide min-w-[1200px]">
           {weekDays.map((day, idx) => (
             <div key={idx} className="space-y-6">
               <div className={`text-center p-8 rounded-[2rem] transition-all flex flex-col items-center justify-center border ${day.getDate() === new Date().getDate() && day.getMonth() === new Date().getMonth() ? 'bg-safari text-white border-safari shadow-2xl shadow-safari/30' : 'bg-navy text-white border-white/5'}`}>
@@ -224,66 +224,54 @@ const EventCard: React.FC<EventCardProps> = ({ event, onAdd, isSaved }) => {
   return (
     <motion.div 
       whileHover={{ y: -4 }}
-      className="rounded-tr-[2.5rem] rounded-br-[2.5rem] rounded-bl-[2.5rem] rounded-tl-none overflow-hidden border border-white/5 group bg-navy/60 backdrop-blur-xl hover:border-safari/50 transition-all flex h-[280px] shadow-3xl shadow-navy/60 relative"
+      className="flex flex-col bg-navy border border-white/5 rounded-[2rem] overflow-hidden hover:border-safari/50 transition-all cursor-pointer group text-white shadow-2xl shadow-black/20 w-full"
     >
-      {/* Content Section - Left */}
-      <div className="flex-1 p-8 flex flex-col justify-between z-10 text-white bg-gradient-to-r from-navy/40 to-transparent">
-        <div className="space-y-4">
-          <div className="space-y-1">
-            <h4 className="text-xl font-serif font-bold group-hover:text-safari transition-colors leading-tight line-clamp-1">{event.title}</h4>
-            <div className="flex items-center gap-2 text-white/40 text-[10px]">
-              <MapPin size={12} className="text-safari" />
-              <span className="uppercase font-bold tracking-tight">{event.location}</span>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="bg-safari/10 border border-safari/20 py-2 px-3 rounded-xl flex items-center gap-3 shrink-0">
-               <Calendar size={14} className="text-safari" />
-               <div className="flex flex-col">
-                 <span className="text-[8px] font-black uppercase tracking-widest text-white/30">Date</span>
-                 <span className="text-[10px] font-bold font-serif">{new Date(event.date).toLocaleDateString([], { day: 'numeric', month: 'short' })}</span>
-               </div>
-            </div>
-
-            <div className="flex-1 space-y-1.5">
-               <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-white/30">
-                  <span>Capacity</span>
-                  <span className={isFull ? 'text-red-500' : 'text-safari'}>{isFull ? 'SOLD' : `${Math.round(capacityPercent)}%`}</span>
-               </div>
-               <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                  <motion.div initial={{ width: 0 }} animate={{ width: `${capacityPercent}%` }} className={`h-full ${isFull ? 'bg-red-500' : 'bg-safari'}`} />
-               </div>
-            </div>
-          </div>
+      <div className="relative h-32 md:h-40 overflow-hidden shrink-0">
+        <img src={event.imageUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="" />
+        <div className="absolute top-3 right-3">
+          <span className="bg-safari text-white text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-lg shadow-lg">
+            {event.category?.replace('_', ' ')}
+          </span>
         </div>
-        
-        <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
-            <div className="flex flex-col">
-              <span className="text-[8px] text-white/20 uppercase font-black tracking-widest leading-none mb-1">{event.providerName}</span>
-              <div className="flex items-baseline gap-1">
-                <span className="text-[10px] text-white/30 font-black">KSH</span>
-                <p className="text-2xl font-bold font-serif text-white">{event.price.toLocaleString()}</p>
-              </div>
-            </div>
-            <button 
-              onClick={() => onAdd(event)}
-              disabled={isFull && !isSaved}
-              className={`p-3 rounded-xl transition-all active:scale-95 border border-white/10 shadow-xl ${isSaved ? 'bg-green-600 text-white' : 'bg-safari text-white hover:bg-safari-light'}`}
-            >
-              {isSaved ? <CheckCircle2 size={18} /> : <PlusCircle size={18} />}
-            </button>
+        <div className="absolute bottom-3 left-3 bg-navy/80 backdrop-blur-md px-2 py-1 rounded-lg border border-white/10 text-[9px] font-bold font-serif text-safari">
+           {new Date(event.date).toLocaleDateString([], { day: 'numeric', month: 'short' })}
         </div>
       </div>
 
-      {/* Image Section - Right */}
-      <div className="w-1/3 h-full relative overflow-hidden shrink-0 group-hover:w-[32%] transition-all duration-700">
-        <div className="absolute inset-0 bg-gradient-to-r from-navy/60 via-navy/10 to-transparent z-10"></div>
-        <img src={event.imageUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="" />
-        <div className="absolute top-4 right-4 z-20">
-          <span className="bg-navy/90 backdrop-blur-md text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-md text-white border border-white/10">
-            {event.category?.replace('_', ' ')}
-          </span>
+      <div className="p-5 flex flex-col flex-1 space-y-4">
+        <div className="space-y-1">
+          <h4 className="font-bold text-sm leading-tight text-white group-hover:text-safari transition-colors line-clamp-2 min-h-[2.5rem]">{event.title}</h4>
+          <div className="flex items-center gap-2 text-[10px] text-white/40">
+            <MapPin size={10} className="text-safari shrink-0" />
+            <span className="truncate uppercase font-bold tracking-tight">{event.location}</span>
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+           <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-white/30">
+              <span className="flex items-center gap-1"><Users size={8} /> Capacity</span>
+              <span className={isFull ? 'text-red-500' : 'text-safari'}>{isFull ? 'FULL' : `${Math.round(capacityPercent)}%`}</span>
+           </div>
+           <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <motion.div initial={{ width: 0 }} animate={{ width: `${capacityPercent}%` }} className={`h-full ${isFull ? 'bg-red-500' : 'bg-safari'}`} />
+           </div>
+        </div>
+
+        <div className="pt-3 border-t border-white/5 flex items-center justify-between mt-auto">
+           <div className="flex flex-col">
+              <span className="text-[7px] text-white/20 uppercase font-black tracking-widest leading-none mb-1">{event.providerName}</span>
+              <p className="text-xs font-bold text-white">KSH {event.price.toLocaleString()}</p>
+           </div>
+           <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onAdd(event);
+              }}
+              disabled={isFull && !isSaved}
+              className={`p-2.5 rounded-xl transition-all active:scale-95 border border-white/10 shadow-xl ${isSaved ? 'bg-green-600 text-white' : 'bg-safari text-white hover:bg-safari-light'}`}
+            >
+              {isSaved ? <CheckCircle2 size={16} /> : <PlusCircle size={16} />}
+            </button>
         </div>
       </div>
     </motion.div>

@@ -14,46 +14,55 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onOpenAuth, onNavigate, activePage, tripCount = 0 }) => {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-navy/5 px-4 py-3 md:px-8 bg-beige/80">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-navy/90 backdrop-blur-xl border-b border-white/5 px-4 py-4 md:px-8">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div 
-          className="flex items-center gap-2 cursor-pointer group"
+          className="flex items-center gap-3 cursor-pointer group"
           onClick={() => onNavigate('home')}
         >
-          {LOGO}
-          <span className="font-serif text-xl md:text-2xl font-bold tracking-tight text-navy group-hover:text-safari transition-colors">
+          <div className="w-12 h-12 flex items-center justify-center rounded-xl overflow-hidden bg-white p-1.5 shadow-inner">
+            <img 
+              src="/logo.png" 
+              alt="PlacesInKenya" 
+              className="w-full h-full object-contain"
+              onError={(e) => {
+                e.currentTarget.src = 'https://via.placeholder.com/48?text=PK&bg=ffffff';
+              }}
+            />
+          </div>
+          <span className="font-serif text-xl md:text-2xl font-bold tracking-tight text-white group-hover:text-safari transition-colors">
             PlacesInKenya
           </span>
         </div>
 
-        <div className="hidden md:flex items-center gap-8 font-medium">
+        <div className="hidden lg:flex items-center gap-10 font-medium">
           <button 
             onClick={() => onNavigate('home')}
-            className={`transition-colors font-black uppercase tracking-widest text-[10px] ${activePage === 'home' ? 'text-safari' : 'text-navy hover:text-safari'}`}
+            className={`transition-all font-black uppercase tracking-widest text-[11px] flex items-center gap-2 pb-1 border-b-2 ${activePage === 'home' ? 'text-safari border-safari' : 'text-white/60 border-transparent hover:text-white'}`}
           >
-            Explore
+            <Search size={14} /> Explore
           </button>
           <button 
             onClick={() => onNavigate('where-to-go')}
-            className={`transition-colors font-black uppercase tracking-widest text-[10px] ${activePage === 'where-to-go' ? 'text-safari' : 'text-navy hover:text-safari'}`}
+            className={`transition-all font-black uppercase tracking-widest text-[11px] flex items-center gap-2 pb-1 border-b-2 ${activePage === 'where-to-go' ? 'text-safari border-safari' : 'text-white/60 border-transparent hover:text-white'}`}
           >
-            Where to Go
+            <MapPin size={14} /> Where to Go
           </button>
           <button 
             onClick={() => onNavigate('operators')}
-            className={`transition-colors font-black uppercase tracking-widest text-[10px] ${activePage === 'operators' ? 'text-safari' : 'text-navy hover:text-safari'}`}
+            className={`transition-all font-black uppercase tracking-widest text-[11px] flex items-center gap-2 pb-1 border-b-2 ${activePage === 'operators' ? 'text-safari border-safari' : 'text-white/60 border-transparent hover:text-white'}`}
           >
-            Operators
+            <User size={14} /> Operators
           </button>
           <div className="relative">
             <button 
               onClick={() => onNavigate('trips')}
-              className={`transition-colors font-black uppercase tracking-widest text-[10px] ${activePage === 'trips' ? 'text-safari' : 'text-navy hover:text-safari'}`}
+              className={`transition-all font-black uppercase tracking-widest text-[11px] flex items-center gap-2 pb-1 border-b-2 ${activePage === 'trips' ? 'text-safari border-safari' : 'text-white/60 border-transparent hover:text-white'}`}
             >
-              Trip Planner
+              <Heart size={14} /> Trips
             </button>
             {tripCount > 0 && (
-              <span className="absolute -top-3 -right-4 bg-safari text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center animate-bounce shadow-lg shadow-safari/30">
+              <span className="absolute -top-3 -right-3 bg-safari text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg shadow-safari/30">
                 {tripCount}
               </span>
             )}
@@ -64,17 +73,17 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onOpenAuth, onNa
           {user ? (
             <div className="flex items-center gap-4">
               <div 
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-navy/5 border border-navy/10 cursor-pointer hover:bg-navy/10 transition-all"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10 transition-all"
                 onClick={() => onNavigate('trips')}
               >
-                <div className="w-6 h-6 rounded-full bg-safari flex items-center justify-center text-xs font-bold text-white">
+                <div className="w-7 h-7 rounded-lg bg-safari flex items-center justify-center text-xs font-bold text-white shadow-lg shadow-safari/20">
                   {user?.name?.[0] || user?.email?.[0] || 'U'}
                 </div>
-                <span className="text-sm font-medium hidden sm:inline text-navy">{user?.name || user?.email?.split('@')[0] || 'User'}</span>
+                <span className="text-sm font-bold hidden sm:inline text-white/80">{user?.name || user?.email?.split('@')[0] || 'User'}</span>
               </div>
               <button 
                 onClick={onLogout}
-                className="p-2 hover:bg-navy/5 rounded-full transition-colors text-navy/70 hover:text-navy"
+                className="p-2.5 hover:bg-white/5 rounded-xl transition-colors text-white/40 hover:text-white"
               >
                 <LogOut size={20} />
               </button>
@@ -82,9 +91,9 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onOpenAuth, onNa
           ) : (
             <button 
               onClick={onOpenAuth}
-              className="px-6 py-2 bg-safari hover:bg-safari-light text-white rounded-full font-semibold transition-all shadow-lg shadow-safari/20"
+              className="px-8 py-2.5 bg-safari hover:bg-safari-light text-white rounded-xl font-bold transition-all shadow-xl shadow-safari/20 active:scale-95"
             >
-              Login
+              Sign In
             </button>
           )}
         </div>

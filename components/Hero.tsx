@@ -48,7 +48,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
           <motion.h1 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="font-serif text-5xl md:text-8xl font-bold leading-tight"
+            className="font-serif text-5xl md:text-8xl font-bold leading-tight text-white"
           >
             Experience <br />
             <span className="text-safari italic">Kenya's Majesty</span>
@@ -71,14 +71,14 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
             onSubmit={handleSubmit} 
             className="relative max-w-3xl mx-auto"
           >
-            <div className="glass rounded-full p-2 flex items-center shadow-2xl border-white/20">
+            <div className="bg-white/10 backdrop-blur-md rounded-full p-2 flex items-center shadow-2xl border border-white/20">
               <div className="flex items-center gap-3 px-6 flex-1 border-r border-white/10">
                 <Search className="text-safari" size={24} />
                 <input 
                   type="text" 
                   value={val}
                   onChange={(e) => setVal(e.target.value)}
-                  placeholder="Where to? (e.g. Maasai Mara, Diani, Nairobi)"
+                  placeholder="Where to? (e.g. Maasai Mara, Nairobi)"
                   className="bg-transparent border-none outline-none w-full text-white placeholder:text-white/50 py-4 text-lg"
                 />
               </div>
@@ -90,37 +90,6 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
               </button>
             </div>
           </motion.form>
-
-          {/* Carousel Details - Now Positioned Below Search Bar */}
-          <AnimatePresence mode="wait">
-            {currentPlace && (
-              <motion.div 
-                key={currentPlace.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="mx-auto flex items-stretch glass rounded-[2rem] border-white/10 max-w-xl h-44 overflow-hidden text-white"
-              >
-                <div className="w-2/5 shrink-0 relative">
-                   <img src={currentPlace.imageUrl} className="absolute inset-0 w-full h-full object-cover" />
-                </div>
-                <div className="text-left p-6 space-y-2 flex-1 flex flex-col justify-center">
-                  <div className="flex items-center justify-between">
-                    <span className="text-safari font-black uppercase tracking-widest text-[9px]">Trending Now</span>
-                    <div className="flex gap-1">
-                       <button onClick={prev} className="p-1.5 hover:bg-white/10 rounded-full transition-colors"><ChevronLeft size={14} /></button>
-                       <button onClick={next} className="p-1.5 hover:bg-white/10 rounded-full transition-colors"><ChevronRight size={14} /></button>
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-bold font-serif line-clamp-1">{currentPlace.name}</h3>
-                  <div className="flex items-center gap-4 text-[11px] text-white/50 font-medium">
-                    <span className="flex items-center gap-1"><MapPin size={12} className="text-safari" /> {currentPlace.location}</span>
-                    <span className="flex items-center gap-1 text-safari font-black"><Star size={12} fill="currentColor" /> {currentPlace.rating}</span>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </div>
     </div>

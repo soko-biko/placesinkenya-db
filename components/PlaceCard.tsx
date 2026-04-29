@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Star, MapPin, Tag, ArrowRight } from 'lucide-react';
+import { Star, MapPin, Tag, ArrowRight, Clock, ShieldCheck } from 'lucide-react';
 import { Place } from '../types';
 
 interface PlaceCardProps {
@@ -11,7 +11,7 @@ interface PlaceCardProps {
 export const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick }) => {
   return (
     <div 
-      className="group bg-navy/60 backdrop-blur-xl rounded-tr-[2.5rem] rounded-br-[2.5rem] rounded-bl-[2.5rem] rounded-tl-none overflow-hidden border border-white/5 hover:border-safari/50 transition-all cursor-pointer shadow-3xl shadow-navy/60 flex h-[320px] relative"
+      className="group bg-navy/60 backdrop-blur-xl rounded-tr-[2.5rem] rounded-br-[2.5rem] rounded-bl-[2.5rem] rounded-tl-none overflow-hidden border border-white/5 hover:border-safari/50 transition-all cursor-pointer shadow-3xl shadow-navy/60 flex h-[340px] relative"
       onClick={() => onClick(place)}
     >
       {/* Content Section - Left */}
@@ -31,9 +31,15 @@ export const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick }) => {
             <h3 className="text-2xl font-serif font-bold text-white group-hover:text-safari transition-colors leading-tight line-clamp-1">
               {place.name}
             </h3>
-            <div className="flex items-center gap-2 text-white/40 text-[10px]">
-              <MapPin size={12} className="text-safari" />
-              <span className="font-medium tracking-wide uppercase italic">{place.location}</span>
+            <div className="flex items-center gap-4 text-white/40 text-[10px]">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <MapPin size={12} className="text-safari shrink-0" />
+                <span className="font-medium tracking-wide uppercase italic truncate">{place.location}</span>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <Clock size={12} className="text-white/30" />
+                <span className="font-bold tracking-widest uppercase">Full Day</span>
+              </div>
             </div>
           </div>
           
@@ -47,8 +53,11 @@ export const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick }) => {
                 {place.rating}
               </div>
               <div className="flex flex-col">
-                <span className="text-[10px] font-black uppercase tracking-widest text-white">Rating</span>
-                <span className="text-[9px] text-white/30 uppercase font-bold tracking-widest text-ellipsis">Exceptional</span>
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white">Exceptional</span>
+                  <ShieldCheck size={10} className="text-green-500" />
+                </div>
+                <span className="text-[9px] text-white/30 uppercase font-bold tracking-widest">350+ Reviews</span>
               </div>
             </div>
             <div className="h-8 w-px bg-white/5"></div>
@@ -65,7 +74,7 @@ export const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick }) => {
         <div className="flex items-center justify-between pt-6 border-t border-white/5">
           <div className="flex flex-col">
             <span className="text-[9px] text-white/20 uppercase font-black tracking-widest">Experience From</span>
-            <span className="text-white text-xl font-bold font-serif">Ksh 4,500</span>
+            <span className="text-white text-xl font-bold font-serif">Ksh {(place.price || 4500).toLocaleString()}</span>
           </div>
           <button className="bg-safari hover:bg-safari-light text-white w-12 h-12 rounded-2xl transition-all flex items-center justify-center shadow-xl shadow-safari/20 group/btn">
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
