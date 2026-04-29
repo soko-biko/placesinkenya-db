@@ -3,7 +3,7 @@ export enum PlaceCategory {
   SAFARI = 'SAFARI',
   HANGOUT_SPOT = 'HANGOUT_SPOT',
   OUTDOOR_ADVENTURE = 'OUTDOOR_ADVENTURE',
-  RESTAURANT_CLUB = 'RESTAURANT_CLUB'
+  EATS_ENT = 'EATS_ENT'
 }
 
 export enum OperatorType {

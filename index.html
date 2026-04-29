@@ -32,6 +32,18 @@
         }
         body {
             background-color: #FCF6E5;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        body::-webkit-scrollbar {
+            display: none; /* Chrome, Safari and Opera */
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
         .glass {
             background: rgba(15, 23, 42, 0.05);

@@ -99,24 +99,24 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="mx-auto flex items-center gap-6 glass p-6 rounded-3xl border-white/10 max-w-xl"
+                className="mx-auto flex items-stretch glass rounded-[2rem] border-white/10 max-w-xl h-44 overflow-hidden text-white"
               >
-                <div className="w-16 h-16 rounded-2xl overflow-hidden shrink-0">
-                   <img src={currentPlace.imageUrl} className="w-full h-full object-cover" />
+                <div className="w-2/5 shrink-0 relative">
+                   <img src={currentPlace.imageUrl} className="absolute inset-0 w-full h-full object-cover" />
                 </div>
-                <div className="text-left space-y-1 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-safari font-bold uppercase tracking-tighter text-xs">Trending Destination</span>
+                <div className="text-left p-6 space-y-2 flex-1 flex flex-col justify-center">
+                  <div className="flex items-center justify-between">
+                    <span className="text-safari font-black uppercase tracking-widest text-[9px]">Trending Now</span>
+                    <div className="flex gap-1">
+                       <button onClick={prev} className="p-1.5 hover:bg-white/10 rounded-full transition-colors"><ChevronLeft size={14} /></button>
+                       <button onClick={next} className="p-1.5 hover:bg-white/10 rounded-full transition-colors"><ChevronRight size={14} /></button>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-bold font-serif">{currentPlace.name}</h3>
-                  <div className="flex items-center gap-4 text-sm text-white/60">
-                    <span className="flex items-center gap-1"><MapPin size={14} /> {currentPlace.location}</span>
-                    <span className="flex items-center gap-1 text-safari font-bold"><Star size={14} fill="currentColor" /> {currentPlace.rating}</span>
+                  <h3 className="text-lg font-bold font-serif line-clamp-1">{currentPlace.name}</h3>
+                  <div className="flex items-center gap-4 text-[11px] text-white/50 font-medium">
+                    <span className="flex items-center gap-1"><MapPin size={12} className="text-safari" /> {currentPlace.location}</span>
+                    <span className="flex items-center gap-1 text-safari font-black"><Star size={12} fill="currentColor" /> {currentPlace.rating}</span>
                   </div>
-                </div>
-                <div className="flex gap-2">
-                   <button onClick={prev} className="p-2 glass rounded-full hover:bg-white/10 transition-colors"><ChevronLeft size={18} /></button>
-                   <button onClick={next} className="p-2 glass rounded-full hover:bg-white/10 transition-colors"><ChevronRight size={18} /></button>
                 </div>
               </motion.div>
             )}

@@ -132,7 +132,7 @@ const App: React.FC = () => {
   const savedItemIds = savedItems.map(i => i.placeId);
 
   return (
-    <div className="min-h-screen bg-beige transition-all duration-500 overflow-x-hidden text-navy font-sans">
+    <div className="min-h-screen bg-beige transition-all duration-500 overflow-x-hidden scrollbar-hide text-navy font-sans">
       <Navbar 
         user={userProfile} 
         onLogout={logout} 
@@ -171,7 +171,7 @@ const App: React.FC = () => {
                       onClick={() => setSelectedCategory(cat)}
                       className={`px-6 py-2.5 rounded-full border transition-all text-sm font-black uppercase tracking-tight active:scale-95 ${selectedCategory === cat ? 'border-safari text-safari bg-safari/10 shadow-xl shadow-safari/5' : 'border-navy/10 text-navy/40 hover:border-safari hover:text-safari'}`}
                     >
-                      {cat?.replace('_', ' ')}
+                      {cat === 'EATS_ENT' ? 'Eats & Entertainment' : cat?.replace('_', ' ')}
                     </button>
                   ))}
                 </div>
@@ -192,7 +192,7 @@ const App: React.FC = () => {
                 </div>
               )}
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 sm:gap-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                  {filteredPlaces.length > 0 ? (
                   filteredPlaces.map(place => (
                     <PlaceCard 

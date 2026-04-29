@@ -122,7 +122,7 @@ export const MOCK_EVENTS: Event[] = [
     location: 'Diani Beach',
     imageUrl: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3',
     registrations: 120,
-    category: PlaceCategory.RESTAURANT_CLUB,
+    category: PlaceCategory.EATS_ENT,
     totalCapacity: 200,
     bookedCapacity: 120
   },

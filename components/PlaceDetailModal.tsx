@@ -21,7 +21,7 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({ place, onClo
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-navy/95 backdrop-blur-md" onClick={onClose}></div>
       
-      <div className="relative bg-navy w-full max-w-6xl max-h-[95vh] overflow-y-auto rounded-[3rem] shadow-[0_0_100px_rgba(15,23,42,0.5)] border border-white/5 animate-scale-up text-white">
+      <div className="relative bg-navy w-full max-w-6xl max-h-[95vh] overflow-y-auto scrollbar-hide rounded-[3rem] shadow-[0_0_100px_rgba(15,23,42,0.5)] border border-white/5 animate-scale-up text-white">
         <button 
           onClick={onClose}
           className="fixed top-8 right-8 z-[70] p-4 bg-navy/80 hover:bg-safari rounded-full text-white transition-all border border-white/10 hover:border-white shadow-2xl active:scale-90"
@@ -77,7 +77,7 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({ place, onClo
             <div className="space-y-6">
               <div className="flex items-center gap-4">
                  <span className="bg-safari/20 text-safari text-[10px] sm:text-xs font-black px-4 py-1.5 rounded-full border border-safari/30 uppercase tracking-[0.2em]">
-                  {place.category?.replace('_', ' ')}
+                  {place.category === 'EATS_ENT' ? 'Eats & Entertainment' : place.category?.replace('_', ' ')}
                 </span>
                 <div className="flex items-center gap-2 text-yellow-500 bg-white/5 px-3 py-1 rounded-full border border-white/10">
                   <Star size={16} fill="currentColor" />

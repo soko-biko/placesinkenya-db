@@ -223,63 +223,52 @@ const EventCard: React.FC<EventCardProps> = ({ event, onAdd, isSaved }) => {
 
   return (
     <motion.div 
-      whileHover={{ y: -12 }}
-      className="rounded-[3rem] overflow-hidden border border-white/5 group bg-navy hover:border-safari/50 transition-all flex flex-col shadow-2xl shadow-navy/30"
+      whileHover={{ y: -6 }}
+      className="rounded-[2rem] overflow-hidden border border-white/5 group bg-navy hover:border-safari/50 transition-all flex flex-col shadow-2xl shadow-navy/30 h-full"
     >
-      <div className="h-56 overflow-hidden relative">
+      <div className="h-32 overflow-hidden relative shrink-0">
         <img src={event.imageUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="" />
-        <div className="absolute top-6 right-6 bg-navy/80 backdrop-blur-md px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10 flex items-center gap-2 text-white">
-           <Star size={14} className="text-yellow-500" fill="currentColor" /> Featured
+        <div className="absolute top-3 right-3 bg-navy/80 backdrop-blur-md px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border border-white/10 flex items-center gap-1 text-white">
+           <Star size={10} className="text-yellow-500" fill="currentColor" /> Featured
         </div>
-        {!isFull && capacityPercent > 70 && (
-          <div className="absolute bottom-6 left-6 bg-red-600 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg text-white">
-             Limited Spots
-          </div>
-        )}
       </div>
       
-      <div className="p-8 space-y-8 flex-1 flex flex-col text-white">
-        <div className="space-y-3">
-          <p className="text-[11px] font-black text-safari uppercase tracking-[0.3em]">{event.category?.replace('_', ' ')}</p>
-          <h4 className="text-3xl font-serif font-bold line-clamp-2 leading-tight group-hover:text-safari transition-colors">{event.title}</h4>
-          <div className="flex items-center gap-2 text-white/50 text-sm">
-            <MapPin size={16} className="text-safari" />
-            <span>{event.location}</span>
+      <div className="p-4 space-y-3 flex-1 flex flex-col text-white">
+        <div className="space-y-1">
+          <p className="text-[8px] font-black text-safari uppercase tracking-[0.3em]">{event.category === 'EATS_ENT' ? 'Eats & Ent' : event.category?.replace('_', ' ')}</p>
+          <h4 className="text-lg font-serif font-bold line-clamp-1 group-hover:text-safari transition-colors">{event.title}</h4>
+          <div className="flex items-center gap-2 text-white/50 text-[10px]">
+            <MapPin size={12} className="text-safari" />
+            <span className="line-clamp-1">{event.location}</span>
           </div>
         </div>
         
-        <p className="text-base text-white/50 line-clamp-3 flex-1 leading-relaxed font-light">
+        <p className="text-[11px] text-white/50 line-clamp-2 flex-1 leading-tight font-light">
           {event.description}
         </p>
 
-        <div className="space-y-6 pt-8 border-t border-white/10">
-          <div className="space-y-3">
-             <div className="flex justify-between text-[11px] font-black uppercase tracking-[0.2em] text-white/40">
-                <span>Registration Progress</span>
-                <span className={isFull ? 'text-red-500' : 'text-safari'}>
-                  {isFull ? 'FULLY BOOKED' : `${event.bookedCapacity} / ${event.totalCapacity}`}
-                </span>
+        <div className="space-y-3 pt-3 border-t border-white/10">
+          <div className="space-y-1.5 text-[9px] font-black uppercase tracking-[0.1em] text-white/40">
+             <div className="flex justify-between">
+                <span>Registrations</span>
+                <span className={isFull ? 'text-red-500' : 'text-safari'}>{isFull ? 'FULL' : `${event.bookedCapacity}/${event.totalCapacity}`}</span>
              </div>
-             <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${capacityPercent}%` }}
-                  className={`h-full ${isFull ? 'bg-red-500' : 'bg-safari'}`}
-                />
+             <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                <motion.div initial={{ width: 0 }} animate={{ width: `${capacityPercent}%` }} className={`h-full ${isFull ? 'bg-red-500' : 'bg-safari'}`} />
              </div>
           </div>
 
-          <div className="flex items-center justify-between border-t border-white/5 pt-6">
-            <div>
-              <p className="text-[10px] text-white/30 uppercase font-black tracking-[0.1em] mb-1">{event.providerName}</p>
-              <p className="text-3xl font-bold font-serif text-white">Ksh {event.price.toLocaleString()}</p>
+          <div className="flex items-center justify-between pt-1">
+            <div className="space-y-0.5">
+              <p className="text-[8px] text-white/30 uppercase font-bold tracking-[0.05em] line-clamp-1">{event.providerName}</p>
+              <p className="text-lg font-bold font-serif text-white">Ksh {event.price.toLocaleString()}</p>
             </div>
             <button 
               onClick={() => onAdd(event)}
               disabled={isFull}
-              className={`p-5 rounded-[1.5rem] ${isSaved ? 'bg-green-600 text-white' : 'bg-white/5 hover:bg-safari text-white/40 hover:text-white'} transition-all hover:scale-110 active:scale-95 border border-white/10 disabled:opacity-30 disabled:cursor-not-allowed shadow-xl`}
+              className={`p-3 rounded-xl ${isSaved ? 'bg-green-600 text-white' : 'bg-white/5 hover:bg-safari text-white/40 hover:text-white'} transition-all hover:scale-105 active:scale-95 border border-white/10 disabled:opacity-30 disabled:cursor-not-allowed shadow-xl`}
             >
-              {isSaved ? <CheckCircle2 size={32} /> : <PlusCircle size={32} />}
+              {isSaved ? <CheckCircle2 size={18} /> : <PlusCircle size={18} />}
             </button>
           </div>
         </div>
