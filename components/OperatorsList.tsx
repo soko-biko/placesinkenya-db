@@ -12,42 +12,63 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
   const individuals = operators.filter(o => o.type === OperatorType.INDIVIDUAL);
 
   const OperatorCard: React.FC<{ operator: TourOperator }> = ({ operator }) => (
-    <div className="p-8 sm:p-10 rounded-tr-[2.5rem] rounded-br-[2.5rem] rounded-bl-[2.5rem] rounded-tl-none border border-white/5 hover:border-safari/40 transition-all flex flex-col sm:flex-row gap-10 group bg-navy/60 backdrop-blur-xl text-white shadow-3xl shadow-navy/40">
-      <div className="sm:w-1/4 flex flex-col items-center justify-center p-8 bg-safari/5 border border-safari/10 rounded-[2rem] shrink-0 transition-colors group-hover:bg-safari/10">
-        <div className={`p-6 rounded-2xl bg-safari/10 text-safari border border-safari/20 group-hover:scale-110 transition-transform mb-4 shadow-inner`}>
-          {operator.type === OperatorType.COMPANY ? <Briefcase size={40} /> : <UserCheck size={40} />}
+    <div className="bg-white rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] transition-all duration-300 flex flex-col h-full border border-navy/5 group">
+      {/* Visual Header / Avatar Section */}
+      <div className="relative h-48 bg-navy p-8 flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-safari via-transparent to-transparent"></div>
         </div>
-        <div className="flex items-center gap-2 text-safari font-black text-xs uppercase tracking-widest">
-          <Star size={14} fill="currentColor" />
-          <span>{operator.rating} Rating</span>
+        
+        <div className="relative z-10 w-24 h-24 bg-white rounded-2xl flex items-center justify-center shadow-2xl border border-white/20 transform group-hover:scale-110 transition-transform duration-500">
+          {operator.type === OperatorType.COMPANY ? (
+            <Briefcase size={40} className="text-navy" />
+          ) : (
+            <UserCheck size={40} className="text-navy" />
+          )}
+        </div>
+
+        {/* Verified Badge */}
+        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-green-500/20 shadow-sm flex items-center gap-1.5">
+          <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+          <span className="text-green-600 text-[10px] font-black uppercase tracking-wider">Verified</span>
+        </div>
+
+        {/* Rating Badge */}
+        <div className="absolute bottom-4 left-4 bg-safari px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-1.5">
+          <Star size={12} fill="white" className="text-white" />
+          <span className="text-white text-[11px] font-bold">{operator.rating} Status</span>
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col justify-between">
-        <div className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <h3 className="text-3xl font-bold font-serif group-hover:text-safari transition-colors">{operator.name}</h3>
-            <span className="text-[10px] bg-white/5 text-white/40 border border-white/10 px-4 py-1.5 rounded-lg uppercase tracking-widest font-black">
-              {operator.type}
+      <div className="p-6 flex flex-col flex-1">
+        <div className="flex-1 space-y-4">
+          <div className="flex flex-col gap-1">
+            <h3 className="text-xl font-bold text-navy group-hover:text-safari transition-colors">{operator.name}</h3>
+            <span className="text-[10px] text-navy/30 uppercase font-bold tracking-widest">
+              {operator.type?.replace('_', ' ')} Partner
             </span>
           </div>
-          <p className="text-white/60 text-base leading-relaxed line-clamp-3 font-light">{operator.bio}</p>
-          <div className="flex flex-wrap gap-2">
+
+          <p className="text-navy/60 text-sm leading-relaxed line-clamp-3 font-medium">
+            {operator.bio}
+          </p>
+
+          <div className="flex flex-wrap gap-2 pt-2">
             {operator.specialties?.map(s => (
-              <span key={s} className="text-[9px] bg-white/5 text-safari border border-safari/10 px-3 py-1 rounded-lg uppercase tracking-widest font-black">
-                #{s}
+              <span key={s} className="text-[9px] bg-navy/5 text-navy border border-navy/10 px-2.5 py-1 rounded-md uppercase tracking-wider font-bold">
+                {s}
               </span>
             ))}
           </div>
         </div>
 
-        <div className="mt-8 pt-8 border-t border-white/5 flex flex-wrap items-center justify-between gap-6">
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] text-white/30 uppercase font-black tracking-widest">Starting Packages</span>
-            <span className="font-bold text-white text-2xl font-serif leading-none">Ksh {operator.basePrice.toLocaleString()}</span>
+        <div className="mt-8 pt-6 border-t border-navy/5 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col w-full md:w-auto">
+            <span className="text-[10px] text-navy/30 uppercase font-black tracking-widest leading-none mb-1">Starting From</span>
+            <span className="font-bold text-navy text-xl font-sans">Ksh {operator.basePrice.toLocaleString()}</span>
           </div>
-          <button className="flex items-center justify-center gap-3 px-8 py-4 bg-safari hover:bg-safari-light text-white rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all shadow-xl shadow-safari/20 active:scale-95 group-hover:px-10">
-            <MessageSquare size={18} />
+          <button className="flex items-center justify-center gap-3 w-full md:w-auto px-10 h-12 bg-navy hover:bg-safari text-white rounded-xl font-bold uppercase tracking-widest text-[10px] transition-all shadow-lg active:scale-95">
+            <MessageSquare size={16} />
             Connect Now
           </button>
         </div>

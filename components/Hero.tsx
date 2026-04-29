@@ -40,7 +40,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
           alt="Kenyan Safari" 
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 hero-gradient"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-navy/55 via-navy/20 to-transparent"></div>
       </div>
 
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto space-y-10">
@@ -63,30 +63,30 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
           </motion.p>
         </div>
 
-        <div className="space-y-12">
+        <div className="space-y-12 w-full">
           <motion.form 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
             onSubmit={handleSubmit} 
-            className="relative max-w-3xl mx-auto"
+            className="relative max-w-3xl mx-auto w-full"
           >
-            <div className="bg-white/10 backdrop-blur-md rounded-full p-2 flex items-center shadow-2xl border border-white/20">
-              <div className="flex items-center gap-3 px-6 flex-1 border-r border-white/10">
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl md:rounded-full p-2 flex flex-col md:flex-row items-center shadow-2xl border border-white/20 w-full">
+              <div className="flex items-center gap-3 px-6 w-full md:flex-1 border-b md:border-b-0 md:border-r border-white/10">
                 <Search className="text-safari" size={24} />
                 <input 
                   type="text" 
                   value={val}
                   onChange={(e) => setVal(e.target.value)}
-                  placeholder="Where to? (e.g. Maasai Mara, Nairobi)"
+                  placeholder="Search destinations, safaris, events…"
                   className="bg-transparent border-none outline-none w-full text-white placeholder:text-white/50 py-4 text-lg"
                 />
               </div>
               <button 
                 type="submit"
-                className="bg-safari hover:bg-safari-light text-white px-10 py-4 rounded-full font-bold transition-all ml-2 shadow-lg hover:scale-105 active:scale-95"
+                className="bg-safari hover:bg-safari-light text-white w-full md:w-auto px-10 py-4 h-[52px] rounded-xl md:rounded-full font-semibold transition-all mt-2 md:mt-0 md:ml-2 shadow-lg active:scale-95 whitespace-nowrap"
               >
-                Explore
+                Start Exploring
               </button>
             </div>
           </motion.form>

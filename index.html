@@ -5,84 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlacesInKenya | Explore the Magic of Safari</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        navy: '#0F172A',
-                        safari: '#EA580C',
-                        'safari-light': '#FB923C',
-                        beige: '#FCF6E5',
-                        'beige-dark': '#F5E6CC',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
-                    },
-                }
-            }
-        }
-    </script>
-    <style>
-        html {
-            scroll-behavior: smooth;
-        }
-        body {
-            background-color: #FCF6E5;
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-        }
-        body::-webkit-scrollbar {
-            display: none; /* Chrome, Safari and Opera */
-        }
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        .glass {
-            background: rgba(15, 23, 42, 0.05);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(15, 23, 42, 0.1);
-        }
-        .hero-gradient {
-            background: linear-gradient(to bottom, rgba(15, 23, 42, 0.2), rgba(15, 23, 42, 0.8));
-        }
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #FCF6E5;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #0F172A;
-            border: 3px solid #FCF6E5;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #EA580C;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-            animation: fadeIn 0.8s ease-out forwards;
-        }
-        @keyframes scaleUp {
-            from { opacity: 0; scale: 0.95; }
-            to { opacity: 1; scale: 1; }
-        }
-        .animate-scale-up {
-            animation: scaleUp 0.5s ease-out forwards;
-        }
-    </style>
-<script type="importmap">
+    <script type="importmap">
 {
   "imports": {
     "lucide-react": "https://esm.sh/lucide-react@^0.563.0",

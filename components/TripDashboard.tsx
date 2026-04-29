@@ -20,111 +20,100 @@ export const TripDashboard: React.FC<TripDashboardProps> = ({ savedItems, places
     .filter(item => item.place);
 
   return (
-    <div className="pt-32 pb-20 px-4 md:px-8 max-w-7xl mx-auto space-y-12 min-h-screen">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-navy/10 pb-10">
-        <div>
-          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-4 text-navy">My Personal Hub</h1>
-          <p className="text-navy/60 text-xl font-light">Your curated list of Kenyan wonders waiting to be explored.</p>
+    <div className="pt-12 pb-20 px-4 md:px-8 max-w-[1200px] mx-auto space-y-12">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-navy/5 pb-8">
+        <div className="space-y-1">
+          <span className="text-safari font-bold uppercase tracking-widest text-[11px]">Private Planner</span>
+          <h1 className="text-4xl md:text-6xl font-serif font-bold text-navy leading-tight">My Personal Hub</h1>
+          <p className="text-navy/40 text-sm md:text-base font-medium">Your curated list of Kenyan wonders.</p>
         </div>
-        <div className="bg-navy p-6 rounded-[2rem] flex items-center gap-8 shadow-2xl shadow-navy/20">
-          <div className="text-center">
-            <p className="text-4xl font-bold text-safari">{savedPlaces.length}</p>
-            <p className="text-[10px] uppercase font-black tracking-[0.2em] text-white/40">Destinations</p>
+        <div className="bg-white border border-navy/5 p-4 rounded-2xl flex items-center gap-6 shadow-sm">
+          <div className="text-center px-2">
+            <p className="text-2xl font-bold text-navy">{savedPlaces.length}</p>
+            <p className="text-[9px] uppercase font-bold tracking-widest text-navy/30">Gems</p>
           </div>
-          <div className="w-px h-12 bg-white/10"></div>
-          <div className="text-center">
-            <p className="text-4xl font-bold text-safari">0</p>
-            <p className="text-[10px] uppercase font-black tracking-[0.2em] text-white/40">Shared Trips</p>
+          <div className="w-px h-8 bg-navy/5"></div>
+          <div className="text-center px-2">
+            <p className="text-2xl font-bold text-navy">0</p>
+            <p className="text-[9px] uppercase font-bold tracking-widest text-navy/30">Trips</p>
           </div>
         </div>
       </div>
 
       {savedPlaces.length === 0 ? (
-        <div className="text-center py-32 space-y-8">
-          <div className="w-32 h-32 bg-navy/5 rounded-full flex items-center justify-center mx-auto text-navy/10">
-            <MapPin size={64} />
+        <div className="text-center py-24 space-y-8 max-w-md mx-auto">
+          <div className="w-20 h-20 bg-navy/5 rounded-2xl flex items-center justify-center mx-auto text-navy/20">
+            <MapPin size={40} />
           </div>
-          <div className="space-y-4">
-            <h3 className="text-3xl font-serif font-bold text-navy">Your planner is empty</h3>
-            <p className="text-navy/50 max-w-md mx-auto text-lg font-light">Start browsing Kenya's beautiful destinations and save your favorites here for a curated trip experience.</p>
+          <div className="space-y-2">
+            <h3 className="text-2xl font-serif font-bold text-navy">Your planner is empty</h3>
+            <p className="text-navy/40 text-sm font-medium leading-relaxed">Start browsing Kenya's beautiful destinations and save your favorites here.</p>
           </div>
           <button 
             onClick={onNavigateHome}
-            className="px-12 py-4 bg-safari hover:bg-safari-light text-white rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-xl shadow-safari/20 active:scale-95"
+            className="w-full h-12 bg-navy hover:bg-safari text-white rounded-xl font-bold uppercase tracking-widest text-[11px] transition-all shadow-lg active:scale-95"
           >
             Explore Places
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
-          <div className="lg:col-span-2 space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-12 items-start">
+          <div className="space-y-6">
             {savedPlaces.map(item => {
               const place = item.place!;
               return (
-                <div key={item.id} className="group bg-navy/60 backdrop-blur-xl rounded-tr-[2.5rem] rounded-br-[2.5rem] rounded-bl-[2.5rem] rounded-tl-none border border-white/5 hover:border-safari/30 transition-all flex flex-col sm:flex-row shadow-2xl shadow-navy/40 overflow-hidden min-h-[300px]">
-                  <div className="w-full sm:w-1/3 relative shrink-0 overflow-hidden">
-                    <img src={place.imageUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="" />
-                    <div className="absolute top-4 left-4">
-                      <span className="text-[9px] font-black text-safari uppercase tracking-[0.2em] bg-navy/90 backdrop-blur-md px-4 py-2 rounded-lg border border-safari/20">
-                        {place.category === 'EATS_ENT' ? 'Eats & Entertainment' : (place.category?.replace('_', ' ') || 'Destination')}
-                      </span>
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-r from-navy/60 via-navy/10 to-transparent z-0 pointer-events-none"></div>
+                <div key={item.id} className="group bg-white rounded-2xl border border-navy/5 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row overflow-hidden relative">
+                  <div className="w-full md:w-48 aspect-video md:aspect-auto shrink-0 relative overflow-hidden">
+                    <img src={place.imageUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={place.name} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-navy/40 to-transparent"></div>
                   </div>
                   
-                  <div className="flex-1 p-8 sm:p-10 flex flex-col justify-between bg-gradient-to-r from-navy/40 to-transparent">
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-start">
+                  <div className="flex-1 p-6 flex flex-col justify-between">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start gap-4">
                         <div className="space-y-1">
-                          <h3 className="text-3xl font-serif font-bold group-hover:text-safari transition-colors">{place.name}</h3>
-                          <div className="flex items-center gap-2 text-white/40 text-sm">
-                            <MapPin size={16} className="text-safari" />
+                          <h3 className="text-lg font-bold text-navy group-hover:text-safari transition-colors">{place.name}</h3>
+                          <div className="flex items-center gap-2 text-navy/40 text-xs font-medium">
+                            <MapPin size={14} className="text-safari" />
                             <span>{place.location}</span>
                           </div>
                         </div>
                         <button 
                           onClick={() => onRemove(item.id)}
-                          className="p-4 text-white/20 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all border border-transparent hover:border-red-500/20"
-                          title="Remove from Planner"
+                          className="p-2 text-navy/20 hover:text-red-500 transition-colors"
+                          title="Remove"
                         >
-                          <Trash2 size={24} />
+                          <Trash2 size={20} />
                         </button>
                       </div>
 
-                      <p className="text-white/40 text-sm font-light line-clamp-2 leading-relaxed">
-                        {place.description}
-                      </p>
-                    </div>
-
-                    <div className="mt-8 pt-8 border-t border-white/5 space-y-6">
-                      <div className="flex flex-wrap items-center justify-between gap-6">
-                        <div className="flex items-center gap-4">
-                          <div className="bg-safari/10 p-3 rounded-2xl text-safari shadow-inner">
-                            <Calendar size={20} />
+                      <div className="pt-4 border-t border-navy/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-navy/5 p-2 rounded-lg text-navy/40">
+                            <Calendar size={18} />
                           </div>
                           <div className="flex flex-col">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-white/30">Planned Experience</span>
-                            <span className="text-sm font-bold">
-                              {item.plannedDate ? new Date(item.plannedDate).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Not yet scheduled'}
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-navy/30">Schedule</span>
+                            <span className="text-xs font-bold text-navy">
+                              {item.plannedDate ? new Date(item.plannedDate).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Flexible'}
                             </span>
                           </div>
                         </div>
 
                         {!item.isEvent ? (
-                          <div className="flex flex-col gap-2 shrink-0">
-                            <label className="text-[9px] font-black uppercase tracking-widest text-safari">Adjust Schedule</label>
+                          <div className="relative">
                             <input 
                               type="datetime-local" 
-                              className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest outline-none focus:border-safari transition-all cursor-pointer text-white hover:bg-white/10"
+                              className="bg-navy/5 border border-transparent rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-wider outline-none focus:border-safari transition-all cursor-pointer text-navy hover:bg-navy/10"
                               value={item.plannedDate || ''}
                               onChange={(e) => onUpdateDate(item.id, e.target.value)}
                             />
                           </div>
                         ) : (
-                          <div className="px-6 py-3 bg-safari/5 border border-safari/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-safari/60 italic flex items-center gap-2">
-                             <div className="w-1.5 h-1.5 bg-safari rounded-full animate-pulse"></div>
-                             Fixed Schedule Event
-                          </div>
+                          <span className="text-[9px] font-bold uppercase tracking-widest text-safari italic flex items-center gap-1.5 bg-safari/5 px-2 py-1 rounded">
+                             <div className="w-1 h-1 bg-safari rounded-full"></div>
+                             Fixed Date
+                          </span>
                         )}
                       </div>
                     </div>
@@ -134,29 +123,25 @@ export const TripDashboard: React.FC<TripDashboardProps> = ({ savedItems, places
             })}
           </div>
 
-          <div className="bg-navy p-10 rounded-[3rem] border border-white/5 sticky top-28 space-y-10 text-white shadow-2xl shadow-navy/40">
-            <h3 className="text-3xl font-serif font-bold border-b border-white/10 pb-6">Trip Summary</h3>
-            <div className="space-y-6">
+          <div className="bg-navy p-8 rounded-2xl sticky top-28 space-y-8 text-white shadow-xl">
+            <h3 className="text-2xl font-serif font-bold border-b border-white/10 pb-4">Trip Summary</h3>
+            <div className="space-y-4">
               <div className="flex justify-between items-center text-white/60">
-                <span className="text-sm uppercase tracking-widest font-black">Total Spots</span>
-                <span className="text-2xl font-bold font-serif text-safari">{savedPlaces.length}</span>
+                <span className="text-[11px] uppercase tracking-widest font-bold">Items</span>
+                <span className="text-xl font-bold font-serif text-safari">{savedPlaces.length}</span>
               </div>
               <div className="flex justify-between items-center text-white/60">
-                <span className="text-sm uppercase tracking-widest font-black">Est. Duration</span>
-                <span className="text-2xl font-bold font-serif text-white">7-10 Days</span>
-              </div>
-              <div className="flex justify-between items-center text-white/60">
-                <span className="text-sm uppercase tracking-widest font-black">Difficulty</span>
-                <span className="text-2xl font-bold font-serif text-white">Moderate</span>
+                <span className="text-[11px] uppercase tracking-widest font-bold">Days</span>
+                <span className="text-xl font-bold font-serif text-white">10 Days</span>
               </div>
             </div>
             
-            <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
-              <p className="text-sm text-safari-light font-medium italic leading-relaxed">"Pro tip: Book tour operators directly for the best local rates and tailored experiences."</p>
+            <div className="bg-white/5 p-4 rounded-xl border border-white/5">
+              <p className="text-xs text-safari/80 font-medium italic leading-relaxed">Book tour operators directly for the best local rates.</p>
             </div>
 
-            <button className="w-full py-5 bg-safari hover:bg-safari-light text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 transition-all shadow-2xl shadow-safari/20 active:scale-95">
-              Export Itinerary <ChevronRight size={20} />
+            <button className="w-full h-12 bg-safari hover:bg-safari-light text-white rounded-xl font-bold uppercase tracking-widest text-[11px] flex items-center justify-center gap-3 transition-all shadow-lg active:scale-95">
+              Export Itinerary <ChevronRight size={18} />
             </button>
           </div>
         </div>

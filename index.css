@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+:root {
+  --color-navy: #0f1b2d;
+  --color-cream: #f5efe6;
+  --color-orange: #e8611a;
+  --color-white: #ffffff;
+  --radius-card: 16px;
+  --shadow-card: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-card-hover: 0 8px 24px rgba(0,0,0,0.12);
+  --container-max: 1200px;
+  --container-pad: clamp(1rem, 4vw, 2rem);
+}
+
+@theme {
+  --color-navy: var(--color-navy);
+  --color-cream: var(--color-cream);
+  --color-safari: var(--color-orange);
+  --color-safari-light: #FB923C;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-navy);
+  font-family: "Inter", sans-serif;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-pad);
+}
+
+.card-base {
+  background: var(--color-white);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.card-base:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Typography Clamping */
+h1 { font-size: clamp(2rem, 6vw, 4rem); }
+h2 { font-size: clamp(1.5rem, 4vw, 2.5rem); }
+h3 { font-size: clamp(1rem, 2.5vw, 1.375rem); }
+p { font-size: clamp(0.875rem, 2vw, 1rem); }
+.text-label { font-size: clamp(0.7rem, 1.5vw, 0.8rem); }

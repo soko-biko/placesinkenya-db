@@ -174,16 +174,16 @@ const App: React.FC = () => {
               }} 
             />
             
-            <section className="max-w-7xl mx-auto px-4 py-20">
+            <section className="max-w-[1200px] mx-auto px-4 py-20">
               <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-6">
-                <div className="space-y-4">
-                  <span className="text-safari font-bold uppercase tracking-widest text-sm">Get Inspired</span>
-                  <h2 className="text-4xl md:text-6xl font-serif font-bold leading-tight text-navy">Top Destinations in Kenya</h2>
+                <div className="space-y-2">
+                  <span className="text-safari font-bold uppercase tracking-widest text-[11px]">Get Inspired</span>
+                  <h2 className="text-navy font-bold leading-tight font-serif" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)' }}>Top Destinations in Kenya</h2>
                 </div>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide -mx-4 px-4 w-screen md:w-auto relative whitespace-nowrap">
                   <button 
                     onClick={() => setSelectedCategory('ALL')}
-                    className={`px-6 py-2.5 rounded-full border transition-all text-sm font-black uppercase tracking-tight active:scale-95 ${selectedCategory === 'ALL' ? 'border-safari text-safari bg-safari/10 shadow-xl shadow-safari/5' : 'border-navy/10 text-navy/40 hover:border-safari hover:text-safari'}`}
+                    className={`px-5 h-9 rounded-full border transition-all text-[11px] font-bold uppercase tracking-wider ${selectedCategory === 'ALL' ? 'bg-navy border-navy text-white shadow-lg' : 'border-navy/10 text-navy hover:border-navy'}`}
                   >
                     All
                   </button>
@@ -191,7 +191,7 @@ const App: React.FC = () => {
                     <button 
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}
-                      className={`px-6 py-2.5 rounded-full border transition-all text-sm font-black uppercase tracking-tight active:scale-95 ${selectedCategory === cat ? 'border-safari text-safari bg-safari/10 shadow-xl shadow-safari/5' : 'border-navy/10 text-navy/40 hover:border-safari hover:text-safari'}`}
+                      className={`px-5 h-9 rounded-full border transition-all text-[11px] font-bold uppercase tracking-wider ${selectedCategory === cat ? 'bg-navy border-navy text-white shadow-lg' : 'border-navy/10 text-navy hover:border-navy'}`}
                     >
                       {cat === 'EATS_ENT' ? 'Eats & Entertainment' : cat?.replace('_', ' ')}
                     </button>
@@ -200,21 +200,21 @@ const App: React.FC = () => {
               </div>
 
                {isAdmin && (
-                <div className="mb-12 p-8 bg-navy border border-white/5 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl shadow-navy/20">
+                <div className="mb-12 p-8 bg-navy border border-white/5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
                   <div className="space-y-1 text-center md:text-left">
-                    <h3 className="text-2xl font-bold font-serif text-white">Cloud Infrastructure Console</h3>
+                    <h3 className="text-xl font-bold font-serif text-white">Cloud Infrastructure Console</h3>
                     <p className="text-white/50 text-sm font-light">Deploy initial cloud collections to your active database instance.</p>
                   </div>
                   <button 
                     onClick={seedDatabase}
-                    className="flex items-center gap-3 bg-safari px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-xs text-white hover:bg-safari-light transition-all shadow-xl shadow-safari/20 active:scale-95"
+                    className="flex items-center gap-3 bg-safari px-8 h-12 rounded-lg font-bold uppercase tracking-widest text-[11px] text-white hover:bg-safari-light transition-all shadow-xl active:scale-95"
                   >
-                    <Plus size={20} /> Initialize Database
+                    <Plus size={16} /> Initialize Database
                   </button>
                 </div>
               )}
               
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                  {filteredPlaces.length > 0 ? (
                   filteredPlaces.map(place => (
                     <PlaceCard 
@@ -315,23 +315,27 @@ const App: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="pt-48 pb-20 flex flex-col items-center justify-center space-y-10"
+            className="flex-1 flex items-center justify-center pt-24 pb-20"
           >
-             <div className="w-32 h-32 bg-navy text-safari rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-navy/20 border border-white/5">
-               <Calendar size={64} />
+             <div className="max-w-[450px] mx-auto px-6 text-center space-y-10 animate-fade-in">
+               <div className="w-20 h-20 bg-navy/5 rounded-2xl flex items-center justify-center mx-auto text-navy/20">
+                 <Calendar size={40} />
+               </div>
+               <div className="space-y-3">
+                  <span className="text-safari font-bold uppercase tracking-widest text-[11px]">Private Access</span>
+                  <h2 className="text-3xl md:text-4xl font-serif font-bold text-navy leading-tight">Private Explorer Hub</h2>
+                  <p className="text-navy/60 text-base font-medium leading-relaxed">
+                    Sign in to access your custom itinerary, saved gems, and exclusive travel guides.
+                  </p>
+               </div>
+               <button 
+                onClick={() => setIsAuthOpen(true)}
+                className="w-full h-12 bg-navy text-white rounded-xl font-bold uppercase tracking-widest text-[11px] shadow-lg hover:bg-safari transition-all active:scale-95 flex items-center justify-center gap-4"
+              >
+                Sign In to Start Planning <ChevronRight size={16} />
+              </button>
+              <p className="text-[9px] text-navy/30 uppercase font-bold tracking-widest leading-none">Secured by PlacesInKenya Collective</p>
              </div>
-             <div className="text-center space-y-4">
-                <h2 className="text-5xl font-serif font-bold text-navy">Your Private Planner</h2>
-                <p className="text-navy/50 max-w-lg mx-auto leading-relaxed text-lg font-light">
-                  Authenticate your account to save destinations, track upcoming events, and curate your personalized Kenyan adventure across multiple cloud instances.
-                </p>
-             </div>
-             <button 
-              onClick={() => setIsAuthOpen(true)}
-              className="bg-navy px-12 py-5 rounded-2xl font-black uppercase tracking-widest text-xs text-white shadow-2xl shadow-navy/30 hover:bg-navy/90 transition-all active:scale-95 flex items-center gap-4"
-            >
-              Sign In to Start Planning
-            </button>
           </motion.main>
         )}
         {activePage === 'onboarding' && (
@@ -346,51 +350,59 @@ const App: React.FC = () => {
       </AnimatePresence>
 
       {/* Footer */}
-      <footer className="bg-navy py-20 px-4 mt-20 text-white relative overflow-hidden">
+      <footer className="bg-navy py-16 text-white relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-safari/50 to-transparent"></div>
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-16 mb-16">
-          <div className="col-span-1 md:col-span-2 space-y-8">
-                 <div className="flex items-center gap-4 group cursor-pointer" onClick={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-                   <div className="w-14 h-14 flex items-center justify-center rounded-xl overflow-hidden bg-white p-1.5 shadow-inner">
-                     <img 
-                       src="/logo.png" 
-                       alt="PlacesInKenya" 
-                       className="w-full h-full object-contain"
-                       onError={(e) => {
-                         e.currentTarget.src = 'https://via.placeholder.com/56?text=PK&bg=ffffff';
-                       }}
-                     />
-                   </div>
-                   <span className="font-serif text-3xl font-bold text-white group-hover:text-safari transition-colors">PlacesInKenya</span>
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+            <div className="space-y-6">
+              <div className="flex items-center gap-4 group cursor-pointer" onClick={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                <div className="w-12 h-12 flex items-center justify-center rounded-xl overflow-hidden bg-white p-1.5 shadow-inner">
+                  <img 
+                    src="/logo.png" 
+                    alt="PlacesInKenya" 
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://via.placeholder.com/56?text=PK&bg=ffffff';
+                    }}
+                  />
                 </div>
-                <p className="text-white/40 text-lg max-w-xl leading-relaxed font-light">
-                  The world's largest Kenyan travel guidance platform. We help hundreds of travelers each month make every trip their best trip.
-                </p>
-          </div>
-          <div className="space-y-6">
-              <h4 className="font-black uppercase tracking-[0.3em] text-[10px] text-safari font-sans">Explore</h4>
-              <ul className="grid grid-cols-1 gap-y-4 text-white/60 font-medium font-sans">
-                <li><button onClick={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-white transition-colors">Destinations</button></li>
-                <li><button onClick={() => { setActivePage('operators'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-white transition-colors">Safari Operators</button></li>
-                <li><button onClick={() => { setActivePage('where-to-go'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-white transition-colors">Upcoming Events</button></li>
-                <li><button onClick={() => { setActivePage('trips'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-white transition-colors">Trip Planner</button></li>
+                <div className="flex flex-col">
+                  <span className="font-serif text-2xl font-bold text-white group-hover:text-safari transition-colors">PlacesInKenya</span>
+                  <span className="text-xs text-white/40 font-medium">Kenya's #1 Travel Guide</span>
+                </div>
+              </div>
+              <p className="text-white/40 text-sm leading-relaxed max-w-sm">
+                The world's largest Kenyan travel guidance platform. We help hundreds of travelers each month make every trip their best trip.
+              </p>
+            </div>
+            
+            <div className="space-y-6">
+              <h4 className="font-bold uppercase tracking-widest text-[11px] text-safari">Explore</h4>
+              <ul className="space-y-3">
+                <li><button onClick={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-white/60 hover:text-white transition-colors text-sm py-1">Destinations</button></li>
+                <li><button onClick={() => { setActivePage('operators'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-white/60 hover:text-white transition-colors text-sm py-1">Safari Operators</button></li>
+                <li><button onClick={() => { setActivePage('where-to-go'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-white/60 hover:text-white transition-colors text-sm py-1">Upcoming Events</button></li>
+                <li><button onClick={() => { setActivePage('trips'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-white/60 hover:text-white transition-colors text-sm py-1">Trip Planner</button></li>
               </ul>
-          </div>
-          <div className="space-y-6">
-              <h4 className="font-black uppercase tracking-[0.3em] text-[10px] text-safari font-sans">Business</h4>
-              <ul className="space-y-4 text-white/60 font-medium font-sans">
-                <li><button onClick={() => { setActivePage('onboarding'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-white transition-colors text-left flex items-center gap-2 group">Partner With Us <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" /></button></li>
-                <li><button className="hover:text-white transition-colors">Write a Review</button></li>
-                <li><button className="hover:text-white transition-colors">Add a Place</button></li>
+            </div>
+
+            <div className="space-y-6">
+              <h4 className="font-bold uppercase tracking-widest text-[11px] text-safari">Business</h4>
+              <ul className="space-y-3">
+                <li><button onClick={() => { setActivePage('onboarding'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-white/60 hover:text-white transition-colors text-sm py-1">Partner With Us</button></li>
+                <li><button className="text-white/60 hover:text-white transition-colors text-sm py-1">Write a Review</button></li>
+                <li><button className="text-white/60 hover:text-white transition-colors text-sm py-1">Add a Place</button></li>
               </ul>
+            </div>
           </div>
-        </div>
-        <div className="max-w-7xl mx-auto pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-white/20 text-xs font-black uppercase tracking-widest font-sans">
-          <p>&copy; 2024 PlacesInKenya. A travel community project.</p>
-          <div className="flex gap-10">
-             <a href="#" className="hover:text-white transition-colors capitalize">Privacy</a>
-             <a href="#" className="hover:text-white transition-colors capitalize">Terms</a>
-             <a href="#" className="hover:text-white transition-colors capitalize">Cookies</a>
+
+          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-white/20 text-[10px] font-bold uppercase tracking-[0.15em]">
+            <p>&copy; 2026 PlacesInKenya. A travel community project.</p>
+            <div className="flex gap-8">
+               <a href="#" className="hover:text-white transition-colors">Privacy</a>
+               <a href="#" className="hover:text-white transition-colors">Terms</a>
+               <a href="#" className="hover:text-white transition-colors">Cookies</a>
+            </div>
           </div>
         </div>
       </footer>

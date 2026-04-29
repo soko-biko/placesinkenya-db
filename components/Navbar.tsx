@@ -14,13 +14,13 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onOpenAuth, onNavigate, activePage, tripCount = 0 }) => {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-navy/90 backdrop-blur-xl border-b border-white/5 px-4 py-4 md:px-8">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 z-[100] bg-navy/90 backdrop-blur-md border-b border-white/5 px-4 h-[72px] flex items-center">
+      <div className="max-w-[1200px] mx-auto w-full flex items-center justify-between">
         <div 
-          className="flex items-center gap-3 cursor-pointer group"
+          className="flex items-center gap-3 cursor-pointer group py-2"
           onClick={() => onNavigate('home')}
         >
-          <div className="w-12 h-12 flex items-center justify-center rounded-xl overflow-hidden bg-white p-1.5 shadow-inner">
+          <div className="w-10 h-10 flex items-center justify-center rounded-xl overflow-hidden bg-white p-1.5 shadow-inner shrink-0">
             <img 
               src="/logo.png" 
               alt="PlacesInKenya" 
@@ -30,39 +30,42 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onOpenAuth, onNa
               }}
             />
           </div>
-          <span className="font-serif text-xl md:text-2xl font-bold tracking-tight text-white group-hover:text-safari transition-colors">
-            PlacesInKenya
-          </span>
+          <div className="flex flex-col">
+            <span className="font-serif text-lg md:text-xl font-bold tracking-tight text-white group-hover:text-safari transition-colors leading-tight">
+              PlacesInKenya
+            </span>
+            <span className="text-[10px] text-white/50 hidden md:block font-medium">Kenya's #1 Travel Guide</span>
+          </div>
         </div>
 
-        <div className="hidden lg:flex items-center gap-10 font-medium">
+        <div className="hidden lg:flex items-center gap-2 font-medium">
           <button 
             onClick={() => onNavigate('home')}
-            className={`transition-all font-black uppercase tracking-widest text-[11px] flex items-center gap-2 pb-1 border-b-2 ${activePage === 'home' ? 'text-safari border-safari' : 'text-white/60 border-transparent hover:text-white'}`}
+            className={`transition-all font-bold uppercase tracking-widest text-[11px] flex items-center gap-2 px-4 h-11 rounded-lg ${activePage === 'home' ? 'text-safari bg-white/5' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
           >
-            <Search size={14} /> Explore
+            Explore
           </button>
           <button 
             onClick={() => onNavigate('where-to-go')}
-            className={`transition-all font-black uppercase tracking-widest text-[11px] flex items-center gap-2 pb-1 border-b-2 ${activePage === 'where-to-go' ? 'text-safari border-safari' : 'text-white/60 border-transparent hover:text-white'}`}
+            className={`transition-all font-bold uppercase tracking-widest text-[11px] flex items-center gap-2 px-4 h-11 rounded-lg ${activePage === 'where-to-go' ? 'text-safari bg-white/5' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
           >
-            <MapPin size={14} /> Where to Go
+            Where to Go
           </button>
           <button 
             onClick={() => onNavigate('operators')}
-            className={`transition-all font-black uppercase tracking-widest text-[11px] flex items-center gap-2 pb-1 border-b-2 ${activePage === 'operators' ? 'text-safari border-safari' : 'text-white/60 border-transparent hover:text-white'}`}
+            className={`transition-all font-bold uppercase tracking-widest text-[11px] flex items-center gap-2 px-4 h-11 rounded-lg ${activePage === 'operators' ? 'text-safari bg-white/5' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
           >
-            <User size={14} /> Operators
+            Operators
           </button>
           <div className="relative">
             <button 
               onClick={() => onNavigate('trips')}
-              className={`transition-all font-black uppercase tracking-widest text-[11px] flex items-center gap-2 pb-1 border-b-2 ${activePage === 'trips' ? 'text-safari border-safari' : 'text-white/60 border-transparent hover:text-white'}`}
+              className={`transition-all font-bold uppercase tracking-widest text-[11px] flex items-center gap-2 px-4 h-11 rounded-lg ${activePage === 'trips' ? 'text-safari bg-white/5' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
             >
-              <Heart size={14} /> Trips
+              Trips
             </button>
             {tripCount > 0 && (
-              <span className="absolute -top-3 -right-3 bg-safari text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg shadow-safari/30">
+              <span className="absolute top-1 right-1 bg-safari text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg shadow-safari/30">
                 {tripCount}
               </span>
             )}
@@ -71,27 +74,27 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onOpenAuth, onNa
 
         <div className="flex items-center gap-4">
           {user ? (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               <div 
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10 transition-all"
+                className="flex items-center gap-2 pr-4 h-11 rounded-xl bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10 transition-all pl-2"
                 onClick={() => onNavigate('trips')}
               >
                 <div className="w-7 h-7 rounded-lg bg-safari flex items-center justify-center text-xs font-bold text-white shadow-lg shadow-safari/20">
                   {user?.name?.[0] || user?.email?.[0] || 'U'}
                 </div>
-                <span className="text-sm font-bold hidden sm:inline text-white/80">{user?.name || user?.email?.split('@')[0] || 'User'}</span>
+                <span className="text-[13px] font-bold hidden sm:inline text-white/80">{user?.name || user?.email?.split('@')[0] || 'User'}</span>
               </div>
               <button 
                 onClick={onLogout}
-                className="p-2.5 hover:bg-white/5 rounded-xl transition-colors text-white/40 hover:text-white"
+                className="w-11 h-11 flex items-center justify-center hover:bg-white/5 rounded-xl transition-colors text-white/40 hover:text-white"
               >
-                <LogOut size={20} />
+                <LogOut size={18} />
               </button>
             </div>
           ) : (
             <button 
               onClick={onOpenAuth}
-              className="px-8 py-2.5 bg-safari hover:bg-safari-light text-white rounded-xl font-bold transition-all shadow-xl shadow-safari/20 active:scale-95"
+              className="px-6 h-11 bg-safari hover:bg-safari-light text-white rounded-lg font-bold text-sm transition-all shadow-xl shadow-safari/20 active:scale-95"
             >
               Sign In
             </button>
