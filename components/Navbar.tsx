@@ -9,9 +9,10 @@ interface NavbarProps {
   onOpenAuth: () => void;
   onNavigate: (page: string) => void;
   activePage: string;
+  tripCount?: number;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onOpenAuth, onNavigate, activePage }) => {
+export const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onOpenAuth, onNavigate, activePage, tripCount = 0 }) => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-navy/5 px-4 py-3 md:px-8 bg-beige/80">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -44,22 +45,32 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onOpenAuth, onNa
           >
             Operators
           </button>
-          <button 
-            onClick={() => onNavigate('trips')}
-            className={`transition-colors font-black uppercase tracking-widest text-[10px] ${activePage === 'trips' ? 'text-safari' : 'text-navy hover:text-safari'}`}
-          >
-            Trip Planner
-          </button>
+          <div className="relative">
+            <button 
+              onClick={() => onNavigate('trips')}
+              className={`transition-colors font-black uppercase tracking-widest text-[10px] ${activePage === 'trips' ? 'text-safari' : 'text-navy hover:text-safari'}`}
+            >
+              Trip Planner
+            </button>
+            {tripCount > 0 && (
+              <span className="absolute -top-3 -right-4 bg-safari text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center animate-bounce shadow-lg shadow-safari/30">
+                {tripCount}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-4">
           {user ? (
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-navy/5 border border-navy/10">
+              <div 
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-navy/5 border border-navy/10 cursor-pointer hover:bg-navy/10 transition-all"
+                onClick={() => onNavigate('trips')}
+              >
                 <div className="w-6 h-6 rounded-full bg-safari flex items-center justify-center text-xs font-bold text-white">
-                  {user.name[0]}
+                  {user?.name?.[0] || user?.email?.[0] || 'U'}
                 </div>
-                <span className="text-sm font-medium hidden sm:inline text-navy">{user.name}</span>
+                <span className="text-sm font-medium hidden sm:inline text-navy">{user?.name || user?.email?.split('@')[0] || 'User'}</span>
               </div>
               <button 
                 onClick={onLogout}

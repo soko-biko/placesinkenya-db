@@ -66,7 +66,7 @@ const App: React.FC = () => {
     }
   };
 
-  const handleSaveItem = (id: string) => {
+  const handleSaveItem = (id: string, isEvent: boolean = false, initialDate?: string) => {
     if (!isAuthenticated) {
       setPendingSaveId(id);
       setIsAuthOpen(true);
@@ -77,14 +77,22 @@ const App: React.FC = () => {
       const newItem: SavedItem = {
         id: Math.random().toString(36).substr(2, 9),
         placeId: id,
-        addedAt: new Date().toISOString()
+        addedAt: new Date().toISOString(),
+        isEvent,
+        plannedDate: initialDate
       };
       setSavedItems(prev => [...prev, newItem]);
     }
   };
 
   const handleSaveEvent = (event: Event) => {
-    handleSaveItem(event.id);
+    handleSaveItem(event.id, true, event.date);
+  };
+
+  const handleUpdateItemDate = (id: string, date: string) => {
+    setSavedItems(prev => prev.map(item => 
+      item.id === id ? { ...item, plannedDate: date } : item
+    ));
   };
 
   const handleRemoveItem = (id: string) => {
@@ -139,6 +147,7 @@ const App: React.FC = () => {
         onOpenAuth={() => setIsAuthOpen(true)}
         onNavigate={setActivePage}
         activePage={activePage}
+        tripCount={savedItems.length}
       />
 
       <AnimatePresence mode="wait">
@@ -192,7 +201,7 @@ const App: React.FC = () => {
                 </div>
               )}
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                  {filteredPlaces.length > 0 ? (
                   filteredPlaces.map(place => (
                     <PlaceCard 
@@ -281,6 +290,7 @@ const App: React.FC = () => {
               savedItems={savedItems} 
               places={[...places, ...MOCK_PLACES, ...MOCK_EVENTS.map(e => ({ id: e.id, name: e.title, location: e.location, imageUrl: e.imageUrl, rating: 5, category: e.category, description: e.description, isTrending: false } as Place))]} 
               onRemove={handleRemoveItem}
+              onUpdateDate={handleUpdateItemDate}
               onNavigateHome={() => setActivePage('home')}
             />
           </motion.main>
@@ -365,7 +375,7 @@ const App: React.FC = () => {
         <PlaceDetailModal 
           place={selectedPlace}
           onClose={() => setSelectedPlace(null)}
-          onAddToTrip={(p) => handleSaveItem(p.id)}
+          onAddToTrip={(p) => { handleSaveItem(p.id); setSelectedPlace(null); }}
           onExploreOperators={openOperatorView}
           isSaved={savedItems.some(i => i.placeId === selectedPlace.id)}
           operators={displayOperators}

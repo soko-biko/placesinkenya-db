@@ -65,6 +65,8 @@ export interface SavedItem {
   id: string;
   placeId: string;
   addedAt: string;
+  plannedDate?: string;
+  isEvent?: boolean;
 }
 
 export interface Itinerary {

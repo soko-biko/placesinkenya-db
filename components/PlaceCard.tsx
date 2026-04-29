@@ -11,50 +11,82 @@ interface PlaceCardProps {
 export const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick }) => {
   return (
     <div 
-      className="group bg-navy rounded-[2rem] overflow-hidden border border-white/5 hover:border-safari/50 transition-all cursor-pointer hover:-translate-y-1 shadow-2xl shadow-navy/20 h-full flex flex-col"
+      className="group bg-navy/60 backdrop-blur-xl rounded-tr-[2.5rem] rounded-br-[2.5rem] rounded-bl-[2.5rem] rounded-tl-none overflow-hidden border border-white/5 hover:border-safari/50 transition-all cursor-pointer shadow-3xl shadow-navy/60 flex h-[320px] relative"
       onClick={() => onClick(place)}
     >
-      <div className="h-36 sm:h-40 overflow-hidden relative shrink-0">
+      {/* Content Section - Left */}
+      <div className="flex-1 p-8 flex flex-col justify-between z-10 bg-gradient-to-r from-navy/40 to-transparent">
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="bg-safari/20 text-safari text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-lg border border-safari/20">
+                {place.category?.replace('_', ' ')}
+              </span>
+              {place.isTrending && (
+                <span className="bg-red-500/10 text-red-400 text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-lg border border-red-500/20">
+                  Best Choice
+                </span>
+              )}
+            </div>
+            <h3 className="text-2xl font-serif font-bold text-white group-hover:text-safari transition-colors leading-tight line-clamp-1">
+              {place.name}
+            </h3>
+            <div className="flex items-center gap-2 text-white/40 text-[10px]">
+              <MapPin size={12} className="text-safari" />
+              <span className="font-medium tracking-wide uppercase italic">{place.location}</span>
+            </div>
+          </div>
+          
+          <p className="text-white/50 text-[13px] leading-relaxed line-clamp-2 font-light max-w-[90%]">
+            {place.description}
+          </p>
+
+          <div className="flex items-center gap-6 pt-2">
+            <div className="flex items-center gap-3">
+              <div className="bg-safari text-white w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm shadow-lg shadow-safari/20">
+                {place.rating}
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-black uppercase tracking-widest text-white">Rating</span>
+                <span className="text-[9px] text-white/30 uppercase font-bold tracking-widest text-ellipsis">Exceptional</span>
+              </div>
+            </div>
+            <div className="h-8 w-px bg-white/5"></div>
+            <div className="flex flex-col">
+              <span className="text-[10px] font-black uppercase tracking-widest text-white">Status</span>
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-glow shadow-green-500/50"></div>
+                <span className="text-[9px] text-white/40 font-bold uppercase">Online</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between pt-6 border-t border-white/5">
+          <div className="flex flex-col">
+            <span className="text-[9px] text-white/20 uppercase font-black tracking-widest">Experience From</span>
+            <span className="text-white text-xl font-bold font-serif">Ksh 4,500</span>
+          </div>
+          <button className="bg-safari hover:bg-safari-light text-white w-12 h-12 rounded-2xl transition-all flex items-center justify-center shadow-xl shadow-safari/20 group/btn">
+            <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
+      </div>
+
+      {/* Image Section - Right */}
+      <div className="w-1/3 h-full relative overflow-hidden shrink-0 group-hover:w-[32%] transition-all duration-700">
+        <div className="absolute inset-0 bg-gradient-to-r from-navy/60 via-navy/10 to-transparent z-10"></div>
         <img 
           src={place.imageUrl} 
           alt={place.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
         />
-        <div className="absolute top-3 left-3 flex gap-2">
-          <span className="bg-navy/80 backdrop-blur-md text-[8px] sm:text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-full text-safari border border-safari/30">
-            {place.category === 'EATS_ENT' ? 'Eats & Ent' : place.category?.replace('_', ' ')}
-          </span>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-navy p-2">
-          <div className="flex items-center gap-1 text-safari">
-            <Star size={10} fill="currentColor" />
-            <span className="text-[10px] font-bold">{place.rating}</span>
-          </div>
-        </div>
-      </div>
-      
-      <div className="p-3 sm:p-4 space-y-1.5 bg-navy flex-1 flex flex-col">
-        <h3 className="text-sm sm:text-base font-bold font-serif text-white group-hover:text-safari transition-colors line-clamp-1">{place.name}</h3>
-        <div className="flex items-center gap-1 text-white/50 text-[9px] sm:text-[10px]">
-          <MapPin size={8} className="text-safari" />
-          <span className="line-clamp-1">{place.location}</span>
-        </div>
-        <p className="text-white/50 text-[10px] sm:text-[11px] line-clamp-2 leading-tight font-light flex-1">
-          {place.description}
-        </p>
-        
-        <div className="flex flex-wrap gap-1.5 pt-1">
-          {place.tags?.slice(0, 2).map(tag => (
-            <span key={tag} className="text-[7px] sm:text-[8px] bg-white/5 px-1.5 py-0.5 rounded-md text-white/30 uppercase tracking-widest font-black">
+        <div className="absolute bottom-6 right-6 z-20 flex gap-2">
+          {place.tags?.slice(0, 1).map(tag => (
+            <span key={tag} className="bg-navy/60 backdrop-blur-md text-[8px] font-black text-white px-3 py-1.5 rounded-lg border border-white/10 uppercase tracking-widest">
               #{tag}
             </span>
           ))}
-        </div>
-
-        <div className="pt-2 flex items-center justify-between border-t border-white/5 mt-auto">
-          <span className="text-safari font-black text-[9px] uppercase tracking-widest flex items-center gap-1 group-hover:gap-1.5 transition-all">
-            Explore <ArrowRight size={10} />
-          </span>
         </div>
       </div>
     </div>

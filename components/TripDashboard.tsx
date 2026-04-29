@@ -7,10 +7,11 @@ interface TripDashboardProps {
   savedItems: SavedItem[];
   places: Place[];
   onRemove: (id: string) => void;
+  onUpdateDate: (id: string, date: string) => void;
   onNavigateHome: () => void;
 }
 
-export const TripDashboard: React.FC<TripDashboardProps> = ({ savedItems, places, onRemove, onNavigateHome }) => {
+export const TripDashboard: React.FC<TripDashboardProps> = ({ savedItems, places, onRemove, onUpdateDate, onNavigateHome }) => {
   const savedPlaces = savedItems
     .map(item => ({
       ...item,
@@ -57,36 +58,80 @@ export const TripDashboard: React.FC<TripDashboardProps> = ({ savedItems, places
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
           <div className="lg:col-span-2 space-y-8">
-            {savedPlaces.map(item => (
-              <div key={item.id} className="group bg-navy text-white p-6 rounded-[2.5rem] border border-white/5 hover:border-safari/30 transition-all flex flex-col sm:flex-row gap-8 items-center shadow-xl shadow-navy/10">
-                <div className="w-full sm:w-48 h-48 flex-shrink-0 rounded-[2rem] overflow-hidden shadow-2xl">
-                  <img src={item.place!.imageUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="" />
-                </div>
-                <div className="flex-1 space-y-4 w-full">
-                  <div className="flex justify-between items-start">
-                    <span className="text-[10px] font-black text-safari uppercase tracking-[0.2em] bg-white/5 px-4 py-1.5 rounded-full">{item.place!.category?.replace('_', ' ')}</span>
-                    <button 
-                      onClick={() => onRemove(item.id)}
-                      className="p-3 text-white/20 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-all"
-                      title="Remove from Planner"
-                    >
-                      <Trash2 size={24} />
-                    </button>
+            {savedPlaces.map(item => {
+              const place = item.place!;
+              return (
+                <div key={item.id} className="group bg-navy/60 backdrop-blur-xl rounded-tr-[2.5rem] rounded-br-[2.5rem] rounded-bl-[2.5rem] rounded-tl-none border border-white/5 hover:border-safari/30 transition-all flex flex-col sm:flex-row shadow-2xl shadow-navy/40 overflow-hidden min-h-[300px]">
+                  <div className="w-full sm:w-1/3 relative shrink-0 overflow-hidden">
+                    <img src={place.imageUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="" />
+                    <div className="absolute top-4 left-4">
+                      <span className="text-[9px] font-black text-safari uppercase tracking-[0.2em] bg-navy/90 backdrop-blur-md px-4 py-2 rounded-lg border border-safari/20">
+                        {place.category === 'EATS_ENT' ? 'Eats & Entertainment' : (place.category?.replace('_', ' ') || 'Destination')}
+                      </span>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-navy/60 via-navy/10 to-transparent z-0 pointer-events-none"></div>
                   </div>
-                  <div className="space-y-1">
-                    <h3 className="text-3xl font-serif font-bold group-hover:text-safari transition-colors">{item.place!.name}</h3>
-                    <div className="flex items-center gap-2 text-white/50 text-base">
-                      <MapPin size={16} className="text-safari" />
-                      <span>{item.place!.location}</span>
+                  
+                  <div className="flex-1 p-8 sm:p-10 flex flex-col justify-between bg-gradient-to-r from-navy/40 to-transparent">
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-1">
+                          <h3 className="text-3xl font-serif font-bold group-hover:text-safari transition-colors">{place.name}</h3>
+                          <div className="flex items-center gap-2 text-white/40 text-sm">
+                            <MapPin size={16} className="text-safari" />
+                            <span>{place.location}</span>
+                          </div>
+                        </div>
+                        <button 
+                          onClick={() => onRemove(item.id)}
+                          className="p-4 text-white/20 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all border border-transparent hover:border-red-500/20"
+                          title="Remove from Planner"
+                        >
+                          <Trash2 size={24} />
+                        </button>
+                      </div>
+
+                      <p className="text-white/40 text-sm font-light line-clamp-2 leading-relaxed">
+                        {place.description}
+                      </p>
+                    </div>
+
+                    <div className="mt-8 pt-8 border-t border-white/5 space-y-6">
+                      <div className="flex flex-wrap items-center justify-between gap-6">
+                        <div className="flex items-center gap-4">
+                          <div className="bg-safari/10 p-3 rounded-2xl text-safari shadow-inner">
+                            <Calendar size={20} />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-white/30">Planned Experience</span>
+                            <span className="text-sm font-bold">
+                              {item.plannedDate ? new Date(item.plannedDate).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'Not yet scheduled'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {!item.isEvent ? (
+                          <div className="flex flex-col gap-2 shrink-0">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-safari">Adjust Schedule</label>
+                            <input 
+                              type="datetime-local" 
+                              className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest outline-none focus:border-safari transition-all cursor-pointer text-white hover:bg-white/10"
+                              value={item.plannedDate || ''}
+                              onChange={(e) => onUpdateDate(item.id, e.target.value)}
+                            />
+                          </div>
+                        ) : (
+                          <div className="px-6 py-3 bg-safari/5 border border-safari/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-safari/60 italic flex items-center gap-2">
+                             <div className="w-1.5 h-1.5 bg-safari rounded-full animate-pulse"></div>
+                             Fixed Schedule Event
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-white/30 text-[10px] uppercase font-black tracking-widest pt-4 border-t border-white/5">
-                    <Calendar size={14} className="text-safari" />
-                    <span>Added {new Date(item.addedAt).toLocaleDateString()}</span>
-                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="bg-navy p-10 rounded-[3rem] border border-white/5 sticky top-28 space-y-10 text-white shadow-2xl shadow-navy/40">
