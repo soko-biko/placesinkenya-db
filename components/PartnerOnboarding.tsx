@@ -32,7 +32,7 @@ export const PartnerOnboarding: React.FC<PartnerOnboardingProps> = ({ onBack }) 
         <motion.div 
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center text-white mb-8 shadow-2xl shadow-green-500/20"
+          className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center text-white mb-8 shadow-xl"
         >
           <CheckCircle2 size={48} />
         </motion.div>
@@ -121,7 +121,7 @@ export const PartnerOnboarding: React.FC<PartnerOnboardingProps> = ({ onBack }) 
                 <button 
                   type="button"
                   onClick={() => setFormStep(2)}
-                  className="w-full h-12 bg-navy text-white rounded-xl font-bold uppercase tracking-widest text-[11px] shadow-lg hover:bg-safari transition-all flex items-center justify-center gap-3"
+                  className="w-full h-12 bg-navy text-white rounded-xl font-bold uppercase tracking-widest text-[11px] hover:bg-safari transition-all flex items-center justify-center gap-3"
                 >
                   Continue <ArrowRight size={16} />
                 </button>
@@ -152,7 +152,7 @@ export const PartnerOnboarding: React.FC<PartnerOnboardingProps> = ({ onBack }) 
                   </button>
                   <button 
                     type="submit"
-                    className="flex-[2] h-12 bg-safari text-white rounded-xl font-bold uppercase tracking-widest text-[11px] shadow-lg hover:bg-safari-light transition-all"
+                    className="flex-[2] h-12 bg-safari text-white rounded-xl font-bold uppercase tracking-widest text-[11px] hover:bg-safari-light transition-all shadow-md"
                   >
                     Submit Application
                   </button>

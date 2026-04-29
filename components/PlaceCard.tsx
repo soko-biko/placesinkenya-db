@@ -32,7 +32,7 @@ export const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick }) => {
               </span>
               <span className="text-white/70 text-[11px] font-bold uppercase tracking-wider">{place.location}</span>
            </div>
-           <div className="bg-safari/15 text-safari border border-safari/50 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold uppercase tracking-[0.05em]">
+           <div className="bg-safari text-white px-2 py-1 rounded text-[9px] font-black uppercase tracking-[0.1em] shadow-sm">
               Online
            </div>
         </div>

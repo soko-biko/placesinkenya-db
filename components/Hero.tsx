@@ -51,15 +51,15 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
             className="font-serif text-5xl md:text-8xl font-bold leading-tight text-white"
           >
             Experience <br />
-            <span className="text-safari italic">Kenya's Majesty</span>
+            <span className="text-safari italic">Magical Kenya</span>
           </motion.h1>
           <motion.p 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="text-xl md:text-2xl text-white/80 max-w-2xl mx-auto font-light leading-relaxed"
+            className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto font-medium leading-relaxed"
           >
-            From legendary safaris to white-sand paradises. Plan your perfect Kenyan escape with the ultimate local guide.
+            From legendary safaris to rooftop restaurants, hidden cafés to midnight concerts — PlacesInKenya is your guide to experiencing Kenya, fully.
           </motion.p>
         </div>
 
@@ -71,15 +71,15 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
             onSubmit={handleSubmit} 
             className="relative max-w-3xl mx-auto w-full"
           >
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl md:rounded-full p-2 flex flex-col md:flex-row items-center shadow-2xl border border-white/20 w-full">
-              <div className="flex items-center gap-3 px-6 w-full md:flex-1 border-b md:border-b-0 md:border-r border-white/10">
+            <div className="bg-white p-2 rounded-2xl flex flex-col md:flex-row items-center shadow-xl w-full">
+              <div className="flex items-center gap-3 px-6 w-full md:flex-1 border-b md:border-b-0 md:border-r border-navy/5">
                 <Search className="text-safari" size={24} />
                 <input 
                   type="text" 
                   value={val}
                   onChange={(e) => setVal(e.target.value)}
-                  placeholder="Search destinations, safaris, events…"
-                  className="bg-transparent border-none outline-none w-full text-white placeholder:text-white/50 py-4 text-lg"
+                  placeholder="Search restaurants, hikes, bars, safaris, hangout spots…"
+                  className="bg-transparent border-none outline-none w-full text-navy placeholder:text-navy/30 py-4 text-base font-bold uppercase tracking-wider"
                 />
               </div>
               <button 

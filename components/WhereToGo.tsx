@@ -13,12 +13,15 @@ interface WhereToGoProps {
 export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, savedItemIds }) => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedEventCat, setSelectedEventCat] = useState<string>('ALL');
   const [showEmpty, setShowEmpty] = useState(false);
   const [baseDate, setBaseDate] = useState(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
     return d;
   });
+
+  const eventCategories = ['ALL', 'FESTIVALS', 'FOOD & DRINK', 'LIVE MUSIC', 'SPORT', 'CULTURE & ART', 'FAMILY'];
 
   const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -33,9 +36,11 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
   const filteredEvents = useMemo(() => {
     return events.filter(e => {
       const eventDate = new Date(e.date);
-      return eventDate.getMonth() === selectedMonth && eventDate.getFullYear() === selectedYear;
+      const matchesDate = eventDate.getMonth() === selectedMonth && eventDate.getFullYear() === selectedYear;
+      const matchesCat = selectedEventCat === 'ALL' || e.category?.toUpperCase() === selectedEventCat;
+      return matchesDate && matchesCat;
     }).sort((a, b) => b.registrations - a.registrations);
-  }, [events, selectedMonth, selectedYear]);
+  }, [events, selectedMonth, selectedYear, selectedEventCat]);
 
   const getEventsForDate = (date: Date) => {
     return filteredEvents.filter(e => {
@@ -67,35 +72,49 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
 
   return (
     <div className="max-w-[1200px] mx-auto px-4">
-      <div className="sticky top-[72px] bg-cream/95 backdrop-blur-md z-30 pt-8 pb-4 -mx-4 px-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 border-b border-navy/5">
+      <div className="sticky top-[72px] bg-cream/98 z-30 pt-8 pb-4 -mx-4 px-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 border-b border-navy/5 shadow-sm">
         <div className="space-y-1">
           <h1 className="text-3xl md:text-5xl font-serif font-bold tracking-tight text-navy">Ways to Experience Kenya</h1>
           <p className="text-navy/40 text-sm md:text-base font-medium">Plan your days with top-rated local events.</p>
         </div>
         
-        <div className="flex items-center gap-3 bg-white p-2 rounded-2xl shadow-sm border border-navy/5">
-          <div className="relative group">
-            <select 
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-              className="appearance-none bg-navy/5 text-navy font-bold uppercase tracking-widest text-[9px] pl-4 pr-8 py-2 rounded-xl outline-none cursor-pointer border border-transparent hover:border-safari transition-all"
-            >
-              {months.map((m, i) => (
-                <option key={m} value={i}>{m}</option>
-              ))}
-            </select>
-          </div>
+        <div className="flex flex-col gap-6">
+          <div className="flex items-center gap-3 bg-white p-2 rounded-2xl shadow-sm border border-navy/5">
+            <div className="relative group">
+              <select 
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                className="appearance-none bg-navy/5 text-navy font-bold uppercase tracking-widest text-[9px] pl-4 pr-8 py-2 rounded-xl outline-none cursor-pointer border border-transparent hover:border-safari transition-all"
+              >
+                {months.map((m, i) => (
+                  <option key={m} value={i}>{m}</option>
+                ))}
+              </select>
+            </div>
 
-          <div className="relative group">
-            <select 
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-              className="appearance-none bg-navy/5 text-navy font-bold uppercase tracking-widest text-[9px] pl-4 pr-8 py-2 rounded-xl outline-none cursor-pointer border border-transparent hover:border-safari transition-all"
-            >
-              {years.map(y => (
-                <option key={y} value={y}>{y}</option>
-              ))}
-            </select>
+            <div className="relative group">
+              <select 
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                className="appearance-none bg-navy/5 text-navy font-bold uppercase tracking-widest text-[9px] pl-4 pr-8 py-2 rounded-xl outline-none cursor-pointer border border-transparent hover:border-safari transition-all"
+              >
+                {years.map(y => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          
+          <div className="flex overflow-x-auto gap-2 scrollbar-hide pb-2 -mx-4 px-4 w-screen md:w-auto">
+            {eventCategories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setSelectedEventCat(cat)}
+                className={`shrink-0 px-5 h-9 rounded-full text-[11px] font-bold uppercase tracking-widest transition-all ${selectedEventCat === cat ? 'bg-navy text-white' : 'bg-white text-navy/40 border border-navy/5 hover:border-navy/20'}`}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -200,13 +219,13 @@ const EventCard: React.FC<EventCardProps> = ({ event, onAdd, isSaved }) => {
         <img src={event.imageUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={event.title} />
         
         {/* Category Badge inside card bounding box */}
-        <div className="absolute top-3 left-3 overflow-hidden rounded">
-          <span className="bg-navy/90 backdrop-blur-md text-white text-[9px] font-bold uppercase tracking-widest px-2.5 py-1.5 shadow-lg border border-white/10">
+        <div className="absolute top-3 left-3 overflow-hidden rounded text-white">
+          <span className="bg-navy text-white text-[9px] font-bold uppercase tracking-widest px-2.5 py-1.5 shadow-md border border-white/10">
             {event.category?.replace('_', ' ')}
           </span>
         </div>
         
-        <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-md px-2.5 py-1.5 rounded-lg border border-navy/10 text-[10px] font-bold font-serif text-safari shadow-sm">
+        <div className="absolute bottom-3 right-3 bg-white px-2.5 py-1.5 rounded-lg border border-navy/10 text-[10px] font-bold font-serif text-safari shadow-sm">
            {new Date(event.date).toLocaleDateString([], { day: 'numeric', month: 'short' })}
         </div>
       </div>

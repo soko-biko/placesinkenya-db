@@ -1,7 +1,7 @@
 
-import React from 'react';
-import { Place, SavedItem } from '../types';
-import { Trash2, Calendar, MapPin, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Place, SavedItem, PlaceCategory } from '../types';
+import { Trash2, Calendar, MapPin, ChevronRight, Settings2, CheckCircle2, Sparkles, Utensils, Music, TreePine, Coffee, Compass, Mountain } from 'lucide-react';
 
 interface TripDashboardProps {
   savedItems: SavedItem[];
@@ -12,6 +12,9 @@ interface TripDashboardProps {
 }
 
 export const TripDashboard: React.FC<TripDashboardProps> = ({ savedItems, places, onRemove, onUpdateDate, onNavigateHome }) => {
+  const [step, setStep] = useState<'categories' | 'itinerary'>('itinerary');
+  const [selectedCats, setSelectedCats] = useState<PlaceCategory[]>([]);
+
   const savedPlaces = savedItems
     .map(item => ({
       ...item,
@@ -19,12 +22,64 @@ export const TripDashboard: React.FC<TripDashboardProps> = ({ savedItems, places
     }))
     .filter(item => item.place);
 
+  const toggleCat = (cat: PlaceCategory) => {
+    setSelectedCats(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
+  };
+
+  if (step === 'categories') {
+    return (
+      <div className="pt-24 pb-40 px-4 md:px-8 max-w-[800px] mx-auto text-center space-y-12">
+        <div className="space-y-4">
+          <Sparkles className="mx-auto text-safari" size={40} />
+          <h1 className="text-4xl md:text-6xl font-serif font-bold text-navy">Tailor Your Itinerary</h1>
+          <p className="text-navy/50 text-xl font-medium">Select the vibes you're chasing. We'll prioritize these in your suggested plan.</p>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+          {[
+            { id: PlaceCategory.RESTAURANTS, label: 'Fine Dining & Local Eats', icon: Utensils },
+            { id: PlaceCategory.ENTERTAINMENT, label: 'Nightlife & Arts', icon: Music },
+            { id: PlaceCategory.OUTDOORS, label: 'Hikes & Nature', icon: TreePine },
+            { id: PlaceCategory.HANGOUT_SPOTS, label: 'Chill & Social', icon: Coffee },
+            { id: PlaceCategory.SAFARI, label: 'Classic Safari', icon: Compass },
+            { id: PlaceCategory.ADVENTURES, label: 'Extreme Thrills', icon: Mountain },
+          ].map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => toggleCat(cat.id)}
+              className={`p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-4 group ${selectedCats.includes(cat.id) ? 'border-safari bg-safari/5 shadow-xl shadow-safari/10' : 'border-navy/5 bg-white hover:border-navy/10'}`}
+            >
+              <div className={`w-12 h-12 flex items-center justify-center rounded-xl bg-navy/5 border border-transparent group-hover:border-safari/30 transition-all ${selectedCats.includes(cat.id) ? 'bg-safari/10 border-safari/30' : ''}`}>
+                <cat.icon size={24} className={selectedCats.includes(cat.id) ? 'text-safari' : 'text-navy/40 group-hover:text-navy'} />
+              </div>
+              <span className={`text-[11px] font-black uppercase tracking-widest text-center leading-tight ${selectedCats.includes(cat.id) ? 'text-safari' : 'text-navy/40 group-hover:text-navy'}`}>{cat.label}</span>
+              {selectedCats.includes(cat.id) && <CheckCircle2 size={16} className="text-safari fill-safari/10" />}
+            </button>
+          ))}
+        </div>
+
+        <button 
+          onClick={() => setStep('itinerary')}
+          disabled={selectedCats.length === 0}
+          className={`w-full max-w-[300px] mx-auto h-14 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-3 ${selectedCats.length > 0 ? 'bg-navy text-white shadow-2xl hover:bg-safari translate-y-0 opacity-100' : 'bg-navy/10 text-navy/20 cursor-not-allowed opacity-50'}`}
+        >
+          Confirm My Vibes <ChevronRight size={18} />
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="pt-12 pb-20 px-4 md:px-8 max-w-[1200px] mx-auto space-y-12">
+    <div className="pt-12 pb-24 px-4 md:px-8 max-w-[1200px] mx-auto space-y-12">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-navy/5 pb-8">
         <div className="space-y-1">
-          <span className="text-safari font-bold uppercase tracking-widest text-[11px]">Private Planner</span>
-          <h1 className="text-4xl md:text-6xl font-serif font-bold text-navy leading-tight">My Personal Hub</h1>
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-safari font-bold uppercase tracking-widest text-[11px]">Private Planner</span>
+            <button onClick={() => setStep('categories')} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-navy/30 hover:text-navy transition-colors bg-navy/5 px-3 py-1 rounded-full border border-navy/5">
+              <Settings2 size={12} /> Refine Preferences
+            </button>
+          </div>
+          <h1 className="text-4xl md:text-6xl font-serif font-bold text-navy leading-tight">My Itinerary</h1>
           <p className="text-navy/40 text-sm md:text-base font-medium">Your curated list of Kenyan wonders.</p>
         </div>
         <div className="bg-white border border-navy/5 p-4 rounded-2xl flex items-center gap-6 shadow-sm">
@@ -34,8 +89,8 @@ export const TripDashboard: React.FC<TripDashboardProps> = ({ savedItems, places
           </div>
           <div className="w-px h-8 bg-navy/5"></div>
           <div className="text-center px-2">
-            <p className="text-2xl font-bold text-navy">0</p>
-            <p className="text-[9px] uppercase font-bold tracking-widest text-navy/30">Trips</p>
+            <p className="text-2xl font-bold text-navy">{Math.max(1, Math.ceil(savedPlaces.length / 2))}</p>
+            <p className="text-[9px] uppercase font-bold tracking-widest text-navy/30">Days</p>
           </div>
         </div>
       </div>

@@ -14,7 +14,7 @@ export const TrendingTicker: React.FC<TrendingTickerProps> = ({ places, onPlaceC
     <div className="bg-navy py-12 overflow-hidden border-y border-white/5 relative">
       <div className="max-w-[1200px] mx-auto px-4">
         <div className="mb-8 flex items-center gap-3">
-          <span className="w-2 h-2 bg-safari rounded-full animate-pulse shadow-lg shadow-safari/50"></span>
+          <span className="w-2 h-2 bg-safari rounded-full"></span>
           <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/40">Happening Now in Kenya</span>
         </div>
 
