@@ -1,0 +1,8 @@
+{
+  "name": "PlacesInKenya",
+  "description": "A cinematic explorer for Kenya's best destinations, tour operators, and personalized trip planning.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": []
+}
