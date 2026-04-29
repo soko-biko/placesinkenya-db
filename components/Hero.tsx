@@ -59,7 +59,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
             transition={{ delay: 0.1 }}
             className="text-xl md:text-2xl text-white/80 max-w-2xl mx-auto font-light leading-relaxed"
           >
-            From legendary safaris, white-sand paradises, thrilling adventures to best entertainment and eating spots. Plan your perfect Kenyan escape with the ultimate local guide.
+            From legendary safaris to white-sand paradises. Plan your perfect Kenyan escape with the ultimate local guide.
           </motion.p>
         </div>
 
