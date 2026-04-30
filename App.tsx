@@ -9,7 +9,7 @@ import { OperatorsList } from './components/OperatorsList';
 import { TripDashboard } from './components/TripDashboard';
 import { LOGO, MOCK_PLACES, MOCK_OPERATORS, MOCK_EVENTS } from './constants';
 import { Place, TourOperator, SavedItem, PlaceCategory, Event } from './types';
-import { X, Mail, Lock, ShieldCheck, Plus, AlertCircle, CheckCircle2, MapPin, Star, Calendar, ArrowRight, ChevronRight } from 'lucide-react';
+import { X, Mail, Lock, ShieldCheck, Plus, AlertCircle, CheckCircle2, MapPin, Star, Calendar, ArrowRight, ChevronRight, Search } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 import { usePlaces, useTrendingPlaces, useOperators } from './hooks/useFirestore';
 import { placesService, providersService } from './firebase/services';
@@ -18,13 +18,12 @@ import { PartnerOnboarding } from './components/PartnerOnboarding';
 import { WhereToGo } from './components/WhereToGo';
 import { CategoryQuickGrid } from './components/CategoryQuickGrid';
 import { ExploreByCity } from './components/ExploreByCity';
-import { EditorialStrip } from './components/EditorialStrip';
-import { SocialProofStrip } from './components/SocialProofStrip';
 import { CategoryPage } from './components/CategoryPage';
 
 const App: React.FC = () => {
   const { userProfile, login, signup, logout, isAuthenticated, isAdmin } = useAuth();
   const [activePage, setActivePage] = useState<string>('home');
+  const [destinationFilter, setDestinationFilter] = useState({ query: '', category: 'ALL' as PlaceCategory | 'ALL', city: '' });
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -153,8 +152,8 @@ const App: React.FC = () => {
   };
 
   const handleCityClick = (city: string) => {
-    setSearchQuery(city);
-    setActivePage('home');
+    setDestinationFilter(prev => ({ ...prev, city, query: '' }));
+    setActivePage('destinations');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -163,96 +162,72 @@ const App: React.FC = () => {
       case 'home':
         return (
           <motion.main key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="pb-0">
-            <Hero onSearch={setSearchQuery} trendingPlaces={trendingPlaces.length > 0 ? trendingPlaces : MOCK_PLACES.filter(p => p.isTrending)} />
+            <Hero onSearch={(q) => { setDestinationFilter(prev => ({ ...prev, query: q })); setActivePage('destinations'); }} trendingPlaces={trendingPlaces.length > 0 ? trendingPlaces : MOCK_PLACES.filter(p => p.isTrending)} />
             
-            <CategoryQuickGrid onCategoryClick={(cat) => { setSelectedCategory(cat); setActivePage('home'); window.scrollTo({ top: 500, behavior: 'smooth' }); }} />
-
             <TrendingTicker 
               places={trendingPlaces.length > 0 ? trendingPlaces : MOCK_PLACES.filter(p => p.isTrending)} 
               onPlaceClick={(place) => setSelectedPlace(place)} 
             />
             
-            <section className="max-w-[1200px] mx-auto px-4 py-20">
-              <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-6">
-                <div className="space-y-2">
-                  <span className="text-safari font-bold uppercase tracking-widest text-[11px]">Top Picks</span>
-                  <h2 className="text-navy font-bold leading-tight font-serif" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)' }}>Experience the real Kenya</h2>
-                </div>
-                <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide -mx-4 px-4 w-screen md:w-auto relative whitespace-nowrap">
-                  <button 
-                    onClick={() => setSelectedCategory('ALL')}
-                    className={`px-5 h-9 rounded-full border transition-all text-[11px] font-bold uppercase tracking-wider ${selectedCategory === 'ALL' ? 'bg-navy border-navy text-white' : 'border-navy/10 text-navy hover:border-navy'}`}
-                  >
-                    All
-                  </button>
-                  {[
-                    { id: PlaceCategory.RESTAURANTS, label: 'Restaurants' },
-                    { id: PlaceCategory.HANGOUT_SPOTS, label: 'Hangout Spots' },
-                    { id: PlaceCategory.ENTERTAINMENT, label: 'Entertainment' },
-                    { id: PlaceCategory.OUTDOORS, label: 'Outdoors' },
-                    { id: PlaceCategory.SAFARI, label: 'Safaris' },
-                    { id: PlaceCategory.ADVENTURES, label: 'Adventures' }
-                  ].map(cat => (
-                    <button 
-                      key={cat.id}
-                      onClick={() => setSelectedCategory(cat.id)}
-                      className={`px-5 h-9 rounded-full border transition-all text-[11px] font-bold uppercase tracking-wider ${selectedCategory === cat.id ? 'bg-navy border-navy text-white' : 'border-navy/10 text-navy hover:border-navy'}`}
-                    >
-                      {cat.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-               {isAdmin && (
-                <div className="mb-12 p-8 bg-navy border border-white/5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
-                  <div className="space-y-1 text-center md:text-left">
-                    <h3 className="text-xl font-bold font-serif text-white">Initialize Database</h3>
-                    <p className="text-white/50 text-sm font-light">Deploy initial cloud collections to your active database instance.</p>
-                  </div>
-                  <button onClick={seedDatabase} className="flex items-center gap-3 bg-safari px-8 h-12 rounded-lg font-bold uppercase tracking-widest text-[11px] text-white hover:bg-safari-light transition-all active:scale-95">
-                    <Plus size={16} /> Seed Data
-                  </button>
-                </div>
-              )}
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                 {filteredPlaces.length > 0 ? (
-                  filteredPlaces.map(place => (
-                    <PlaceCard key={place.id} place={place} onClick={setSelectedPlace} />
-                  ))
-                ) : (
-                  <div className="col-span-full py-40 text-center space-y-8">
-                     <AlertCircle className="mx-auto text-navy/5" size={120} />
-                     <div className="space-y-2">
-                       <p className="text-3xl font-serif font-bold text-navy/40">No Destinations Found</p>
-                       <p className="text-navy/30 text-sm uppercase tracking-widest font-black">Try broadening your exploration filters</p>
-                     </div>
-                     <button onClick={() => {setSearchQuery(''); setSelectedCategory('ALL');}} className="px-8 py-3 border border-navy/10 text-navy/40 rounded-full text-xs font-black uppercase tracking-widest hover:border-safari hover:text-safari transition-all">
-                       Reset All Filters
-                     </button>
-                  </div>
-                )}
-              </div>
-            </section>
-
             <ExploreByCity onCityClick={handleCityClick} />
-            <EditorialStrip />
-            <SocialProofStrip />
           </motion.main>
         );
-      case 'restaurants':
-        return <CategoryPage title="Where to Eat in Kenya" subtitle="From nyama choma joints to rooftop fine dining — Kenya's food scene is wilder than you think." category={PlaceCategory.RESTAURANTS} places={allDisplayPlaces.filter(p => p.category === PlaceCategory.RESTAURANTS)} onPlaceClick={setSelectedPlace} subcategories={['ALL', 'STREET FOOD', 'LOCAL CUISINE', 'FINE DINING', 'CAFÉS', 'ROOFTOPS', 'SEAFOOD']} heroImage="https://images.unsplash.com/photo-1544025162-d76694265947" />;
-      case 'entertainment':
-        return <CategoryPage title="Nairobi After Dark" subtitle="Live music, rooftop bars, comedy nights, art galleries, cinema and more." category={PlaceCategory.ENTERTAINMENT} places={allDisplayPlaces.filter(p => p.category === PlaceCategory.ENTERTAINMENT)} onPlaceClick={setSelectedPlace} subcategories={['ALL', 'BARS & LOUNGES', 'LIVE MUSIC', 'CLUBS', 'COMEDY', 'THEATRE & ART', 'CINEMAS']} heroImage="https://images.unsplash.com/photo-1514525253361-bee8718a74a2" />;
-      case 'hangout-spots':
-        return <CategoryPage title="Your Next Favourite Spot" subtitle="Cafés to work from, parks to unwind in, rooftops to watch the sunset from." category={PlaceCategory.HANGOUT_SPOTS} places={allDisplayPlaces.filter(p => p.category === PlaceCategory.HANGOUT_SPOTS)} onPlaceClick={setSelectedPlace} subcategories={['ALL', 'CAFÉS', 'PARKS & GARDENS', 'ROOFTOPS', 'MALLS & MARKETS', 'BEACHES', 'VIEWPOINTS']} heroImage="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3" />;
-      case 'outdoors':
-        return <CategoryPage title="Get Outside" subtitle="Hike volcanoes, paddle lakes, cycle through tea farms, or just breathe in a forest." category={PlaceCategory.OUTDOORS} places={allDisplayPlaces.filter(p => p.category === PlaceCategory.OUTDOORS)} onPlaceClick={setSelectedPlace} subcategories={['ALL', 'HIKING & TREKKING', 'WATER SPORTS', 'CYCLING', 'BIRDWATCHING', 'CAMPING', 'FAMILY ACTIVITIES']} heroImage="https://images.unsplash.com/photo-1551632811-561732d1e306" />;
-      case 'adventures':
-        return <CategoryPage title="Push Your Limits" subtitle="From white water rafting in Sagana to skydiving over Diani Beach." category={PlaceCategory.ADVENTURES} places={allDisplayPlaces.filter(p => p.category === PlaceCategory.ADVENTURES)} onPlaceClick={setSelectedPlace} subcategories={['ALL', 'WATER', 'AIR', 'LAND', 'CLIMBING', 'EXTREME']} heroImage="https://images.unsplash.com/photo-1530866495547-084978a5df97" />;
-      case 'safaris':
-        return <CategoryPage title="Safari & Nature" subtitle="National parks, conservancies, and hidden wildlife gems." category={PlaceCategory.SAFARI} places={allDisplayPlaces.filter(p => p.category === PlaceCategory.SAFARI)} onPlaceClick={setSelectedPlace} subcategories={['ALL', 'NATIONAL PARKS', 'CONSERVANCIES', 'BIRD WATCHING', 'PHOTOGRAPHY']} heroImage="https://images.unsplash.com/photo-1516426122078-c23e76319801" />;
+      case 'destinations':
+        return (
+          <motion.main key="destinations" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="pt-32 pb-20 px-4 max-w-7xl mx-auto space-y-12">
+            <div className="space-y-4 text-center">
+              <h1 className="text-4xl md:text-6xl font-serif font-bold text-navy">Catalogue of Wonders</h1>
+              <p className="text-navy/50 text-xl font-light">Explore every verified gem in our collection.</p>
+            </div>
+            
+            <div className="bg-white p-2 rounded-2xl flex flex-col md:flex-row items-center shadow-xl w-full max-w-3xl mx-auto">
+              <div className="flex items-center gap-3 px-6 w-full md:flex-1 border-b md:border-b-0 md:border-r border-navy/5">
+                <Search className="text-safari" size={24} />
+                <input 
+                  type="text" 
+                  value={destinationFilter.query}
+                  onChange={(e) => setDestinationFilter(prev => ({ ...prev, query: e.target.value }))}
+                  placeholder="Search destinations, cities, or vibes..." 
+                  className="w-full h-14 bg-transparent outline-none text-navy font-medium placeholder:text-navy/20"
+                />
+              </div>
+              <div className="flex items-center gap-2 px-4 w-full md:w-auto">
+                 <select 
+                   value={destinationFilter.category}
+                   onChange={(e) => setDestinationFilter(prev => ({ ...prev, category: e.target.value as any }))}
+                   className="bg-transparent text-navy font-bold uppercase tracking-widest text-[11px] px-4 h-14 outline-none cursor-pointer"
+                 >
+                   <option value="ALL">All Categories</option>
+                   {Object.values(PlaceCategory).map(cat => <option key={cat} value={cat}>{cat.replace('_', ' ')}</option>)}
+                 </select>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2 justify-center">
+              {['Nairobi', 'Mombasa', 'Diani', 'Watamu', 'Lamu', 'Nanyuki', 'Naivasha', 'Kisumu'].map(city => (
+                <button
+                  key={city}
+                  onClick={() => setDestinationFilter(prev => ({ ...prev, city: prev.city === city ? '' : city }))}
+                  className={`px-6 h-10 rounded-full text-[11px] font-bold uppercase tracking-widest transition-all ${destinationFilter.city === city ? 'bg-safari text-white' : 'bg-navy/5 text-navy/40 hover:bg-navy/10'}`}
+                >
+                  {city}
+                </button>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {allDisplayPlaces.filter(p => {
+                const matchesQuery = p.name.toLowerCase().includes(destinationFilter.query.toLowerCase()) || 
+                  p.location.toLowerCase().includes(destinationFilter.query.toLowerCase());
+                const matchesCategory = destinationFilter.category === 'ALL' || p.category === destinationFilter.category;
+                const matchesCity = !destinationFilter.city || p.location.toLowerCase().includes(destinationFilter.city.toLowerCase());
+                return matchesQuery && matchesCategory && matchesCity;
+              }).map(place => (
+                <PlaceCard key={place.id} place={place} onClick={setSelectedPlace} />
+              ))}
+            </div>
+          </motion.main>
+        );
       case 'where-to-go':
         return <WhereToGo events={MOCK_EVENTS} onAddToTrip={handleSaveEvent} savedItemIds={savedItemIds} />;
       case 'operators':
@@ -338,13 +313,20 @@ const App: React.FC = () => {
             <div>
               <h4 className="font-bold uppercase tracking-widest text-[11px] text-safari mb-8">Establishments</h4>
               <ul className="space-y-4">
-                {['Restaurants', 'Entertainment', 'Hangout Spots', 'Outdoor Activities', 'Adventures', 'Safaris'].map(item => (
-                  <li key={item}>
+                {[
+                  { label: 'Restaurants', id: PlaceCategory.RESTAURANTS },
+                  { label: 'Entertainment', id: PlaceCategory.ENTERTAINMENT },
+                  { label: 'Hangout Spots', id: PlaceCategory.HANGOUT_SPOTS },
+                  { label: 'Outdoors', id: PlaceCategory.OUTDOORS },
+                  { label: 'Adventures', id: PlaceCategory.ADVENTURES },
+                  { label: 'Safaris', id: PlaceCategory.SAFARI }
+                ].map(item => (
+                  <li key={item.label}>
                     <button 
-                      onClick={() => handleNavigate(item.toLowerCase().replace(' ', '-'))}
+                      onClick={() => { setDestinationFilter(prev => ({ ...prev, category: item.id })); setActivePage('destinations'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                       className="text-white/50 hover:text-white transition-colors text-xs font-bold uppercase tracking-wider"
                     >
-                      {item}
+                      {item.label}
                     </button>
                   </li>
                 ))}

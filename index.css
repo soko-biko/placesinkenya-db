@@ -17,6 +17,13 @@
   --color-cream: var(--color-cream);
   --color-safari: var(--color-orange);
   --color-safari-light: #FB923C;
+
+  @keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  --animate-scroll: scroll 40s linear infinite;
+  --animate-marquee: scroll 30s linear infinite;
 }
 
 html {

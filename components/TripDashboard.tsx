@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Place, SavedItem, PlaceCategory } from '../types';
-import { Trash2, Calendar, MapPin, ChevronRight, Settings2, CheckCircle2, Sparkles, Utensils, Music, TreePine, Coffee, Compass, Mountain } from 'lucide-react';
+import { Trash2, Calendar, MapPin, ChevronRight, Settings2, CheckCircle2, SlidersHorizontal, Utensils, Music, TreePine, Coffee, Compass, Mountain } from 'lucide-react';
 
 interface TripDashboardProps {
   savedItems: SavedItem[];
@@ -30,9 +30,9 @@ export const TripDashboard: React.FC<TripDashboardProps> = ({ savedItems, places
     return (
       <div className="pt-24 pb-40 px-4 md:px-8 max-w-[800px] mx-auto text-center space-y-12">
         <div className="space-y-4">
-          <Sparkles className="mx-auto text-safari" size={40} />
+          <SlidersHorizontal className="mx-auto text-safari" size={40} />
           <h1 className="text-4xl md:text-6xl font-serif font-bold text-navy">Tailor Your Itinerary</h1>
-          <p className="text-navy/50 text-xl font-medium">Select the vibes you're chasing. We'll prioritize these in your suggested plan.</p>
+          <p className="text-navy/50 text-xl font-medium">Select your preferences to prioritize these in your suggested plan.</p>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
@@ -63,7 +63,7 @@ export const TripDashboard: React.FC<TripDashboardProps> = ({ savedItems, places
           disabled={selectedCats.length === 0}
           className={`w-full max-w-[300px] mx-auto h-14 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-3 ${selectedCats.length > 0 ? 'bg-navy text-white shadow-2xl hover:bg-safari translate-y-0 opacity-100' : 'bg-navy/10 text-navy/20 cursor-not-allowed opacity-50'}`}
         >
-          Confirm My Vibes <ChevronRight size={18} />
+          Confirm Plan Preferences <ChevronRight size={18} />
         </button>
       </div>
     );
