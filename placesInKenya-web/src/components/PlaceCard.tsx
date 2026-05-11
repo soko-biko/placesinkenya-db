@@ -1,0 +1,161 @@
+
+import React from 'react';
+import { Star, MapPin, ArrowRight, ShieldCheck, Heart, Share2 } from 'lucide-react';
+import { Place, PlaceCategory } from '../types';
+
+interface PlaceCardProps {
+  place?: Place;
+  onClick?: (place: Place) => void;
+  onSave?: (e: React.MouseEvent) => void;
+  isSaved?: boolean;
+  isLoading?: boolean;
+}
+
+export const PlaceCard: React.FC<PlaceCardProps> = React.memo(({ place, onClick, onSave, isSaved, isLoading }) => {
+  const getCTAText = (category?: PlaceCategory) => {
+    switch (category) {
+      case PlaceCategory.RESTAURANT: return 'Reserve Table';
+      case PlaceCategory.HOTEL: return 'Book Now';
+      case PlaceCategory.SAFARI:
+      case PlaceCategory.EXPERIENCE:
+      case PlaceCategory.ADVENTURES: return 'Book Now';
+      default: return 'Explore Details';
+    }
+  };
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!place) return;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: place.name,
+        text: `Check out ${place.name} in ${place.location} on PlacesInKenya!`,
+        url: window.location.href,
+      }).catch(console.error);
+    } else {
+      // Fallback to WhatsApp
+      const text = encodeURIComponent(`Check out ${place.name} in ${place.location} on PlacesInKenya! ${window.location.href}`);
+      window.open(`https://wa.me/?text=${text}`, '_blank');
+    }
+  };
+
+  if (isLoading || !place) {
+    return (
+      <div className="w-full bg-white rounded-[32px] overflow-hidden shadow-lux animate-pulse border border-navy/5 flex flex-col h-full">
+         <div className="relative aspect-video bg-navy/5">
+           <div className="absolute top-4 left-4 w-20 h-6 bg-navy/10 rounded-lg" />
+           <div className="absolute top-4 right-4 w-8 h-8 bg-navy/10 rounded-lg" />
+         </div>
+         <div className="p-8 flex-1 space-y-6">
+            <div className="space-y-2">
+              <div className="h-7 bg-navy/10 rounded-xl w-3/4" />
+              <div className="h-3 bg-navy/5 rounded-lg w-1/4" />
+            </div>
+            <div className="space-y-2">
+               <div className="h-3 bg-navy/5 rounded-lg w-full" />
+               <div className="h-3 bg-navy/5 rounded-lg w-full" />
+               <div className="h-3 bg-navy/5 rounded-lg w-2/3" />
+            </div>
+            <div className="pt-6 flex items-center justify-between border-t border-navy/5">
+               <div className="space-y-2">
+                 <div className="h-2 bg-navy/5 rounded-full w-8" />
+                 <div className="h-5 bg-navy/10 rounded-lg w-20" />
+               </div>
+               <div className="h-12 bg-navy/10 rounded-2xl w-32" />
+            </div>
+         </div>
+      </div>
+    );
+  }
+
+  return (
+    <div 
+      className="group bg-white rounded-[32px] overflow-hidden shadow-lux hover:shadow-2xl transition-all duration-500 cursor-pointer flex flex-col h-full relative border border-navy/5"
+      id={`place-card-${place.id}`}
+      onClick={() => onClick?.(place)}
+    >
+      {/* Image Section - Fixed 16:9 Aspect Ratio */}
+      <div className="relative aspect-video overflow-hidden bg-navy/5 shrink-0">
+        <img 
+          src={place.imageUrl} 
+          alt={place.name}
+          loading="lazy"
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms] ease-out"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-transparent"></div>
+        
+        {/* Category Badge - Top Left */}
+        <div className="absolute top-4 left-4">
+           <span className="bg-white/90 backdrop-blur-md text-navy text-[9px] font-black uppercase tracking-[0.2em] px-3 h-7 flex items-center rounded-xl shadow-lg border border-navy/5">
+             {place.category?.replace('_', ' ')}
+            </span>
+        </div>
+
+        {/* Verified Badge - Next to Action Buttons */}
+        {place.isVerified && (
+          <div className="absolute top-4 right-28 group/verified">
+             <div className="bg-safari text-white px-3 h-7 rounded-xl shadow-xl flex items-center justify-center gap-1.5 border border-safari-light/30 backdrop-blur-sm">
+                <ShieldCheck size={12} className="shrink-0" />
+                <span className="text-[8px] font-black uppercase tracking-widest hidden sm:block">Verified</span>
+             </div>
+          </div>
+        )}
+
+        {/* Action Buttons Overlay */}
+        <div className="absolute top-4 right-4 flex items-center gap-2">
+          <button 
+            onClick={handleShare}
+            className="w-10 h-10 rounded-xl backdrop-blur-md bg-white/20 text-white hover:bg-white hover:text-safari flex items-center justify-center transition-all tap-target border border-white/20"
+            title="Share"
+          >
+            <Share2 size={16} />
+          </button>
+          <button 
+            onClick={(e) => { e.stopPropagation(); onSave?.(e); }}
+            className={`w-10 h-10 rounded-xl backdrop-blur-md flex items-center justify-center transition-all tap-target border ${isSaved ? 'bg-red-500 text-white border-red-500 shadow-lg shadow-red-500/20' : 'bg-white/20 text-white hover:bg-white hover:text-red-500 border-white/20'}`}
+          >
+            <Heart size={16} fill={isSaved ? "currentColor" : "none"} />
+          </button>
+        </div>
+      </div>
+
+      {/* Content Section */}
+      <div className="p-8 flex flex-col flex-1">
+        <div className="space-y-4 flex-1">
+          <div className="space-y-1">
+            <h3 className="text-xl sm:text-2xl font-serif font-bold text-navy tracking-tight line-clamp-2 leading-tight group-hover:text-safari transition-colors">
+              {place.name}
+            </h3>
+            <div className="flex items-center gap-2 text-navy/40">
+              <MapPin size={12} className="text-safari" />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">{place.location}</span>
+            </div>
+          </div>
+
+          <p className="text-navy/50 text-sm sm:text-base leading-relaxed line-clamp-3 font-medium opacity-80">
+            {place.description}
+          </p>
+
+          <div className="flex items-center gap-1 text-safari">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} size={14} fill={i < Math.floor(place.rating) ? "currentColor" : "none"} className={i < Math.floor(place.rating) ? "" : "text-navy/10"} />
+            ))}
+            <span className="text-[11px] font-bold text-navy/30 ml-2 uppercase tracking-[0.1em]">({(place.rating * 12).toFixed(0)} Reviews)</span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between pt-8 mt-8 border-t border-navy/5">
+          <div className="flex flex-col">
+            <span className="text-[9px] text-navy/20 uppercase font-black tracking-[0.2em] leading-none mb-1">From</span>
+            <span className="text-navy text-xl font-bold font-sans tracking-tight">Ksh {(place.price || 4500).toLocaleString()}</span>
+          </div>
+          <button className="h-12 px-8 bg-navy text-white rounded-2xl flex items-center justify-center gap-3 transition-all group-hover:bg-safari shadow-lg hover:shadow-safari/20">
+            <span className="text-[10px] font-black uppercase tracking-widest">{getCTAText(place.category)}</span>
+            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+});

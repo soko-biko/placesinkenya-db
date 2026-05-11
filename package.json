@@ -1,26 +1,19 @@
 {
-  "name": "placesinkenya",
+  "name": "placesinkenya-monorepo",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "workspaces": [
+    "placesInKenya-web",
+    "placesInKenya-admin",
+    "functions"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@tailwindcss/vite": "^4.2.4",
-    "firebase": "^12.12.1",
-    "lucide-react": "^0.563.0",
-    "motion": "^12.38.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "tailwindcss": "^4.2.4"
+    "dev": "npm run dev -w @placesinkenya/web",
+    "dev:admin": "npm run dev -w @placesinkenya/admin",
+    "build": "npm run build -w @placesinkenya/web && npm run build -w @placesinkenya/admin && rm -rf dist && mkdir -p dist/admin && cp -r placesInKenya-web/dist/* dist/ && cp -r placesInKenya-admin/dist/* dist/admin/",
+    "lint": "npm run lint -w @placesinkenya/web",
+    "functions:build": "npm run build -w functions"
   },
   "devDependencies": {
-    "@types/node": "^22.14.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "typescript": "~5.8.2"
   }
 }

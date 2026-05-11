@@ -1,52 +1,135 @@
-
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Safety net
+    // 0. Global Safety Net
     match /{document=**} {
       allow read, write: if false;
     }
 
-    // Users collection
-    match /users/{userId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth.uid == userId;
+    // --- Helpers ---
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function isAdmin() { 
+      return isSignedIn() && (
+        request.auth.token.admin == true || 
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      ); 
     }
+    function isVerified() { return isSignedIn() && request.auth.token.email_verified == true; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
     
-    // Places collection - public read, admin write
-    match /places/{placeId} {
-      allow read: if true;
-      allow create, update, delete: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
-    }
-    
-    // Providers collection - public read, admin write
-    match /providers/{providerId} {
-      allow read: if true;
-      allow create, update, delete: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
-    }
-    
-    // Pending Providers - create by anyone, manage by admin
-    match /pendingProviders/{providerId} {
-      allow read: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
-      allow create: if true;
-      allow update, delete: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
-    }
-    
-    // Itineraries
-    match /itineraries/{itineraryId} {
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
     }
 
-    // Ratings
-    match /ratings/{ratingId} {
-      allow read: if true;
-      allow create: if request.auth != null;
+    // --- Validation Blueprints ---
+    function isValidPlace(data) {
+      return data.keys().hasAll(['name', 'description', 'location', 'category', 'imageUrl', 'ownerId']) &&
+             data.keys().size() <= 18 && // Increased for denormalization fields
+             data.name is string && data.name.size() <= 100 &&
+             data.description is string && data.description.size() <= 2000 &&
+             data.location is string && data.location.size() <= 150 &&
+             data.category in ['RESTAURANT', 'ENTERTAINMENT', 'HANGOUT_SPOTS', 'OUTDOORS', 'SAFARI', 'ADVENTURES', 'HOTEL', 'EXPERIENCE'] &&
+             data.imageUrl is string && data.imageUrl.size() <= 500 &&
+             data.ownerId == request.auth.uid &&
+             // Price must be number > 0 for production tracking
+             (data.get('price', 1) is number && data.get('price', 1) > 0) &&
+             // Denormalization: Store review stats on the place itself to save O(N) reads
+             (data.get('rating', 0) is number && data.get('rating', 0) <= 5) &&
+             (data.get('reviewCount', 0) is number && data.get('reviewCount', 0) >= 0) &&
+             (data.get('averageRating', 0) is number && data.get('averageRating', 0) <= 5);
+    }
+
+    function isValidReview(data) {
+      return data.keys().hasAll(['userId', 'placeId', 'rating', 'comment', 'createdAt']) &&
+             data.userId == request.auth.uid &&
+             data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+             data.comment is string && data.comment.size() <= 1000 &&
+             data.createdAt == request.time;
+    }
+
+    // --- Collection Gates ---
+
+    // 1. Places (Public Read, Owner/Admin Write)
+    match /places/{placeId} {
+      allow get: if isValidId(placeId);
+      allow list: if true;
+      allow create: if isSignedIn() && isValidId(placeId) && isValidPlace(incoming());
+      allow update: if (isAdmin() || isOwner(existing().ownerId)) && isValidPlace(incoming());
+      allow delete: if isAdmin() || isOwner(existing().ownerId);
+
+      // Reviews (Subcollection Pattern)
+      match /reviews/{reviewId} {
+        allow get: if isValidId(reviewId);
+        allow list: if true;
+        allow create: if isVerified() && isValidId(reviewId) && isValidReview(incoming());
+        allow update: if isOwner(existing().userId) && isValidReview(incoming());
+        allow delete: if isOwner(existing().userId) || isAdmin();
+      }
+    }
+
+    // 2. User Profiles (PII Isolation Strategy)
+    match /users/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin(); // Only admins can list users
+      allow create: if isOwner(userId) && isValidId(userId) && incoming().role == 'USER';
+      allow update: if isOwner(userId) && incoming().role == existing().role;
+      
+      match /savedItems/{itemId} {
+        allow get: if isValidId(itemId) && isOwner(userId);
+        allow list: if isOwner(userId);
+        allow write: if isOwner(userId) && isValidId(itemId);
+      }
+      
+      // Private PII Isolation
+      match /private/info {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // 3. Registrations (Verified Process)
+    match /registrations/{regId} {
+      allow create: if isSignedIn() && isValidId(regId) && incoming().status == 'PENDING' && incoming().submittedAt == request.time;
+      allow get: if isValidId(regId) && (isAdmin() || (isSignedIn() && existing().email == request.auth.token.email));
+      allow list: if isAdmin() || (isSignedIn() && resource.data.email == request.auth.token.email);
+      allow update, delete: if isAdmin() || (isSignedIn() && existing().email == request.auth.token.email);
+    }
+
+    // 4. Events
+    match /events/{eventId} {
+      allow get: if isValidId(eventId);
+      allow list: if true;
+      allow create: if (isAdmin() || isVerified()) && isValidId(eventId);
+      allow update, delete: if isAdmin() || (isVerified() && (resource.data.providerId == request.auth.uid || resource.data.operatorId == request.auth.uid));
+    }
+
+    // 5. Shared Infrastructure
+    match /providers/{id} { 
+      allow get: if isValidId(id);
+      allow list: if true;
+      allow write: if isAdmin() && isValidId(id); 
+    }
+    match /operators/{id} { 
+      allow get: if isValidId(id);
+      allow list: if true;
+      allow write: if isAdmin() && isValidId(id); 
+    }
+    match /guides/{id} { 
+      allow get: if isValidId(id);
+      allow list: if true;
+      allow write: if isAdmin() && isValidId(id); 
+    }
+    match /itineraries/{id} { 
+      allow get: if isValidId(id) && isOwner(existing().userId);
+      allow list: if isOwner(resource.data.userId);
+      allow create: if isOwner(incoming().userId) && isValidId(id);
+      allow update, delete: if isOwner(existing().userId);
+    }
+    match /admins/{adminId} { 
+      allow read: if isSignedIn() && isValidId(adminId); 
     }
   }
 }
+

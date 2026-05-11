@@ -1,2 +1,0 @@
-// This is a placeholder for the logo image provided by the user.
-// In a real environment, the binary data would be saved here.
