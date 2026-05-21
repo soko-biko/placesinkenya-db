@@ -96,7 +96,7 @@ export const AdminDashboard: React.FC = () => {
             <h1 className="text-4xl md:text-5xl font-serif font-bold capitalize">
               {activeTab.replace('-', ' ')}
             </h1>
-            <p className="text-white/40 text-sm">Synchronized with the PlacesInKenya Global Collective.</p>
+            <p className="text-white/40 text-sm">Synchronized with the PlacesInKenya Global Registry.</p>
           </div>
           <div className="flex gap-4">
             <button className="px-6 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all">

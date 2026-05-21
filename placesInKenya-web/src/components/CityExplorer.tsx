@@ -16,20 +16,20 @@ export const CityExplorer: React.FC<CityExplorerProps> = ({ onCityClick }) => {
   ];
 
   return (
-    <section className="py-24 md:py-32 bg-white">
+    <section className="py-12 sm:py-20 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="space-y-4 mb-16 text-center">
+        <div className="space-y-3 mb-10 md:mb-14 text-center">
           <span className="text-safari font-black uppercase tracking-[0.3em] text-[10px]">Regional Hubs</span>
-          <h2 className="text-4xl md:text-6xl font-serif font-bold text-navy">The Geographic Collective</h2>
+          <h2 className="text-[clamp(1.5rem,4vw,2.5rem)] font-serif font-bold text-navy leading-tight">The Geographic Collective</h2>
         </div>
 
         {/* Mobile: Horizontal scroll pills */}
-        <div className="md:hidden flex overflow-x-auto gap-4 pb-8 no-scrollbar snap-x">
+        <div className="md:hidden flex overflow-x-auto gap-3 pb-6 no-scrollbar snap-x">
           {cities.map((city, i) => (
             <button
               key={i}
               onClick={() => onCityClick(city.name)}
-              className="shrink-0 px-8 h-12 bg-navy/5 rounded-2xl text-navy font-black uppercase tracking-[0.2em] text-[10px] snap-center whitespace-nowrap"
+              className="shrink-0 px-6 h-10 bg-navy/5 rounded-full text-navy font-black uppercase tracking-[0.2em] text-[10px] snap-center whitespace-nowrap"
             >
               {city.name}
             </button>
@@ -37,7 +37,7 @@ export const CityExplorer: React.FC<CityExplorerProps> = ({ onCityClick }) => {
         </div>
 
         {/* Desktop: Grid with overlays */}
-        <div className="hidden md:grid grid-cols-12 grid-rows-2 gap-4 h-[700px]">
+        <div className="hidden md:grid grid-cols-12 grid-rows-2 gap-4 h-[450px] sm:h-[500px] md:h-[550px]">
           {cities.map((city, i) => (
             <motion.div
               key={i}
@@ -46,7 +46,7 @@ export const CityExplorer: React.FC<CityExplorerProps> = ({ onCityClick }) => {
               transition={{ delay: i * 0.05 }}
               viewport={{ once: true }}
               onClick={() => onCityClick(city.name)}
-              className={`relative overflow-hidden group cursor-pointer rounded-[40px] shadow-lux ${
+              className={`relative overflow-hidden group cursor-pointer rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.08)] ${
                 i === 0 ? 'col-span-8 row-span-1' : 
                 i === 1 ? 'col-span-4 row-span-1' : 
                 i === 2 ? 'col-span-4 row-span-1' :
@@ -56,10 +56,10 @@ export const CityExplorer: React.FC<CityExplorerProps> = ({ onCityClick }) => {
             >
               <img src={city.image} alt={city.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
-              <div className="absolute inset-0 flex items-end p-10">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-safari translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">Explore Hub</span>
-                  <h3 className="text-3xl font-serif font-bold text-white leading-tight">{city.name}</h3>
+              <div className="absolute inset-0 flex items-end p-6">
+                <div className="space-y-0.5">
+                  <span className="text-[9px] font-black uppercase tracking-[0.4em] text-safari translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">Explore Hub</span>
+                   <h3 className="text-xl sm:text-2xl font-serif font-bold text-white leading-tight">{city.name}</h3>
                 </div>
               </div>
             </motion.div>

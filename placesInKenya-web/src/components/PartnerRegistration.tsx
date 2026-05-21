@@ -124,7 +124,7 @@ export const PartnerRegistration: React.FC = () => {
                     initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
                     className="text-safari font-black uppercase tracking-[0.4em] text-[10px]"
                  >
-                   Become a Member of the Collective
+                   Become a Registered Partner
                  </motion.span>
                  <motion.h1 
                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
@@ -224,7 +224,7 @@ export const PartnerRegistration: React.FC = () => {
             <div className="space-y-6">
                <h2 className="text-4xl font-serif font-bold text-navy">Application Received! 🎉</h2>
                <p className="text-navy/40 text-lg italic leading-relaxed">
-                  Our collective curation team will review your application within <span className="text-navy font-bold">3-5 business days</span>. 
+                  Our curation team will review your application within <span className="text-navy font-bold">3-5 business days</span>. 
                   You'll receive an email at <span className="text-safari font-black">{formData.email}</span> with further instructions.
                </p>
             </div>
@@ -237,7 +237,7 @@ export const PartnerRegistration: React.FC = () => {
                </button>
                <button 
                 onClick={() => {
-                  navigator.clipboard.writeText('I just applied to join the PlacesInKenya Collective! 🇰🇪');
+                  navigator.clipboard.writeText('I just applied to register on PlacesInKenya! 🇰🇪');
                   alert('Status copied to clipboard!');
                 }}
                 className="h-14 bg-safari text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-safari/90 transition-all"
@@ -535,7 +535,7 @@ export const PartnerRegistration: React.FC = () => {
                               <div className="w-10 h-10 bg-navy/5 text-safari flex items-center justify-center rounded-xl shrink-0"><AlertCircle size={20} /></div>
                               <p className="text-sm text-navy/40 font-medium italic leading-relaxed">
                                  I verify that all information provided is accurate and representational of our actual operations. 
-                                 I agree to the <span className="text-safari font-bold underline cursor-pointer">Collective Code of Conduct</span>.
+                                 I agree to the <span className="text-safari font-bold underline cursor-pointer">Partner Code of Conduct</span>.
                               </p>
                            </div>
                         </div>
@@ -560,7 +560,7 @@ export const PartnerRegistration: React.FC = () => {
        </main>
 
        <footer className="py-12 border-t border-navy/5 text-center">
-          <p className="text-[9px] font-black uppercase tracking-[0.4em] text-navy/10">Synchronized via Collective Secure Cloud</p>
+          <p className="text-[9px] font-black uppercase tracking-[0.4em] text-navy/10">Synchronized via Secure Cloud Registry</p>
        </footer>
     </div>
   );

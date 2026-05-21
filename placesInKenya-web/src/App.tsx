@@ -22,7 +22,8 @@ const AdminDashboard = lazy(() => import('./components/AdminDashboard').then(m =
 
 import { TrendingNow } from './components/TrendingNow';
 import { UpcomingExperiences } from './components/UpcomingExperiences';
-import { CityExplorer } from './components/CityExplorer';
+// Import commented out per design update
+// import { CityExplorer } from './components/CityExplorer';
 import { OperatorSpotlight } from './components/OperatorSpotlight';
 import { StatsBar } from './components/StatsBar';
 import { PartnerInviteStrip } from './components/PartnerInviteStrip';
@@ -32,7 +33,7 @@ const SkeletonLoader = () => (
         <div className="w-20 h-20 bg-navy/5 rounded-[2rem] animate-pulse flex items-center justify-center">
             <div className="w-10 h-10 border-4 border-safari border-t-transparent rounded-full animate-spin"></div>
         </div>
-        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-navy/20 animate-pulse">Synchronizing Collective Data...</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-navy/20 animate-pulse">Synchronizing Registry Data...</p>
     </div>
 );
 
@@ -214,7 +215,7 @@ const App: React.FC = () => {
               onViewAll={() => setActivePage('where-to-go')}
             />
             
-            <CityExplorer onCityClick={handleCityClick} />
+            {/* REMOVED: Hubs section removed per design update */}
 
             <OperatorSpotlight operators={displayOperators} />
 
@@ -266,7 +267,7 @@ const App: React.FC = () => {
                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
                        className="text-5xl md:text-8xl font-serif font-bold text-white tracking-tight"
                      >
-                       Guides & <span className="italic text-safari font-light">Collective</span> Partners
+                       Guides & <span className="italic text-safari font-light">Trusted</span> Partners
                      </motion.h1>
                      <motion.p 
                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
@@ -321,7 +322,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cream transition-all duration-500 overflow-x-hidden scrollbar-hide text-navy font-sans">
+    <div className="min-h-screen bg-background transition-all duration-500 overflow-x-hidden scrollbar-hide text-navy font-sans">
       <Navbar 
         user={userProfile} 
         onLogout={logout} 
@@ -339,12 +340,13 @@ const App: React.FC = () => {
         </Suspense>
       </div>
 
-      {/* Footer */}
+      {/* Footer styled with Niko Free style sheets */}
       <footer className="bg-navy pt-20 pb-12 text-white relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-safari/30 to-transparent"></div>
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-16 mb-20">
-            <div className="md:col-span-1 space-y-8">
+            {/* Brand Column */}
+            <div className="space-y-6">
               <div 
                 className="flex items-center gap-4 cursor-pointer group" 
                 onClick={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
@@ -352,15 +354,31 @@ const App: React.FC = () => {
                 <div className="w-12 h-12 flex items-center justify-center rounded-2xl overflow-hidden bg-white p-2 shadow-inner">
                   <img src="/regenerated_image_1777526382608.png" alt="PlacesInKenya" className="w-full h-full object-contain" />
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col justify-center">
                    <span className="font-serif text-2xl font-bold text-white group-hover:text-safari transition-colors">PlacesInKenya</span>
                 </div>
               </div>
               <p className="text-white/40 text-sm leading-relaxed max-w-xs">
                 Kenya's most comprehensive destination guide. Discover the magic of the wild and the pulse of the city through our curated aesthetic database.
               </p>
+              {/* Social icons with hover lift */}
+              <div className="flex gap-4 pt-2">
+                {['facebook', 'instagram', 'twitter', 'linkedin'].map((social) => (
+                  <a 
+                    key={social} 
+                    href={`https://${social}.com`} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:-translate-y-[2px] hover:border-white/30 transition-all duration-300 bg-white/5 active:scale-95"
+                    title={social}
+                  >
+                    <span className="text-xs uppercase font-extrabold tracking-widest text-[8px]">{social.charAt(0)}</span>
+                  </a>
+                ))}
+              </div>
             </div>
             
+            {/* Categories Column */}
             <FooterSection title="Establishments">
               <ul className="space-y-4">
                 {[
@@ -383,6 +401,7 @@ const App: React.FC = () => {
               </ul>
             </FooterSection>
 
+            {/* Quick Links Column */}
             <FooterSection title="Planning">
               <ul className="space-y-4">
                 <li><button onClick={() => handleNavigate('home')} className="text-white/50 hover:text-white transition-colors text-[11px] font-bold uppercase tracking-wider tap-target">All Destinations</button></li>
@@ -392,17 +411,35 @@ const App: React.FC = () => {
               </ul>
             </FooterSection>
 
-            <FooterSection title="Community">
-              <ul className="space-y-4">
-                <li><button onClick={() => handleNavigate('partner-registration')} className="text-white/50 hover:text-white transition-colors text-[11px] font-bold uppercase tracking-wider tap-target">Partner With Us</button></li>
-                <li><button className="text-white/50 hover:text-white transition-colors text-[11px] font-bold uppercase tracking-wider tap-target">Add a Place</button></li>
-                <li><button className="text-white/50 hover:text-white transition-colors text-[11px] font-bold uppercase tracking-wider tap-target">Global Collective</button></li>
-              </ul>
-            </FooterSection>
+            {/* Newsletter Column */}
+            <div className="space-y-6">
+              <h4 className="font-bold uppercase tracking-widest text-[11px] text-safari">Newsletter</h4>
+              <p className="text-white/40 text-sm leading-relaxed">
+                Receive the weekly curated digest of hidden spaces and premium experiences in Kenya.
+              </p>
+              {/* Inline pill input + primary colored button */}
+              <form 
+                onSubmit={(e) => { e.preventDefault(); alert("Successfully joined the PlacesInKenya digest!"); }}
+                className="relative flex items-center w-full max-w-sm h-12 bg-white/5 border border-white/10 rounded-full focus-within:border-white/30 p-1 group transition-all"
+              >
+                <input 
+                  type="email" 
+                  placeholder="Your email address" 
+                  className="w-full bg-transparent pl-4 pr-24 text-white text-xs outline-none font-sans placeholder:text-white/30"
+                  required
+                />
+                <button 
+                  type="submit" 
+                  className="absolute right-1 top-1 bottom-1 px-4 bg-safari hover:bg-safari/90 text-white rounded-full text-[9px] font-black uppercase tracking-widest transition-all duration-300 active:scale-95 shadow-md shrink-0"
+                >
+                  Join
+                </button>
+              </form>
+            </div>
           </div>
 
           <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-white/20 text-[10px] font-bold uppercase tracking-[0.2em]">&copy; 2026 PlacesInKenya Collective. All Rights Reserved.</p>
+            <p className="text-white/20 text-[10px] font-bold uppercase tracking-[0.2em]">&copy; 2026 PlacesInKenya. All Rights Reserved.</p>
             <div className="flex gap-10">
                <a href="#" className="text-white/20 hover:text-white transition-colors text-[10px] font-bold uppercase tracking-widest">Privacy</a>
                <a href="#" className="text-white/20 hover:text-white transition-colors text-[10px] font-bold uppercase tracking-widest">Terms</a>

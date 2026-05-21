@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, MapPin, Calendar, Users, Star, Share2, ShieldCheck, ArrowRight, ExternalLink } from 'lucide-react';
 import { Event } from '../types';
-import { motion, AnimatePresence } from 'motion/react';
 
 interface EventDetailModalProps {
   event: Event;
@@ -10,202 +9,205 @@ interface EventDetailModalProps {
 }
 
 export const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClose, isSaved }) => {
+  const [activeTab, setActiveTab] = useState<'overview' | 'capacity' | 'organizer'>('overview');
+  
   const isFull = event.bookedCapacity >= event.totalCapacity;
   const spotsLeft = event.totalCapacity - event.bookedCapacity;
   const capacityPercent = (event.bookedCapacity / event.totalCapacity) * 100;
 
+  // Lock body scroll while modal is active
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, []);
+
+  // Close when hitting escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="absolute inset-0 bg-navy/80 backdrop-blur-xl"
-      />
+    // ── Overlay: Dark blurred layout background ──
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6 lg:p-12 overflow-hidden">
+      <div className="absolute inset-0 bg-navy/95 backdrop-blur-md sm:backdrop-blur-lg" onClick={onClose}></div>
       
-      <motion.div 
-        initial={{ scale: 0.9, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.9, opacity: 0, y: 20 }}
-        className="relative bg-white w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-[40px] shadow-2xl scrollbar-hide"
-      >
-        <button 
-          onClick={onClose}
-          className="absolute top-8 right-8 z-10 p-4 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white transition-all border border-white/20 group"
-        >
-          <X size={24} className="group-hover:rotate-90 transition-transform" />
-        </button>
+      {/* ── Modal Main Frame ── */}
+      <div className="relative bg-white w-full sm:w-[600px] md:w-[640px] lg:w-[640px] h-[92vh] sm:h-[85vh] lg:h-[80vh] max-h-[92vh] sm:max-h-[85vh] lg:max-h-[80vh] overflow-hidden rounded-t-[2.5rem] sm:rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.6)] border border-navy/5 animate-slide-up flex flex-col text-navy">
+        
+        {/* ══ SECTION A: IMAGE HERO ZONE ══════════════════════════════════════ */}
+        <div className="relative w-full aspect-[16/7] sm:aspect-[16/8] shrink-0 max-h-[30vh]">
+          <img 
+            src={event.imageUrl || '/placeholder.jpg'} 
+            alt={event.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
+          
+          {/* Close button top right */}
+          <button 
+            onClick={onClose}
+            aria-label="Close"
+            className="absolute top-4 right-4 z-10 p-2.5 bg-black/40 backdrop-blur-md hover:bg-safari rounded-full text-white transition-all border border-white/10 active:scale-90 cursor-pointer"
+          >
+            <X size={16} />
+          </button>
 
-        <div className="flex flex-col">
-          {/* Hero Section */}
-          <div className="relative h-[400px] md:h-[500px]">
-            <img 
-              src={event.imageUrl} 
-              className="w-full h-full object-cover" 
-              alt={event.title} 
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/20 to-transparent"></div>
-            
-            <div className="absolute bottom-12 left-12 right-12 space-y-6">
-              <div className="flex flex-wrap gap-3">
-                <span className="bg-safari rounded-full px-5 h-8 flex items-center text-[10px] font-black uppercase tracking-[0.2em] text-white">
-                  {event.category.replace('_', ' ')}
-                </span>
-                <span className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-5 h-8 flex items-center text-[10px] font-black uppercase tracking-[0.2em] text-white">
-                  {new Date(event.date).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
-                </span>
-              </div>
-              <h2 className="text-4xl md:text-6xl font-serif font-bold text-white leading-tight max-w-3xl">
-                {event.title}
-              </h2>
-            </div>
-          </div>
-
-          {/* Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 p-8 md:p-12">
-            {/* Left Content */}
-            <div className="lg:col-span-7 space-y-12">
-              <div className="space-y-6">
-                <h3 className="text-2xl font-serif font-bold text-navy">About the Experience</h3>
-                <p className="text-navy/60 text-lg leading-relaxed">
-                  {event.description}
-                </p>
-              </div>
-
-              {/* Photo Gallery */}
-              {event.gallery && event.gallery.length > 0 && (
-                <div className="space-y-6">
-                   <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-navy/30">Visual Preview</h4>
-                   <div className="grid grid-cols-2 gap-4">
-                      {event.gallery.map((img, i) => (
-                        <div key={i} className="aspect-video rounded-3xl overflow-hidden shadow-lg group">
-                          <img 
-                            src={img} 
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                            alt={`Gallery ${i}`} 
-                          />
-                        </div>
-                      ))}
-                   </div>
-                </div>
-              )}
-
-              {/* Organizer Card */}
-              {event.organizer && (
-                <div className="bg-cream/50 rounded-[40px] p-10 flex flex-col md:flex-row gap-8 items-center border border-navy/5">
-                   <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-xl shrink-0">
-                      <img src={event.organizer.logo} className="w-full h-full object-cover" alt="Organizer" />
-                   </div>
-                   <div className="space-y-4 text-center md:text-left flex-1">
-                      <div className="flex flex-col md:flex-row md:items-center gap-3">
-                         <h4 className="text-xl font-serif font-bold text-navy">{event.providerName}</h4>
-                         <div className="flex items-center justify-center md:justify-start gap-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} size={12} className={i < event.organizer!.rating ? "fill-safari text-safari" : "text-navy/10"} />
-                            ))}
-                         </div>
-                      </div>
-                      <p className="text-navy/50 text-sm italic font-medium">"{event.organizer.bio}"</p>
-                      <button className="text-[10px] font-black uppercase tracking-[0.3em] text-safari flex items-center gap-2 hover:translate-x-2 transition-transform">
-                         View Professional Profile <ArrowRight size={12} />
-                      </button>
-                   </div>
-                </div>
-              )}
-            </div>
-
-            {/* Right Sidebar - Sticky on desktop */}
-            <div className="lg:col-span-5 space-y-8 h-fit lg:sticky lg:top-8">
-              <div className="bg-navy rounded-[40px] p-10 text-white space-y-10 shadow-2xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-safari/10 rounded-bl-[60px]"></div>
-                
-                <div className="space-y-2">
-                   <span className="text-[10px] font-black uppercase tracking-[0.3em] text-safari">Entry Secured By</span>
-                   <p className="text-4xl font-serif font-bold tracking-tight">Ksh {event.price.toLocaleString()}</p>
-                </div>
-
-                <div className="space-y-6">
-                   <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
-                      <span>Limited Availability</span>
-                      <span className={spotsLeft < 10 ? 'text-red-500' : 'text-safari'}>{spotsLeft} spots remaining</span>
-                   </div>
-                   <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                      <motion.div 
-                        initial={{ width: 0 }} 
-                        animate={{ width: `${capacityPercent}%` }} 
-                        className={`h-full transition-all duration-1000 ${spotsLeft < 20 ? 'bg-red-500' : 'bg-safari'}`} 
-                      />
-                   </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4 text-white/60">
-                    <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-safari">
-                       <MapPin size={20} />
-                    </div>
-                    <div>
-                       <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Location</p>
-                       <p className="font-bold text-sm tracking-tight">{event.location}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 text-white/60">
-                    <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-safari">
-                       <Calendar size={20} />
-                    </div>
-                    <div>
-                       <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Date & Time</p>
-                       <p className="font-bold text-sm tracking-tight">Starts at 10:00 AM</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 text-white/60">
-                    <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-safari">
-                       <Users size={20} />
-                    </div>
-                    <div>
-                       <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Interest</p>
-                       <p className="font-bold text-sm tracking-tight">{event.interestedCount || 0} people viewing</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4 pt-4">
-                   <a 
-                     href={event.bookingLink || 'about:blank'}
-                     target="_blank"
-                     rel="noopener noreferrer"
-                     className={`w-full h-20 bg-safari hover:bg-safari-light text-white rounded-[24px] font-black uppercase tracking-[0.2em] text-[11px] shadow-2xl transition-all shadow-safari/20 active:scale-95 flex items-center justify-center gap-4 group ${isFull ? 'pointer-events-none opacity-50 grayscale' : ''}`}
-                   >
-                     {isFull ? 'Sold Out' : (
-                       <>Reserve My Spot <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" /></>
-                     )}
-                   </a>
-                   
-                   <div className="flex gap-4">
-                      <button className="flex-1 h-14 bg-white/5 hover:bg-white/10 rounded-2xl flex items-center justify-center gap-3 transition-colors border border-white/5 group">
-                        <Share2 size={16} className="text-white/40 group-hover:text-safari" />
-                        <span className="text-[9px] font-black uppercase tracking-widest">Broadcast</span>
-                      </button>
-                      <button className="flex-1 h-14 bg-white/5 hover:bg-white/10 rounded-2xl flex items-center justify-center gap-3 transition-colors border border-white/5 group">
-                        <ExternalLink size={16} className="text-white/40 group-hover:text-safari" />
-                        <span className="text-[9px] font-black uppercase tracking-widest">Get Map</span>
-                      </button>
-                   </div>
-                </div>
-              </div>
-
-              {/* Secure Booking Badge */}
-              <div className="p-8 border border-navy/5 rounded-[40px] flex items-center gap-4 text-navy/30">
-                 <ShieldCheck size={24} className="text-safari" />
-                 <p className="text-[9px] font-black uppercase tracking-[0.2em] leading-relaxed">
-                    Verified collective event. <br />
-                    Secure payment & instant confirmation.
-                 </p>
-              </div>
-            </div>
+          {/* Badges Overlay */}
+          <div className="absolute bottom-4 left-4 flex gap-2">
+            <span className="bg-safari text-white text-[9px] font-black uppercase tracking-[0.2em] px-3.5 h-6 rounded-full flex items-center shadow-lg">
+              {event.category.replace('_', ' ')}
+            </span>
           </div>
         </div>
-      </motion.div>
+
+        {/* ══ SECTION B: TITLE & METRICS ZONE ═════════════════════════════ */}
+        <div className="px-5 sm:px-6 pt-3.5 pb-2 shrink-0">
+          <h2 className="font-serif font-bold text-[clamp(1.15rem,2.8vw,1.6rem)] leading-snug text-navy line-clamp-1">
+            {event.title}
+          </h2>
+
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-[clamp(0.72rem,1.8vw,0.85rem)] text-navy/60">
+            <span className="flex items-center gap-1">
+              <MapPin size={12} className="text-safari" />
+              {event.location}
+            </span>
+            <span>•</span>
+            <span className="flex items-center gap-1 font-semibold text-navy">
+              <Calendar size={12} className="text-safari" />
+              {new Date(event.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+            </span>
+          </div>
+        </div>
+
+        {/* ══ SECTION C: TABS & EXPERIENCE INFO (FLEX REMAIN ZONE) ═════ */}
+        <div className="px-5 sm:px-6 py-2 flex-1 min-h-0 flex flex-col overflow-hidden">
+          
+          {/* Tabs Selector row */}
+          <div className="flex border-b border-navy/10 shrink-0 mb-3.5 gap-2">
+            {[
+              { id: 'overview', label: 'About Experience' },
+              { id: 'capacity', label: 'Availability' },
+              { id: 'organizer', label: 'Organizer' }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`pb-2 px-1 text-[10px] font-black uppercase tracking-widest border-b-2 transition-all cursor-pointer ${
+                  activeTab === tab.id 
+                    ? 'border-safari text-safari' 
+                    : 'border-transparent text-navy/40 hover:text-navy'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Active Tab Container */}
+          <div className="flex-1 min-h-0 overflow-hidden flex flex-col justify-start">
+            
+            {activeTab === 'overview' && (
+              <div className="space-y-3 p-1">
+                <p className="text-[clamp(0.78rem,1.8vw,0.92rem)] text-navy/75 leading-relaxed line-clamp-4">
+                  {event.description}
+                </p>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <span className="text-[9px] font-black bg-navy/5 border border-navy/5 uppercase tracking-widest px-3 h-7 flex items-center rounded-full text-navy/60">
+                    🎟 Entry fee: Ksh {event.price.toLocaleString()}
+                  </span>
+                  <span className="text-[9px] font-black bg-navy/5 border border-navy/5 uppercase tracking-widest px-3 h-7 flex items-center rounded-full text-navy/60">
+                    🏆 Verified Collective Event
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'capacity' && (
+              <div className="space-y-3 p-1 flex flex-col justify-start">
+                <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.15em] text-navy/50">
+                  <span>Spots allocated: {event.totalCapacity}</span>
+                  <span className={spotsLeft < 15 ? 'text-red-500 font-bold' : 'text-safari'}>{spotsLeft} remaining</span>
+                </div>
+                
+                {/* Visual Capacity gauge */}
+                <div className="h-2 w-full bg-navy/5 rounded-full overflow-hidden shrink-0">
+                  <div 
+                    style={{ width: `${capacityPercent}%` }}
+                    className={`h-full transition-all duration-700 ${spotsLeft < 15 ? 'bg-red-500' : 'bg-safari'}`} 
+                  />
+                </div>
+
+                <div className="p-3 bg-navy/5 rounded-[20px] flex items-center gap-3 text-navy/60 text-xs leading-normal">
+                  <ShieldCheck size={18} className="text-safari shrink-0" />
+                  <p className="text-[10px] uppercase font-bold tracking-wide">
+                    Verified real-time capacity counter. Secure your ticket immediately to guarantee entry.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'organizer' && (
+              <div className="space-y-3.5 p-1 flex flex-col">
+                {event.organizer ? (
+                  <div className="flex items-center gap-3 bg-navy/5 p-3.5 rounded-[24px]">
+                    <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white shadow-md shrink-0">
+                      <img src={event.organizer.logo || "/placeholder.jpg"} className="w-full h-full object-cover" alt="Organizer" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-serif font-bold text-xs text-navy leading-none">{event.providerName}</span>
+                        <div className="flex text-safari shrink-0"><Star size={10} fill="currentColor" /></div>
+                      </div>
+                      <p className="text-[10px] text-navy/50 mt-1 italic line-clamp-2">
+                        "{event.organizer.bio || 'Verified Host of Local Experiences'}"
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-navy/10 p-3 text-center text-xs text-navy/30 italic">
+                    Registered through overall PlacesInKenya platform provider framework.
+                  </div>
+                )}
+              </div>
+            )}
+
+          </div>
+        </div>
+
+        {/* ══ SECTION D: RESERVATIONS AND ACTIONS (BOTTOM STICKY) ═════ */}
+        <div className="px-5 sm:px-6 pt-2 pb-4.5 sm:pb-5 border-t border-navy/5 bg-white flex flex-col gap-2 shrink-0 shadow-inner">
+          <div className="flex gap-2 sm:gap-3 items-center">
+            
+            {/* Primary Reserve Button */}
+            <a 
+              href={event.bookingLink || 'https://wa.me/254700000000'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex-1 h-11 bg-safari hover:bg-safari/95 text-white rounded-xl font-black uppercase text-[10px] tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all ${isFull ? 'pointer-events-none opacity-40 grayscale' : ''}`}
+            >
+              <ExternalLink size={12} />
+              <span>{isFull ? 'Sold Out' : 'Reserve My Spot'}</span>
+            </a>
+
+            {/* Broadcast action button */}
+            <button 
+              onClick={() => {
+                navigator.clipboard.writeText(`Join me at "${event.title}" on PlacesInKenya! 🇰🇪`);
+                alert('Event share link copied!');
+              }}
+              className="px-4.5 h-11 bg-navy/5 hover:bg-navy/10 text-navy rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+            >
+              <Share2 size={12} className="text-safari" />
+              <span>Share</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 };

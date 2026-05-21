@@ -1,6 +1,5 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, MapPin, Calendar, Users, Star, ArrowRight, ShieldCheck, Search, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin, Calendar, Clock, Smile, Sparkles, Star, Users, ArrowRight, ShieldCheck, Search, Loader2, Bookmark, BookmarkCheck } from 'lucide-react';
 import { Event } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import { EventDetailModal } from './EventDetailModal';
@@ -11,380 +10,484 @@ interface WhereToGoProps {
   savedItemIds: string[];
 }
 
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+const DAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
 export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, savedItemIds }) => {
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedCategory, setSelectedCategory] = useState('ALL');
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+
+  // Initialize selectedDate to today
   const [selectedDate, setSelectedDate] = useState<Date>(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
     return d;
   });
-  const [selectedCategory, setSelectedCategory] = useState('ALL');
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+
+  // Calendar navigation state
+  const [viewMonth, setViewMonth] = useState(selectedDate.getMonth());
+  const [viewYear, setViewYear] = useState(selectedDate.getFullYear());
 
   const categories = ['ALL', 'FESTIVALS', 'FOOD_DRINK', 'ADVENTURES', 'CULTURE', 'WILDLIFE'];
 
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
+  // Days in current viewMonth
+  const firstDayIndex = new Date(viewYear, viewMonth, 1).getDay();
+  const totalDays = new Date(viewYear, viewMonth + 1, 0).getDate();
 
-  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  // Helper arrays for dates
+  const daysArray = Array.from({ length: totalDays }, (_, i) => i + 1);
+  const emptyCells = Array.from({ length: firstDayIndex });
 
-  // Generate current week view based on selectedDate
-  const weekDays = useMemo(() => {
-    const start = new Date(selectedDate);
-    const day = start.getDay();
-    const diff = start.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
-    start.setDate(diff);
-    
-    return Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(start);
-      d.setDate(start.getDate() + i);
-      return d;
+  // Get date strings with events for dot indicators
+  const eventDatesSet = useMemo(() => {
+    const set = new Set<string>();
+    events.forEach(e => {
+      const d = new Date(e.date);
+      set.add(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`);
     });
-  }, [selectedDate]);
+    return set;
+  }, [events]);
 
+  const hasEventOnDate = (day: number) => {
+    return eventDatesSet.has(`${viewYear}-${viewMonth}-${day}`);
+  };
+
+  const isSelectedDate = (day: number) => {
+    return selectedDate.getDate() === day &&
+           selectedDate.getMonth() === viewMonth &&
+           selectedDate.getFullYear() === viewYear;
+  };
+
+  const isTodayDate = (day: number) => {
+    const today = new Date();
+    return today.getDate() === day &&
+           today.getMonth() === viewMonth &&
+           today.getFullYear() === viewYear;
+  };
+
+  const handlePrevMonth = () => {
+    if (viewMonth === 0) {
+      setViewMonth(11);
+      setViewYear(prev => prev - 1);
+    } else {
+      setViewMonth(prev => prev - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (viewMonth === 11) {
+      setViewMonth(0);
+      setViewYear(prev => prev + 1);
+    } else {
+      setViewMonth(prev => prev + 1);
+    }
+  };
+
+  const handleDaySelect = (day: number) => {
+    const newDate = new Date(viewYear, viewMonth, day);
+    newDate.setHours(0, 0, 0, 0);
+    setSelectedDate(newDate);
+  };
+
+  const handleJumpToToday = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    setSelectedDate(today);
+    setViewMonth(today.getMonth());
+    setViewYear(today.getFullYear());
+  };
+
+  // Filter events based on active filters
   const displayedEvents = useMemo(() => {
     return events.filter(e => {
       const eDate = new Date(e.date);
-      const isSameDay = eDate.toDateString() === selectedDate.toDateString();
+      const isSameDay = eDate.getDate() === selectedDate.getDate() &&
+                         eDate.getMonth() === selectedDate.getMonth() &&
+                         eDate.getFullYear() === selectedDate.getFullYear();
       const matchesCat = selectedCategory === 'ALL' || e.category === selectedCategory;
       return isSameDay && matchesCat;
     });
   }, [events, selectedDate, selectedCategory]);
 
-  const nearestEvent = useMemo(() => {
+  // Nearest event logic
+  const nearestUpcomingEvent = useMemo(() => {
     if (displayedEvents.length > 0) return null;
     return events
-      .filter(e => new Date(e.date) >= selectedDate && (selectedCategory === 'ALL' || e.category === selectedCategory))
+      .filter(e => {
+        const eDate = new Date(e.date);
+        eDate.setHours(0,0,0,0);
+        const matchesCat = selectedCategory === 'ALL' || e.category === selectedCategory;
+        return eDate >= selectedDate && matchesCat;
+      })
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
   }, [events, selectedDate, selectedCategory, displayedEvents]);
-
-  const handleDayClick = (date: Date) => {
-    setSelectedDate(date);
-    setSelectedMonth(date.getMonth());
-    setSelectedYear(date.getFullYear());
-  };
-
-  const jumpToToday = () => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    setSelectedDate(today);
-    setSelectedMonth(today.getMonth());
-    setSelectedYear(today.getFullYear());
-  };
-
-  const moveWeek = (direction: number) => {
-    const next = new Date(selectedDate);
-    next.setDate(selectedDate.getDate() + direction * 7);
-    setSelectedDate(next);
-  };
 
   return (
     <div className="min-h-screen bg-off-white pb-32">
       {/* Dynamic Header Area */}
       <section className="relative pt-40 pb-20 bg-navy overflow-hidden">
-        <div className="absolute inset-0 z-0">
+        <div id="events-header-bg" className="absolute inset-0 z-0">
           <img 
             src="https://images.unsplash.com/photo-1547448415-e9f5b28e570d"
             className="w-full h-full object-cover opacity-20 grayscale mix-blend-overlay"
-            alt="Landscape"
+            alt="Scenic Landscape"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-navy/60 via-navy to-navy"></div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 relative z-10 text-center space-y-12">
-          <div className="space-y-4">
-             <motion.span 
-               initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-               className="text-safari font-black uppercase tracking-[0.4em] text-[10px]"
-             >
-               Temporal Explorations
-             </motion.span>
-             <motion.h1 
-               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-               className="text-5xl md:text-8xl font-serif font-bold text-white tracking-tight"
-             >
-               Ways to <span className="italic text-safari font-light">Experience</span> Kenya
-             </motion.h1>
-             <motion.p 
-               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-               className="text-white/40 max-w-2xl mx-auto text-lg font-light italic"
-             >
-               Discover a curated sequence of events, from mountain bikes in the valley to jazz festivals in the city.
-             </motion.p>
-          </div>
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 relative z-10 text-center space-y-4">
+          <motion.span 
+            initial={{ opacity: 0, y: 10 }} 
+            animate={{ opacity: 1, y: 0 }}
+            className="text-safari font-black uppercase tracking-[0.4em] text-[10px]"
+          >
+            Temporal Excursions
+          </motion.span>
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ delay: 0.1 }}
+            className="text-4xl md:text-7xl font-serif font-bold text-white tracking-tight"
+          >
+            Ways to <span className="italic text-safari font-light">Experience</span> Kenya
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            transition={{ delay: 0.2 }}
+            className="text-white/40 max-w-2xl mx-auto text-sm sm:text-base font-light italic"
+          >
+            A sequence of scheduled prestige events, from athletic safaris to jazz festivals in the city.
+          </motion.p>
         </div>
       </section>
 
-      {/* Navigator & Filters Bar */}
-      <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-y border-navy/5 shadow-lux pb-2">
-        <div className="max-w-7xl mx-auto px-6">
-          {/* Top Row: Year/Month Selector + Today Button */}
-          <div className="flex flex-col md:flex-row items-center justify-between py-6 gap-6">
-            <div className="flex items-center gap-4">
-               <div className="relative group">
-                  <select 
-                    value={selectedMonth}
-                    onChange={(e) => {
-                       const m = parseInt(e.target.value);
-                       setSelectedMonth(m);
-                       const d = new Date(selectedDate);
-                       d.setMonth(m);
-                       setSelectedDate(d);
-                    }}
-                    className="appearance-none bg-navy/5 hover:bg-navy/10 h-10 px-6 pr-10 rounded-xl text-[10px] font-black uppercase tracking-widest text-navy outline-none cursor-pointer transition-all"
-                  >
-                    {months.map((m, i) => <option key={m} value={i}>{m}</option>)}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-navy/40 pointer-events-none" size={12} />
-               </div>
-               <div className="relative group">
-                  <select 
-                    value={selectedYear}
-                    onChange={(e) => {
-                        const y = parseInt(e.target.value);
-                        setSelectedYear(y);
-                        const d = new Date(selectedDate);
-                        d.setFullYear(y);
-                        setSelectedDate(d);
-                    }}
-                    className="appearance-none bg-navy/5 hover:bg-navy/10 h-10 px-6 pr-10 rounded-xl text-[10px] font-black uppercase tracking-widest text-navy outline-none cursor-pointer transition-all"
-                  >
-                    {[2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-navy/40 pointer-events-none" size={12} />
-               </div>
-               <button 
-                onClick={jumpToToday}
-                className="h-10 px-6 rounded-xl bg-safari text-white text-[10px] font-black uppercase tracking-widest shadow-lg hover:shadow-safari/20 transition-all active:scale-95"
-               >
-                 Today
-               </button>
-            </div>
-
-            <div className="flex items-center gap-2">
-               <button onClick={() => moveWeek(-1)} className="w-10 h-10 flex items-center justify-center rounded-xl bg-navy/5 hover:bg-navy hover:text-white transition-all"><ChevronLeft size={18} /></button>
-               <div className="flex items-center gap-2 px-6 h-10 bg-navy/5 rounded-xl text-[10px] font-black uppercase tracking-widest text-navy/40">
-                  <Calendar size={14} className="text-safari" />
-                  Week of {weekDays[0].toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
-               </div>
-               <button onClick={() => moveWeek(1)} className="w-10 h-10 flex items-center justify-center rounded-xl bg-navy/5 hover:bg-navy hover:text-white transition-all"><ChevronRight size={18} /></button>
-            </div>
-          </div>
-
-          {/* Middle Row: Week Navigator Pills */}
-          <div className="grid grid-cols-7 gap-3 py-4 border-t border-navy/5">
-            {weekDays.map((day, i) => {
-                const isSelected = day.toDateString() === selectedDate.toDateString();
-                const isToday = day.toDateString() === new Date().toDateString();
-                return (
-                    <button 
-                        key={i}
-                        onClick={() => handleDayClick(day)}
-                        className={`flex flex-col items-center justify-center gap-2 py-4 rounded-[20px] transition-all relative overflow-hidden ${isSelected ? 'bg-navy text-white shadow-2xl scale-105 z-10' : 'bg-navy/5 text-navy/40 hover:bg-navy/10'}`}
-                    >
-                        <span className="text-[9px] font-black uppercase tracking-[0.2em]">{daysOfWeek[day.getDay()]}</span>
-                        <span className="text-xl font-serif font-bold">{day.getDate()}</span>
-                        {isToday && !isSelected && <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-safari rounded-full" />}
-                        {isSelected && <motion.div layoutId="selection-bubble" className="absolute inset-0 bg-navy -z-10" />}
-                    </button>
-                )
-            })}
-          </div>
-
-          {/* Bottom Row: Category Toggles */}
-          <div className="flex items-center gap-6 overflow-x-auto scrollbar-hide py-4 mt-2 border-t border-navy/5">
-            {categories.map(cat => (
+      {/* Main Dual-Panel Layout Container */}
+      <main className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
+        <div className="flex flex-col lg:flex-row gap-10 items-start">
+          
+          {/* LEFT COLUMN: Sticky Calendar Date Picker & Filter Set */}
+          <aside className="w-full lg:w-[320px] lg:sticky lg:top-24 shrink-0 space-y-8">
+            
+            {/* Calendar Block Container */}
+            <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-navy/5 p-5 select-none">
+              
+              {/* Header Navigator */}
+              <div className="flex items-center justify-between mb-4 border-b border-navy/5 pb-3">
                 <button 
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className="relative group py-2"
+                  onClick={handlePrevMonth}
+                  className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-navy/5 text-navy transition-colors active:scale-90"
                 >
-                    <span className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${selectedCategory === cat ? 'text-navy' : 'text-navy/30 group-hover:text-navy/60'}`}>
-                        {cat.replace('_', ' & ')}
-                    </span>
-                    {selectedCategory === cat && (
-                        <motion.div 
-                          layoutId="cat-indicator" 
-                          className="absolute -bottom-1 left-0 right-0 h-0.5 bg-safari flex items-center justify-center"
-                        >
-                            <div className="w-1 h-1 bg-safari rotate-45" />
-                        </motion.div>
-                    )}
+                  <ChevronLeft size={16} />
                 </button>
-            ))}
-          </div>
-        </div>
-      </div>
+                <span className="font-serif font-bold text-sm tracking-tight text-navy">
+                  {MONTHS[viewMonth]} {viewYear}
+                </span>
+                <button 
+                  onClick={handleNextMonth}
+                  className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-navy/5 text-navy transition-colors active:scale-90"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
 
-      {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-6 py-20">
-        <div className="space-y-32">
+              {/* Day Headers */}
+              <div className="grid grid-cols-7 mb-2 text-center text-[10px] font-black uppercase tracking-wider text-navy/30">
+                {DAYS_SHORT.map(day => (
+                  <div key={day} className="py-1">{day}</div>
+                ))}
+              </div>
+
+              {/* Days Grid */}
+              <div className="grid grid-cols-7 gap-y-1 gap-x-1">
+                {/* Pad out empty spaces */}
+                {emptyCells.map((_, i) => (
+                  <div key={`empty-${i}`} className="w-8 h-8" />
+                ))}
+
+                {/* Day Buttons */}
+                {daysArray.map(day => {
+                  const sel = isSelectedDate(day);
+                  const isT = isTodayDate(day);
+                  const hasEv = hasEventOnDate(day);
+
+                  return (
+                    <button
+                      key={day}
+                      onClick={() => handleDaySelect(day)}
+                      className={`relative mx-auto w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all ${
+                        sel 
+                          ? 'bg-navy text-white shadow-md' 
+                          : isT 
+                          ? 'border-2 border-safari text-safari' 
+                          : 'text-navy hover:bg-navy/5'
+                      }`}
+                    >
+                      <span>{day}</span>
+                      {/* Active Event Dot */}
+                      {hasEv && !sel && (
+                        <span className="absolute bottom-[2px] left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-safari" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Jump to Today Button */}
+              <button
+                onClick={handleJumpToToday}
+                className="mt-5 w-full h-9 bg-navy/5 text-navy hover:bg-navy hover:text-white transition-all text-[9px] font-black uppercase tracking-widest rounded-lg flex items-center justify-center gap-1.5"
+              >
+                <Calendar size={12} className="text-safari" />
+                <span>Jump To Today</span>
+              </button>
+            </div>
+
+            {/* Category Filter Cards */}
+            <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-navy/5 p-5 space-y-4">
+              <span className="text-safari font-black uppercase tracking-widest text-[9px] block">Filter Category</span>
+              <div className="flex flex-col gap-1.5">
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`w-full h-10 px-4 rounded-xl text-left text-xs font-bold uppercase tracking-wider flex items-center justify-between transition-colors ${
+                      selectedCategory === cat
+                        ? 'bg-safari/10 border-l-4 border-safari text-navy'
+                        : 'text-navy/50 hover:bg-navy/5'
+                    }`}
+                  >
+                    <span>{cat.replace('_', ' & ')}</span>
+                    {selectedCategory === cat && <span className="w-1.5 h-1.5 rounded-full bg-safari animate-ping" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+          </aside>
+
+          {/* RIGHT COLUMN: Interactive Events Listing Panel */}
+          <section className="flex-1 w-full min-w-0">
+            
+            {/* List Header Info */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-navy/5 pb-4 mb-6 gap-3">
+              <div className="space-y-0.5">
+                <h2 className="font-serif font-bold text-lg md:text-xl text-navy">
+                  Expeditions on {selectedDate.toLocaleDateString('en-KE', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                </h2>
+                <p className="text-xs text-navy/40">
+                  Curated premium live schedule matching selections
+                </p>
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-wider bg-navy/5 text-navy/60 h-7 px-3 rounded-full flex items-center w-max">
+                {displayedEvents.length} Active {displayedEvents.length === 1 ? 'Event' : 'Events'}
+              </span>
+            </div>
+
             <AnimatePresence mode="wait">
-                {displayedEvents.length > 0 ? (
-                    <motion.div 
-                        key={selectedDate.toISOString()}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        className="grid grid-cols-1 md:grid-cols-2 gap-12"
-                    >
-                        {displayedEvents.map(event => (
-                            <ExperienceCard 
-                                key={event.id}
-                                event={event}
-                                onClick={() => setSelectedEvent(event)}
-                                isSaved={savedItemIds.includes(event.id)}
-                            />
-                        ))}
-                    </motion.div>
-                ) : (
-                    <motion.div 
-                        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                        className="py-32 flex flex-col items-center justify-center text-center space-y-12 bg-white rounded-[60px] border border-dashed border-navy/10 px-8"
-                    >
-                        <div className="w-24 h-24 bg-navy/5 rounded-full flex items-center justify-center text-navy/10 relative">
-                            <Calendar size={48} />
-                            <div className="absolute inset-0 animate-ping bg-navy/5 rounded-full scale-150 opacity-20" />
+              {displayedEvents.length > 0 ? (
+                <div key="events-grid-view" className="space-y-4">
+                  {displayedEvents.map(event => {
+                    const spotsLeft = event.totalCapacity - event.bookedCapacity;
+                    const isFull = spotsLeft <= 0;
+                    const itemIsSaved = savedItemIds.includes(event.id);
+
+                    return (
+                      <motion.article 
+                        key={event.id}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.98 }}
+                        className="bg-white rounded-2xl border border-navy/5 shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-xl p-4 sm:p-5 flex flex-col md:flex-row gap-5 hover:-translate-y-0.5 transition-all duration-300 group cursor-pointer"
+                        onClick={() => setSelectedEvent(event)}
+                      >
+                        {/* Event Left Zone: Compact visual details */}
+                        <div className="flex items-start md:items-center gap-4 shrink-0 border-b md:border-b-0 md:border-r border-navy/5 pb-3 md:pb-0 md:pr-5 min-w-[70px] justify-between md:justify-center text-center">
+                          <div className="flex flex-col items-center justify-center w-full">
+                            <span className="text-[9px] font-black text-safari uppercase tracking-widest leading-none">
+                              {new Date(event.date).toLocaleString('en-KE', { month: 'short' }).toUpperCase()}
+                            </span>
+                            <span className="font-serif font-extrabold text-3xl leading-none text-navy my-1">
+                              {new Date(event.date).getDate()}
+                            </span>
+                            <span className="text-[9px] font-bold text-navy/40 uppercase">
+                              {new Date(event.date).toLocaleString('en-KE', { weekday: 'short' })}
+                            </span>
+                          </div>
+                          
+                          {/* Small bookmark wrapper for mobile screens */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onAddToTrip(event);
+                            }}
+                            className="md:hidden p-2 rounded-full bg-navy/5 text-navy hover:text-safari"
+                          >
+                            {itemIsSaved ? <BookmarkCheck size={16} className="text-safari" /> : <Bookmark size={16} />}
+                          </button>
                         </div>
-                        <div className="space-y-4">
-                            <h3 className="text-3xl font-serif font-bold text-navy">No Experiences Today</h3>
-                            <p className="text-navy/40 max-w-sm mx-auto text-lg leading-relaxed">
-                                The temporal currents are calm on this day. Explore a different date or discover our nearest upcoming wonder.
-                             </p>
+
+                        {/* Event Image Zone */}
+                        <div className="relative w-full md:w-[150px] aspect-[4/3] rounded-xl overflow-hidden shrink-0 group-hover:scale-[1.02] transition-transform duration-500">
+                          <img 
+                            src={event.imageUrl} 
+                            alt={event.title} 
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute top-2 left-2">
+                            <span className="bg-navy/80 backdrop-blur-md text-white font-black text-[8px] uppercase tracking-widest px-2.5 h-6 rounded-md flex items-center border border-white/5">
+                              {event.category.replace('_', ' ')}
+                            </span>
+                          </div>
                         </div>
-                        
-                        {nearestEvent && (
-                            <div className="bg-cream/30 p-10 rounded-[40px] border border-navy/5 space-y-6 max-w-lg w-full">
-                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-safari">Next Curated Discovery</span>
-                                <div className="flex gap-6 items-center text-left">
-                                    <div className="w-20 h-20 rounded-2xl overflow-hidden shrink-0 border-4 border-white shadow-xl">
-                                        <img src={nearestEvent.imageUrl} className="w-full h-full object-cover" alt="" />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <h4 className="font-serif font-bold text-navy leading-tight">{nearestEvent.title}</h4>
-                                        <p className="text-xs font-bold text-safari uppercase tracking-widest">
-                                            {new Date(nearestEvent.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                                        </p>
-                                    </div>
-                                </div>
-                                <button 
-                                  onClick={() => handleDayClick(new Date(nearestEvent.date))}
-                                  className="w-full h-16 bg-navy text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-safari transition-all"
-                                >
-                                    Jump to this Experience
-                                </button>
+
+                        {/* Event Content & Actions Zone */}
+                        <div className="flex-1 flex flex-col justify-between min-w-0">
+                          <div className="space-y-2">
+                            {/* Meta items */}
+                            <div className="flex flex-wrap items-center gap-3 text-[10px] text-navy/50 font-semibold uppercase tracking-wider">
+                              <span className="flex items-center gap-1">
+                                <MapPin size={11} className="text-safari" />
+                                {event.location}
+                              </span>
+                              <span>•</span>
+                              <span className="flex items-center gap-1">
+                                <Clock size={11} className="text-safari" />
+                                {event.time || 'All Day'}
+                              </span>
                             </div>
-                        )}
-                    </motion.div>
-                )}
+
+                            {/* Title */}
+                            <h3 className="font-serif font-bold text-base sm:text-lg text-navy leading-snug group-hover:text-safari transition-colors line-clamp-2">
+                              {event.title}
+                            </h3>
+
+                            {/* Short bio if existing, or description */}
+                            <p className="text-navy/6 tracking-normal text-xs leading-relaxed line-clamp-2">
+                              {event.description}
+                            </p>
+                          </div>
+
+                          {/* Capacity Indicator & Bottom Action Row inside Card */}
+                          <div className="mt-4 pt-4 border-t border-navy/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            
+                            {/* Exclusivity spotsLeft gauge */}
+                            <div className="space-y-1.5 flex-1 max-w-[200px]">
+                              <div className="flex justify-between text-[8px] font-black uppercase tracking-wider text-navy/40">
+                                <span>Spots remaining</span>
+                                <span className={spotsLeft < 10 ? 'text-red-500' : 'text-safari'}>
+                                  {isFull ? 'Sold Out' : `${spotsLeft} / ${event.totalCapacity}`}
+                                </span>
+                              </div>
+                              <div className="h-1 bg-navy/5 rounded-full overflow-hidden">
+                                <div 
+                                  style={{ width: `${Math.min(100, (event.bookedCapacity / event.totalCapacity) * 100)}%` }}
+                                  className={`h-full transition-all duration-[600ms] ${spotsLeft < 10 ? 'bg-red-500' : 'bg-safari'}`}
+                                />
+                              </div>
+                            </div>
+
+                            {/* Buttons */}
+                            <div className="flex items-center justify-end gap-2.5 shrink-0">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onAddToTrip(event);
+                                }}
+                                className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all active:scale-90 ${
+                                  itemIsSaved 
+                                    ? 'bg-safari/15 border-safari text-safari' 
+                                    : 'border-navy/10 hover:border-navy text-navy hover:bg-navy/5'
+                                }`}
+                                title={itemIsSaved ? "Saved" : "Save to Trip"}
+                              >
+                                {itemIsSaved ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
+                              </button>
+
+                              <button
+                                onClick={() => setSelectedEvent(event)}
+                                className="h-9 px-4 bg-navy hover:bg-safari text-white text-[9px] font-black uppercase tracking-widest rounded-lg flex items-center gap-1.5 shadow-md active:scale-95 transition-all"
+                              >
+                                <span>Book Pass</span>
+                                <ArrowRight size={10} />
+                              </button>
+                            </div>
+
+                          </div>
+                        </div>
+
+                      </motion.article>
+                    );
+                  })}
+                </div>
+              ) : (
+                <motion.div 
+                  key="no-events-view"
+                  initial={{ opacity: 0 }} 
+                  animate={{ opacity: 1 }}
+                  className="py-16 flex flex-col items-center justify-center text-center space-y-6 bg-white rounded-2xl border border-dashed border-navy/10 px-6 shadow-sm"
+                >
+                  <div className="w-16 h-16 bg-navy/5 rounded-full flex items-center justify-center text-navy/10 relative">
+                    <Calendar size={32} />
+                    <div className="absolute inset-0 animate-ping bg-navy/5 rounded-full scale-110 opacity-15" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-serif font-bold text-navy">No Scheduled Expeditions</h3>
+                    <p className="text-navy/40 max-w-sm mx-auto text-xs sm:text-sm leading-relaxed">
+                      No matching premium events are scheduled for this date. Check our nearest upcoming discovery below or select another date.
+                    </p>
+                  </div>
+
+                  {nearestUpcomingEvent && (
+                    <div className="bg-cream/30 p-5 sm:p-6 rounded-xl border border-navy/5 space-y-4 max-w-md w-full text-left mt-4 shadow-sm">
+                      <span className="text-[8px] font-black uppercase tracking-widest text-safari block">Nearest Upcoming Discovery</span>
+                      <div className="flex gap-4 items-center">
+                        <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0 border-2 border-white shadow-md">
+                          <img src={nearestUpcomingEvent.imageUrl} className="w-full h-full object-cover" alt="" />
+                        </div>
+                        <div className="space-y-0.5">
+                          <h4 className="font-serif font-bold text-xs sm:text-sm text-navy leading-normal line-clamp-1">{nearestUpcomingEvent.title}</h4>
+                          <p className="text-[10px] font-black text-safari uppercase tracking-wider">
+                            {new Date(nearestUpcomingEvent.date).toLocaleDateString('en-KE', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </p>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => {
+                          const nDate = new Date(nearestUpcomingEvent.date);
+                          setSelectedDate(nDate);
+                          setViewMonth(nDate.getMonth());
+                          setViewYear(nDate.getFullYear());
+                        }}
+                        className="w-full h-9 bg-navy hover:bg-safari hover:scale-[1.01] text-white rounded-lg font-black uppercase tracking-widest text-[9px] transition-all"
+                      >
+                        Navigate to this day
+                      </button>
+                    </div>
+                  )}
+                </motion.div>
+              )}
             </AnimatePresence>
+
+          </section>
+
         </div>
       </main>
 
       {/* Modals */}
       <AnimatePresence>
         {selectedEvent && (
-            <EventDetailModal 
-                event={selectedEvent}
-                onClose={() => setSelectedEvent(null)}
-                isSaved={savedItemIds.includes(selectedEvent.id)}
-            />
+          <EventDetailModal 
+            event={selectedEvent}
+            onClose={() => setSelectedEvent(null)}
+            isSaved={savedItemIds.includes(selectedEvent.id)}
+          />
         )}
       </AnimatePresence>
     </div>
   );
 };
-
-interface ExperienceCardProps {
-    event: Event;
-    onClick: () => void;
-    isSaved: boolean;
-}
-
-const ExperienceCard: React.FC<ExperienceCardProps> = ({ event, onClick, isSaved }) => {
-    const isFull = event.bookedCapacity >= event.totalCapacity;
-    const capacityPercent = (event.bookedCapacity / event.totalCapacity) * 100;
-    const spotsLeft = event.totalCapacity - event.bookedCapacity;
-
-    return (
-        <motion.div 
-            onClick={onClick}
-            whileHover={{ y: -10 }}
-            className="group bg-white rounded-[40px] overflow-hidden shadow-lux hover:shadow-2xl transition-all duration-700 cursor-pointer border border-navy/5 flex flex-col h-full"
-        >
-            <div className="relative aspect-video overflow-hidden">
-                <img src={event.imageUrl} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-[2000ms]" alt="" />
-                <div className="absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                
-                {/* Date Badge Overlay */}
-                <div className="absolute top-6 left-6 flex flex-col items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-2xl border border-navy/5">
-                    <span className="text-[10px] font-black uppercase text-safari">{new Date(event.date).toLocaleDateString(undefined, { month: 'short' })}</span>
-                    <span className="text-2xl font-serif font-bold text-navy leading-none">{new Date(event.date).getDate()}</span>
-                </div>
-
-                {/* Category Badge */}
-                <div className="absolute top-6 right-6">
-                    <span className="bg-navy/80 backdrop-blur-md text-white text-[9px] font-black uppercase tracking-[0.2em] px-4 h-8 flex items-center rounded-xl border border-white/10 shadow-xl">
-                        {event.category.replace('_', ' ')}
-                    </span>
-                </div>
-            </div>
-
-            <div className="p-10 space-y-8 flex-1 flex flex-col">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-navy/30">
-                        <MapPin size={12} className="text-safari" />
-                        <span className="text-[9px] font-black uppercase tracking-[0.2em]">{event.location}</span>
-                    </div>
-                    <h3 className="text-3xl font-serif font-bold text-navy group-hover:text-safari transition-colors leading-tight line-clamp-2">
-                        {event.title}
-                    </h3>
-                </div>
-
-                {/* Capacity UI */}
-                <div className="space-y-4">
-                    <div className="flex justify-between text-[9px] font-black uppercase tracking-[0.2em]">
-                        <span className="text-navy/30">Exclusivity Gauge</span>
-                        <span className={spotsLeft < 10 ? 'text-red-500' : 'text-safari'}>
-                            {spotsLeft} spots left of {event.totalCapacity}
-                        </span>
-                    </div>
-                    <div className="h-1.5 w-full bg-navy/5 rounded-full overflow-hidden">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: `${capacityPercent}%` }}
-                          className={`h-full transition-all duration-1000 ${spotsLeft < 20 ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)]' : 'bg-safari shadow-[0_0_10px_rgba(232,98,26,0.3)]'}`}
-                        />
-                    </div>
-                </div>
-
-                {/* Bottom Row */}
-                <div className="pt-8 border-t border-navy/5 flex items-center justify-between mt-auto">
-                    <div className="flex flex-col">
-                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-navy/30 leading-none mb-1">Pass From</span>
-                        <span className="text-2xl font-bold text-navy font-sans tracking-tight">Ksh {event.price.toLocaleString()}</span>
-                    </div>
-                    
-                    <button className="h-14 px-8 bg-navy group-hover:bg-safari text-white rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl active:scale-95">
-                        <span className="text-[10px] font-black uppercase tracking-widest">Reserve My Spot</span>
-                        <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
-                    </button>
-                </div>
-            </div>
-        </motion.div>
-    );
-};
-
-const ChevronDown = ({ className, size }: { className?: string, size?: number }) => (
-    <svg 
-      className={className} 
-      width={size || 24} height={size || 24} 
-      viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-    >
-      <path d="m6 9 6 6 6-6"/>
-    </svg>
-);

@@ -294,7 +294,7 @@ export const MyKenya: React.FC<MyKenyaProps> = ({
                   className="space-y-12"
                 >
                   <div className="space-y-2">
-                    <h2 className="text-4xl font-serif font-bold text-navy">Collective Contributions</h2>
+                    <h2 className="text-4xl font-serif font-bold text-navy">Registry Contributions</h2>
                     <p className="text-navy/40 italic font-medium">Your shared experiences within the database.</p>
                   </div>
 
@@ -370,7 +370,7 @@ export const MyKenya: React.FC<MyKenyaProps> = ({
                     <div className="space-y-4">
                        {[
                          { id: 'notifications', title: 'System Alerts', desc: 'Real-time updates on saved itinerary changes and booking status.' },
-                         { id: 'newsletter', title: 'The Collective Dispatch', desc: 'A monthly editorial on hidden Kenyan gems and aesthetic routes.' }
+                         { id: 'newsletter', title: 'The Kenya Dispatch', desc: 'A monthly editorial on hidden Kenyan gems and aesthetic routes.' }
                        ].map((pref) => (
                          <div key={pref.id} className="flex items-center justify-between p-6 bg-cream/30 rounded-3xl border border-navy/5">
                             <div className="space-y-1">

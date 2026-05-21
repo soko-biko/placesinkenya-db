@@ -27,7 +27,7 @@ export const CatalogueHeader: React.FC<CatalogueHeaderProps> = ({ searchQuery, o
             animate={{ opacity: 1, y: 0 }}
             className="text-safari font-black uppercase tracking-[0.4em] text-[10px]"
           >
-            The Collective Selection
+            The Curated Selection
           </motion.span>
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}

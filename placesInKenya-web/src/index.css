@@ -1,3 +1,9 @@
+/* 
+  Places in Kenya — Full Website Redesign Styling
+  Inspired by Niko Free (niko-free.com). 
+  Preserves core branding colors (#0D1B2A, #E8621A) and fonts ("Playfair Display", "DM Sans").
+*/
+
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 @import "tailwindcss";
 
@@ -7,23 +13,37 @@
 }
 
 :root {
-  --color-navy: #0D1B2A;
-  --color-safari: #E8621A;
+  /* Niko Free Design Tokens Master Layout Configuration */
+  --color-primary: #0D1B2A;
+  --color-secondary: #E8621A;
+  --color-background: #FAFAF8;
+  --color-text: #1A1A1A;
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+
+  /* Backward Compatibility Names & Utilities */
+  --color-navy: var(--color-primary);
+  --color-safari: var(--color-secondary);
   --color-cream: #F5EFE6;
-  --color-off-white: #FAFAF8;
-  --color-text-dark: #1A1A1A;
+  --color-off-white: var(--color-background);
+  --color-text-dark: var(--color-text);
   
-  --radius-card: 20px;
+  --radius-card: 16px;
   --radius-button: 12px;
   
   --shadow-lux: 0 4px 20px rgba(13, 27, 42, 0.05);
   --shadow-lux-hover: 0 12px 40px rgba(13, 27, 42, 0.12);
   
-  --font-serif: "Playfair Display", serif;
-  --font-sans: "DM Sans", sans-serif;
+  --font-serif: var(--font-heading);
+  --font-sans: var(--font-body);
 }
 
 @theme {
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --color-background: var(--color-background);
+  --color-text: var(--color-text);
+
   --color-navy: var(--color-navy);
   --color-safari: var(--color-safari);
   --color-cream: var(--color-cream);
@@ -90,9 +110,9 @@ html {
 }
 
 body {
-  background-color: var(--color-off-white);
-  color: var(--color-text-dark);
-  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-body);
   overflow-x: hidden;
   line-height: 1.5;
 }
@@ -118,10 +138,10 @@ p, button, input, select, textarea {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-off-white);
+  background: var(--color-background);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-navy);
+  background: var(--color-primary);
   border-radius: 10px;
 }
 
@@ -159,3 +179,144 @@ p, button, input, select, textarea {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lux-hover);
 }
+
+/* Niko Free Animated Nav Underline Effect */
+.nav-underlined-link {
+  position: relative;
+  display: inline-block;
+}
+.nav-underlined-link::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background-color: var(--color-secondary);
+  transform-origin: bottom left;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.nav-underlined-link:hover::after, .nav-underlined-link.active::after {
+  transform: scaleX(1);
+}
+
+/* Reveal-on-scroll intersection styling */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* === RESPONSIVE SCALING & LAYOUT GRIDS (NIKO FREE BLUEPRINT) === */
+
+/* Cards Grid Container */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+  width: 100%;
+}
+
+@media (max-width: 639px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .cards-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Global Content Container Widths */
+.page-container,
+.content-wrapper {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2rem);
+}
+
+@media (min-width: 640px)  { .page-container { max-width: 640px;  } }
+@media (min-width: 768px)  { .page-container { max-width: 768px;  } }
+@media (min-width: 1024px) { .page-container { max-width: 1024px; } }
+@media (min-width: 1280px) { .page-container { max-width: 1280px; } }
+@media (min-width: 1400px) { .page-container { max-width: 1400px; } }
+
+/* Fluid Typography / Heading Sizing */
+.hero-title {
+  font-size: clamp(1.75rem, 5vw, 3.5rem);
+  line-height: 1.15;
+}
+
+.hero-subtitle {
+  font-size: clamp(0.9375rem, 2vw, 1.25rem);
+  line-height: 1.6;
+}
+
+.section-heading {
+  font-size: clamp(1.375rem, 3vw, 2.25rem);
+}
+
+/* Mobile-Specific Performance & Reset Rules */
+@media (max-width: 639px) {
+  * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  body {
+    padding-inline: 0;
+  }
+
+  main {
+    padding-inline: 1rem;
+  }
+
+  section {
+    padding-block: 2rem;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Login page — prevent ALL scroll */
+body:has(.login-page-root) {
+  overflow: hidden !important;
+  height: 100vh;
+}
+
+/* Ensure navbar stays on top and is never hidden */
+body:has(.login-page-root) nav,
+body:has(.login-page-root) header {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 100 !important;
+}
+

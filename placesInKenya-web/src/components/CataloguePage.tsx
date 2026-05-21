@@ -178,31 +178,30 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
 
             {/* Grid */}
             {isLoading && visibleCount === 12 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-[32px] overflow-hidden border border-navy/5 shadow-lux animate-pulse h-[460px] relative">
-                    <div className="aspect-video bg-navy/5 relative overflow-hidden">
+                  <div key={i} className="bg-white rounded-2xl overflow-hidden border border-navy/5 shadow-lux animate-pulse h-[380px] relative">
+                    <div className="aspect-[4/3] bg-navy/5 relative overflow-hidden">
                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
                     </div>
-                    <div className="p-8 space-y-4">
-                       <div className="h-8 bg-navy/5 rounded-xl w-3/4"></div>
+                    <div className="p-4 sm:p-5 space-y-3">
+                       <div className="h-6 bg-navy/5 rounded-lg w-3/4"></div>
                        <div className="h-3 bg-navy/5 rounded-full w-1/4"></div>
-                       <div className="space-y-2 pt-4">
-                          <div className="h-3 bg-navy/5 rounded-full w-full"></div>
-                          <div className="h-3 bg-navy/5 rounded-full w-full"></div>
-                          <div className="h-3 bg-navy/5 rounded-full w-2/3"></div>
+                       <div className="space-y-1.5 pt-2">
+                           <div className="h-3 bg-navy/5 rounded-full w-full"></div>
+                           <div className="h-3 bg-navy/5 rounded-full w-2/3"></div>
                        </div>
-                       <div className="pt-8 flex justify-between">
-                          <div className="h-10 bg-navy/5 rounded-xl w-24"></div>
-                          <div className="h-10 bg-navy/5 rounded-xl w-32"></div>
+                       <div className="pt-4 flex justify-between border-t border-navy/5">
+                           <div className="h-8 bg-navy/5 rounded-lg w-16"></div>
+                           <div className="h-8 bg-navy/5 rounded-lg w-24"></div>
                        </div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : filteredPlaces.length > 0 ? (
-              <div className="space-y-16">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-10">
+              <div className="space-y-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                     {displayedPlaces.map((place, i) => (
                     <motion.div
                         key={place.id}
@@ -222,30 +221,30 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
                 </div>
 
                 {visibleCount < filteredPlaces.length && (
-                    <div className="flex flex-col items-center gap-6 py-12 border-t border-navy/5">
-                        <p className="text-[11px] font-bold text-navy/30 uppercase tracking-[0.2em]">
+                    <div className="flex flex-col items-center gap-4 py-8 border-t border-navy/5">
+                        <p className="text-[10px] font-bold text-navy/30 uppercase tracking-[0.2em]">
                             You've revealed {displayedPlaces.length} of {filteredPlaces.length} gems
                         </p>
                         <button 
                             onClick={handleLoadMore}
                             disabled={isLoading}
-                            className="group h-20 px-16 bg-white hover:bg-navy text-navy hover:text-white border-2 border-navy rounded-[40px] font-black uppercase tracking-[0.3em] text-[11px] transition-all flex items-center gap-4 shadow-lux active:scale-95 disabled:opacity-50"
+                            className="group h-12 px-10 bg-white hover:bg-navy text-navy hover:text-white border-2 border-navy rounded-full font-black uppercase tracking-[0.3em] text-[10px] sm:text-[11px] transition-all flex items-center justify-center gap-3 shadow-lux active:scale-95 disabled:opacity-50"
                         >
-                            {isLoading ? <Loader2 className="animate-spin" size={18} /> : (
-                                <>Reveal More Wonders <div className="w-10 h-10 bg-navy/5 group-hover:bg-white/10 rounded-full flex items-center justify-center transition-colors"><LayoutGrid size={16} /></div></>
+                            {isLoading ? <Loader2 className="animate-spin" size={16} /> : (
+                                <>Reveal More Wonders <div className="w-8 h-8 bg-navy/5 group-hover:bg-white/10 rounded-full flex items-center justify-center transition-colors"><LayoutGrid size={14} /></div></>
                             )}
                         </button>
                     </div>
                 )}
               </div>
             ) : (
-              <div className="py-32 flex flex-col items-center justify-center text-center space-y-8 bg-white rounded-[60px] border border-dashed border-navy/10">
-                <div className="w-24 h-24 bg-navy/5 rounded-full flex items-center justify-center text-navy/10">
-                  <Search size={48} />
+              <div className="py-16 md:py-24 flex flex-col items-center justify-center text-center space-y-6 bg-white rounded-2xl border border-dashed border-navy/10 px-6">
+                <div className="w-16 h-16 bg-navy/5 rounded-full flex items-center justify-center text-navy/10">
+                  <Search size={32} />
                 </div>
-                <div className="space-y-4">
-                  <h3 className="text-3xl font-serif font-bold text-navy">No Treasures Found</h3>
-                  <p className="text-navy/40 max-w-sm mx-auto text-lg leading-relaxed">
+                <div className="space-y-2">
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-navy">No Treasures Found</h3>
+                  <p className="text-navy/40 max-w-sm mx-auto text-sm leading-relaxed">
                     The wild spirit is vast, but it seems we couldn't find a match for your current filters. Broaden your horizons.
                   </p>
                 </div>
@@ -255,7 +254,7 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
                         setSelectedCategory('ALL');
                         setSelectedCity('');
                     }}
-                    className="h-16 px-10 bg-navy text-white rounded-2xl font-black uppercase tracking-widest text-[11px] hover:bg-safari transition-all"
+                    className="h-10 px-6 bg-navy text-white rounded-full font-black uppercase tracking-widest text-[10px] hover:bg-safari transition-all"
                 >
                     Clear All Filters
                 </button>

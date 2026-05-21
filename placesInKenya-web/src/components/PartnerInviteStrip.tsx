@@ -37,11 +37,11 @@ export const PartnerInviteStrip: React.FC<PartnerInviteStripProps> = ({ onPartne
         >
           <button 
             onClick={onPartnerClick}
-            className="group relative h-16 md:h-20 bg-white text-navy px-12 md:px-16 rounded-[32px] font-black uppercase tracking-[0.2em] text-[11px] md:text-xs transition-all shadow-2xl active:scale-95 overflow-hidden flex items-center gap-6"
+            className="group relative h-12 bg-white text-navy px-8 rounded-full font-black uppercase tracking-[0.2em] text-[10px] md:text-xs transition-all shadow-2xl active:scale-95 overflow-hidden flex items-center gap-4"
           >
             <div className="absolute inset-0 bg-safari translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-in-out" />
             <span className="relative z-10 group-hover:text-white transition-colors duration-300">Become a Partner</span>
-            <ArrowRight size={20} className="relative z-10 group-hover:text-white group-hover:translate-x-2 transition-all duration-300" />
+            <ArrowRight size={16} className="relative z-10 group-hover:text-white group-hover:translate-x-1.5 transition-all duration-300" />
           </button>
         </motion.div>
       </div>

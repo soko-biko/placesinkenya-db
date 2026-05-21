@@ -1,8 +1,6 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MapPin, User, LogOut, Heart, ChevronDown, Utensils, Music, Coffee, TreePine, Mountain, Compass, Menu, X, Plus } from 'lucide-react';
-import { LOGO } from '../constants';
+import { LogOut, User, FolderHeart, Plus, Compass } from 'lucide-react';
 
 interface NavbarProps {
   user: any;
@@ -13,187 +11,287 @@ interface NavbarProps {
   tripCount?: number;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onOpenAuth, onNavigate, activePage, tripCount = 0 }) => {
-  const [isExploreOpen, setIsExploreOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+export const Navbar: React.FC<NavbarProps> = ({
+  user,
+  onLogout,
+  onOpenAuth,
+  onNavigate,
+  activePage,
+  tripCount = 0,
+}) => {
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const navItems = [
     { id: 'home', label: 'Home' },
     { id: 'destinations', label: 'Explore' },
     { id: 'where-to-go', label: 'Events' },
     { id: 'operators', label: 'Operators & Guides' },
-    { id: 'about', label: 'About' },
   ];
 
   const handleNavigate = (page: string) => {
-    if (page === 'about') return; // Placeholder
     onNavigate(page);
-    setIsMobileMenuOpen(false);
+    setMenuOpen(false);
   };
 
+  // Prevent background scroll when the side drawer is active
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [menuOpen]);
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] bg-white/90 backdrop-blur-xl border-b border-navy/5 px-4 h-16 sm:h-24 flex items-center shadow-sm">
-      <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between">
-        {/* Logo Left */}
-        <div 
-          className="flex items-center gap-3 sm:gap-4 cursor-pointer group py-2 shrink-0"
-          onClick={() => handleNavigate('home')}
-        >
-          <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl sm:rounded-2xl overflow-hidden bg-navy p-1.5 sm:p-2 shadow-lux shrink-0 lux-transition group-hover:scale-105">
-            <img src="/regenerated_image_1777526382608.png" alt="PlacesInKenya" className="w-full h-full object-contain brightness-0 invert" />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-serif text-lg sm:text-2xl font-bold tracking-tight text-navy leading-tight">
+    <>
+      {/* Navbar Container */}
+      <nav id="navbar" className="fixed top-0 left-0 right-0 z-[100] bg-[#FAFAF8]/90 backdrop-blur-[12px] border-b border-navy/5 px-4 sm:px-6 lg:px-8 h-16 flex items-center shadow-sm">
+        <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between gap-4">
+          
+          {/* Left Zone: Logo only (No 'COLLECTIVE' text) */}
+          <div 
+            id="navbar-logo"
+            className="flex items-center gap-2.5 cursor-pointer group py-2 shrink-0"
+            onClick={() => handleNavigate('home')}
+          >
+            <div className="w-9 h-9 flex items-center justify-center rounded-xl overflow-hidden bg-navy p-1.5 shadow-lux shrink-0 transition-transform duration-300 group-hover:scale-105">
+              <img 
+                src="/regenerated_image_1777526382608.png" 
+                alt="PlacesInKenya" 
+                className="w-full h-full object-contain brightness-0 invert" 
+              />
+            </div>
+            <span className="font-serif text-base sm:text-lg font-bold tracking-tight text-navy leading-none">
               PlacesInKenya
             </span>
-            <span className="text-[8px] sm:text-[9px] text-safari font-black uppercase tracking-[0.3em] ml-0.5 opacity-80">Collective</span>
+          </div>
+
+          {/* Middle Zone: Desktop Navigation Links (inline) */}
+          <div className="hidden lg:flex items-center gap-6 xl:gap-8 shrink-0">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleNavigate(item.id)}
+                className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all relative py-1 hover:text-safari cursor-pointer ${
+                  activePage === item.id 
+                    ? 'text-safari font-black' 
+                    : 'text-navy/60'
+                }`}
+              >
+                <span>{item.label}</span>
+                {activePage === item.id && (
+                  <motion.span 
+                    layoutId="activeNavLine" 
+                    className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-safari rounded-full" 
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Right Zone: Always Visible 'List Your Business' CTA + Hamburger Icon */}
+          <div id="navbar-actions" className="flex items-center gap-2 sm:gap-4 shrink-0">
+            
+            {/* CTA Button — list business onboarding trigger */}
+            <button 
+              id="navbar-cta-list"
+              onClick={() => handleNavigate('partner-registration')}
+              className="flex items-center gap-1.5 bg-navy hover:bg-safari hover:text-white text-white text-[10px] font-black uppercase tracking-widest px-3 sm:px-5 h-10 rounded-full shadow-md hover:scale-[1.03] transition-all duration-200 whitespace-nowrap active:scale-95 cursor-pointer"
+            >
+              <Plus size={13} className="text-safari" />
+              <span className="hidden sm:inline">List Your Business</span>
+              <span className="sm:hidden">List</span>
+            </button>
+
+            {/* Desktop-only Auth controls */}
+            <div className="hidden lg:flex items-center gap-3 shrink-0">
+              {user ? (
+                <>
+                  <button
+                    id="navbar-btn-trips-desktop"
+                    onClick={() => handleNavigate('trips')}
+                    className={`h-10 px-4 rounded-full text-[10px] font-black uppercase tracking-[0.15em] flex items-center gap-2 transition-all cursor-pointer ${
+                      activePage === 'trips'
+                        ? 'bg-navy text-white shadow-md'
+                        : 'bg-navy/5 text-navy/70 hover:bg-navy/10'
+                    }`}
+                  >
+                    <Compass size={13} className="text-safari" />
+                    <span>My Kenya {tripCount > 0 && `(${tripCount})`}</span>
+                  </button>
+                  
+                  <button
+                    id="navbar-btn-logout-desktop"
+                    onClick={onLogout}
+                    title="Sign Out"
+                    className="w-10 h-10 rounded-full bg-red-500/10 hover:bg-red-500/15 text-red-500 flex items-center justify-center transition-all cursor-pointer border border-red-500/5 active:scale-90"
+                  >
+                    <LogOut size={14} />
+                  </button>
+                </>
+              ) : (
+                <button
+                  id="navbar-btn-signin-desktop"
+                  onClick={onOpenAuth}
+                  className="h-10 px-5 border border-navy/20 text-navy hover:bg-navy hover:text-white rounded-full font-black uppercase tracking-widest text-[10px] transition-all duration-300 active:scale-95 cursor-pointer"
+                >
+                  Sign In
+                </button>
+              )}
+            </div>
+
+            {/* Menu Sandwich/Hamburger Trigger */}
+            <button
+              id="navbar-hamburger"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Toggle Navigation Menu"
+              className="lg:hidden w-10 h-10 flex flex-col items-center justify-center gap-[5px] rounded-full hover:bg-navy/5 active:scale-90 transition-all cursor-pointer border border-navy/5"
+            >
+              <span className={`block w-5 h-[2px] bg-navy rounded-full transition-all duration-300 origin-center ${menuOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
+              <span className={`block w-5 h-[2px] bg-navy rounded-full transition-all duration-300 ${menuOpen ? 'opacity-0 scale-x-0' : ''}`} />
+              <span className={`block w-5 h-[2px] bg-navy rounded-full transition-all duration-300 origin-center ${menuOpen ? '-rotate-45 -translate-y-[7px]' : ''}`} />
+            </button>
+
           </div>
         </div>
+      </nav>
 
-        {/* Desktop Links Center */}
-        <div className="hidden lg:flex items-center gap-1 font-medium mx-8">
-          {navItems.map(item => (
-            <button 
-              key={item.id}
-              onClick={() => handleNavigate(item.id)}
-              className={`transition-all font-bold uppercase tracking-[0.2em] text-[10px] px-6 h-12 rounded-xl tap-target ${activePage === item.id ? 'text-navy bg-navy/5' : 'text-navy/40 hover:text-navy hover:bg-navy/5'}`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Desktop Actions Right */}
-        <div className="hidden lg:flex items-center gap-6">
-          {user ? (
-            <div className="flex items-center gap-4">
-              <button 
-                onClick={() => handleNavigate('trips')}
-                className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-navy/40 hover:text-safari transition-colors tap-target"
-              >
-                My Kenya {tripCount > 0 && <span className="w-5 h-5 bg-safari text-white rounded-full flex items-center justify-center text-[9px]">{tripCount}</span>}
-              </button>
-              <div className="w-[1px] h-6 bg-navy/10 mx-2"></div>
-              <button onClick={onLogout} className="text-navy/40 hover:text-red-500 transition-colors tap-target px-2"><LogOut size={18} /></button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-4">
-               <button 
-                  onClick={onOpenAuth}
-                  className="text-[11px] font-black uppercase tracking-[0.2em] text-navy/50 hover:text-navy transition-colors px-4 tap-target"
-               >
-                  Sign In
-               </button>
-               <button 
-                  onClick={() => handleNavigate('onboarding')}
-                  className="relative group px-8 h-12 bg-navy text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] overflow-hidden transition-all shadow-lux active:scale-95 flex items-center gap-3"
-               >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                  <Plus size={14} className="text-safari group-hover:text-white group-hover:rotate-90 transition-all duration-500" />
-                  <span className="relative z-10">List Your Business</span>
-               </button>
-            </div>
-          )}
-        </div>
-
-        {/* Mobile Menu Toggle */}
-        <button 
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="lg:hidden w-11 h-11 flex items-center justify-center bg-navy/5 rounded-xl text-navy transition-all active:scale-90"
-        >
-          {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
-      </div>
-
-      {/* Mobile Menu Overlay - Full Screen */}
+      {/* Hamburger Drawer & Overlay */}
       <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="lg:hidden fixed inset-0 bg-white/95 backdrop-blur-2xl z-[200] overflow-y-auto"
-          >
-            <div className="h-16 flex items-center justify-between px-4 border-b border-navy/5">
-               <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-navy p-1.5 flex items-center justify-center">
-                     <img src="/regenerated_image_1777526382608.png" className="w-full h-full object-contain brightness-0 invert" alt="logo" />
-                  </div>
-                  <span className="font-serif font-bold text-navy">Collective</span>
-               </div>
-               <button 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-11 h-11 flex items-center justify-center bg-navy/5 rounded-xl text-navy"
-               >
-                  <X size={20} />
-               </button>
-            </div>
+        {menuOpen && (
+          <>
+            {/* Backdrop Overlay */}
+            <motion.div
+              id="drawer-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setMenuOpen(false)}
+              className="fixed inset-0 z-[140] bg-black/40 backdrop-blur-[6px] pointer-events-auto"
+            />
 
-            <div className="px-6 py-12 flex flex-col gap-12 min-h-[calc(100vh-64px)]">
-              <div className="space-y-6">
-                <span className="text-safari font-black uppercase tracking-[0.4em] text-[10px] block border-l-2 border-safari pl-4">Registry Navigation</span>
-                <div className="grid grid-cols-1 gap-2">
-                  {navItems.map((item, idx) => (
-                    <motion.button
-                      key={item.id}
-                      initial={{ x: -20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: idx * 0.05 }}
-                      onClick={() => handleNavigate(item.id)}
-                      className={`w-full flex items-center justify-between px-8 h-16 rounded-2xl text-left font-black uppercase tracking-[0.2em] text-[10px] transition-all ${activePage === item.id ? 'bg-navy text-white shadow-xl translate-x-2' : 'bg-navy/5 text-navy/40 active:bg-navy/10'}`}
-                    >
-                      {item.label}
-                      <ChevronDown size={14} className="-rotate-90 opacity-40" />
-                    </motion.button>
-                  ))}
-                </div>
+            {/* Side Drawer Panel */}
+            <motion.aside
+              id="drawer-aside"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
+              className="fixed top-0 right-0 z-[150] h-full w-[320px] max-w-[85vw] bg-[#FAFAF8] shadow-2xl flex flex-col border-l border-navy/5"
+            >
+              {/* Drawer Header */}
+              <div id="drawer-header" className="flex items-center justify-between px-6 h-16 border-b border-navy/5">
+                <span className="font-serif font-bold text-lg text-navy">
+                  Navigation
+                </span>
+                <button
+                  id="drawer-close"
+                  onClick={() => setMenuOpen(false)}
+                  className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-navy/5 text-navy text-xl leading-none transition-colors"
+                >
+                  ×
+                </button>
               </div>
 
-              <div className="mt-auto pt-10 border-t border-navy/10 space-y-8 pb-12">
-                <div className="flex items-center gap-4">
-                   <div className="w-12 h-12 rounded-full bg-navy/5 flex items-center justify-center text-safari">
-                      <User size={24} />
-                   </div>
-                   <div className="flex flex-col">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-navy/40">Explorer Status</span>
-                      <span className="text-sm font-bold text-navy">{user ? user.email : 'Guest Resident'}</span>
-                   </div>
-                </div>
+              {/* Drawer Content Area */}
+              <div id="drawer-body" className="flex-1 overflow-y-auto px-6 py-8 flex flex-col justify-between">
                 
-                {user ? (
-                   <button 
-                      onClick={() => { onLogout(); setIsMobileMenuOpen(false); }} 
-                      className="w-full h-16 bg-red-500/10 text-red-500 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-3 transition-all active:scale-95"
-                   >
-                      <LogOut size={16} /> Terminate Session
-                   </button>
-                ) : (
-                  <div className="grid grid-cols-1 gap-4">
-                    <button 
-                      onClick={() => { onOpenAuth(); setIsMobileMenuOpen(false); }}
-                      className="w-full h-16 border border-navy/10 text-navy/60 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] active:bg-navy/5 transition-all"
-                    >
-                      Initiate Handshake (Sign In)
-                    </button>
-                    <button 
-                      onClick={() => { handleNavigate('onboarding'); setIsMobileMenuOpen(false); }}
-                      className="w-full h-24 bg-gradient-to-br from-navy to-navy-light text-white rounded-[28px] font-black uppercase tracking-[0.4em] text-[10px] shadow-2xl shadow-navy/20 active:scale-95 transition-all flex flex-col items-center justify-center gap-2 group relative overflow-hidden border border-white/5"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-tr from-safari/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      <div className="flex items-center gap-3 relative z-10">
-                        <Compass size={18} className="text-safari group-hover:rotate-180 transition-transform duration-1000" />
-                        <span>Partner Portal</span>
-                      </div>
-                      <span className="text-[8px] opacity-40 font-medium tracking-[0.6em] relative z-10">List Your Business</span>
-                    </button>
+                {/* Nav Links */}
+                <div className="space-y-6">
+                  <span className="text-safari font-black uppercase tracking-[0.3em] text-[9px] block pl-1">Registry Pages</span>
+                  <nav className="flex flex-col gap-2">
+                    {navItems.map((item, index) => (
+                      <motion.button
+                        id={`drawer-link-${item.id}`}
+                        key={item.id}
+                        initial={{ x: 20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: index * 0.05 }}
+                        onClick={() => handleNavigate(item.id)}
+                        className={`w-full flex items-center justify-between px-5 h-12 rounded-xl text-left font-black uppercase tracking-[0.2em] text-[10px] transition-all ${
+                          activePage === item.id 
+                            ? 'bg-navy text-white shadow-md translate-x-1' 
+                            : 'bg-navy/5 text-navy/50 hover:bg-navy/10 hover:text-navy'
+                        }`}
+                      >
+                        <span>{item.label}</span>
+                        <span className={`w-1.5 h-1.5 rounded-full ${activePage === item.id ? 'bg-safari' : 'bg-transparent'}`} />
+                      </motion.button>
+                    ))}
+                  </nav>
+                </div>
+
+                {/* User Status / Core Actions Section at Bottom of Drawer */}
+                <div id="drawer-footer-actions" className="pt-8 border-t border-navy/10 space-y-6">
+                  
+                  {/* Status Card */}
+                  <div className="flex items-center gap-3.5 bg-navy/5 p-4 rounded-xl">
+                    <div className="w-10 h-10 rounded-full bg-navy/15 flex items-center justify-center text-safari">
+                      <User size={18} />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[8px] font-black uppercase tracking-widest text-navy/40">Explorer Account</span>
+                      <span className="text-xs font-bold text-navy truncate">
+                        {user ? user.email : 'Guest Resident'}
+                      </span>
+                    </div>
                   </div>
-                )}
+
+                  {/* Core Status Buttons */}
+                  <div className="space-y-3">
+                    {user && (
+                      <button
+                        id="drawer-btn-trips"
+                        onClick={() => handleNavigate('trips')}
+                        className={`w-full h-12 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-2.5 transition-all active:scale-95 ${
+                          activePage === 'trips'
+                            ? 'bg-navy text-white'
+                            : 'bg-navy/5 text-navy/70 hover:bg-navy/10'
+                        }`}
+                      >
+                        <Compass size={14} className="text-safari" />
+                        <span>My Kenya ({tripCount})</span>
+                      </button>
+                    )}
+
+                    {user ? (
+                      <button
+                        id="drawer-btn-logout"
+                        onClick={() => {
+                          onLogout();
+                          setMenuOpen(false);
+                        }}
+                        className="w-full h-12 bg-red-500/10 text-red-500 hover:bg-red-500/15 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-2 transition-all active:scale-95"
+                      >
+                        <LogOut size={14} />
+                        <span>Sign Out</span>
+                      </button>
+                    ) : (
+                      <button
+                        id="drawer-btn-signin"
+                        onClick={() => {
+                          onOpenAuth();
+                          setMenuOpen(false);
+                        }}
+                        className="w-full h-12 border border-navy/20 text-navy hover:bg-navy hover:text-white rounded-xl font-black uppercase tracking-[0.2em] text-[10px] transition-all duration-300 active:scale-95"
+                      >
+                        Sign In / Register
+                      </button>
+                    )}
+                  </div>
+
+                </div>
+
               </div>
-            </div>
-          </motion.div>
+            </motion.aside>
+          </>
         )}
       </AnimatePresence>
-    </nav>
+    </>
   );
 };
 

@@ -26,23 +26,23 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
   ];
 
   return (
-    <div className="relative min-h-screen md:h-[85vh] w-full overflow-hidden flex items-center justify-center pt-24 md:pt-40 pb-20">
-      {/* Background - Single Image */}
+    <div className="relative min-h-screen md:h-[90vh] w-full overflow-hidden flex items-center justify-center pt-24 md:pt-40 pb-20">
+      {/* Background - Single Image and Linear Gradient Blend */}
       <div className="absolute inset-0 z-0">
         <img 
           src="https://images.unsplash.com/photo-1516426122078-c23e76319801" 
           alt="Kenyan Safari" 
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-navy/60 via-navy/20 to-navy/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/10 to-black/70" style={{ background: 'linear-gradient(160deg, rgba(0,0,0,0.55), rgba(0,0,0,0.2), rgba(0,0,0,0.7))' }}></div>
       </div>
 
-      <div className="relative z-10 text-center px-4 max-w-6xl mx-auto space-y-12 md:space-y-16">
+      <div className="relative z-10 text-center px-4 max-w-6xl mx-auto space-y-10 md:space-y-14">
         <div className="space-y-6">
           <motion.h1 
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="font-serif text-5xl md:text-9xl font-bold leading-[0.9] text-white tracking-tighter"
+            className="font-serif text-[clamp(2rem,6vw,3.5rem)] md:text-[clamp(3.5rem,8vw,5.5rem)] font-bold leading-[1.05] text-white tracking-tighter"
           >
             Experience the <br />
             <span className="text-safari italic">Majesty</span> of Kenya
@@ -51,54 +51,54 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="text-lg md:text-2xl text-white/70 max-w-2xl mx-auto font-light leading-relaxed font-sans italic"
+            className="font-sans text-[clamp(0.9rem,2.2vw,1.125rem)] text-white/85 max-w-2xl mx-auto font-light leading-relaxed"
           >
             A curated collective of the most authentic destinations in the heart of Africa.
           </motion.p>
         </div>
 
         <div className="space-y-8 w-full max-w-4xl mx-auto">
-          {/* Main Search Bar */}
+          {/* Main Search Bar - Rounded Pill Shape with Focus Shadow Glow */}
           <motion.form 
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
             onSubmit={handleSubmit}
-            className="relative group h-20 md:h-24"
+            className="relative group h-16 md:h-20 w-full max-w-3xl mx-auto"
           >
-            <div className="absolute inset-0 bg-white/10 backdrop-blur-2xl rounded-3xl border border-white/20 shadow-2xl transition-all group-focus-within:bg-white group-focus-within:border-white"></div>
-            <div className="absolute inset-y-0 left-8 flex items-center text-white/30 group-focus-within:text-safari">
-              <Search size={28} />
+            <div className="absolute inset-0 bg-white/10 backdrop-blur-2xl rounded-full border border-white/20 shadow-2xl transition-all group-focus-within:bg-white group-focus-within:border-white group-focus-within:ring-4 group-focus-within:ring-navy/20"></div>
+            <div className="absolute inset-y-0 left-6 flex items-center text-white/50 group-focus-within:text-navy">
+              <Search size={22} />
             </div>
             <input 
               type="text"
               value={val}
               onChange={(e) => setVal(e.target.value)}
               placeholder="Where will your spirit wander?"
-              className="absolute inset-0 bg-transparent px-20 text-white group-focus-within:text-navy text-lg md:text-2xl font-medium outline-none placeholder:text-white/30 group-focus-within:placeholder:text-navy/20 tap-target"
+              className="absolute inset-0 bg-transparent pl-16 pr-32 md:pr-40 text-white group-focus-within:text-navy text-base md:text-lg font-medium outline-none placeholder:text-white/60 group-focus-within:placeholder:text-navy/45 tap-target text-left"
             />
             <div className="absolute inset-y-2 right-2 flex items-center">
               <button 
                 type="submit"
-                className="h-full px-8 md:px-12 bg-safari hover:bg-safari-light text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-xl transition-all active:scale-95 tap-target"
+                className="h-full px-6 md:px-10 bg-navy hover:bg-navy-light text-white rounded-full font-black uppercase tracking-[0.2em] text-[10px] md:text-[11px] shadow-xl transition-all active:scale-95 tap-target"
               >
                 Explore
               </button>
             </div>
           </motion.form>
 
-          {/* Category Pills */}
+          {/* Category Chips Scrollbar Custom Row */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="flex flex-wrap justify-center gap-3 md:gap-4"
+            className="flex flex-wrap justify-center gap-3 md:gap-4 overflow-x-auto scrollbar-hide py-2"
           >
             {categories.map((cat, i) => (
               <button
                 key={i}
                 onClick={() => onSearch('', cat.id)}
-                className="flex items-center gap-3 px-6 h-12 bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl text-white text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] transition-all hover:border-white/30 active:scale-95 group tap-target"
+                className="flex items-center gap-3 px-6 h-12 bg-white/5 hover:bg-navy backdrop-blur-md border border-white/10 rounded-full text-white text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] transition-all hover:border-white/30 hover:scale-105 active:scale-95 group tap-target whitespace-nowrap"
               >
                 <span className="text-safari group-hover:scale-110 transition-transform">{cat.icon}</span>
                 {cat.label}
