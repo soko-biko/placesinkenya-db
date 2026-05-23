@@ -167,7 +167,27 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
       </section>
 
       {/* Main Dual-Panel Layout Container */}
-      <main className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
+      <main className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 space-y-8">
+        {/* Events category filter chips */}
+        <div 
+          className="flex flex-row gap-2 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`shrink-0 h-9 px-5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all duration-150 whitespace-nowrap cursor-pointer ${
+                selectedCategory === cat
+                  ? 'bg-navy text-white border-navy shadow-sm'
+                  : 'bg-white text-navy/65 border-navy/5 hover:border-safari'
+              }`}
+            >
+              {cat.replace('_', ' & ')}
+            </button>
+          ))}
+        </div>
+
         <div className="flex flex-col lg:flex-row gap-10 items-start">
           
           {/* LEFT COLUMN: Sticky Calendar Date Picker & Filter Set */}
@@ -247,26 +267,7 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
               </button>
             </div>
 
-            {/* Category Filter Cards */}
-            <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-navy/5 p-5 space-y-4">
-              <span className="text-safari font-black uppercase tracking-widest text-[9px] block">Filter Category</span>
-              <div className="flex flex-col gap-1.5">
-                {categories.map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`w-full h-10 px-4 rounded-xl text-left text-xs font-bold uppercase tracking-wider flex items-center justify-between transition-colors ${
-                      selectedCategory === cat
-                        ? 'bg-safari/10 border-l-4 border-safari text-navy'
-                        : 'text-navy/50 hover:bg-navy/5'
-                    }`}
-                  >
-                    <span>{cat.replace('_', ' & ')}</span>
-                    {selectedCategory === cat && <span className="w-1.5 h-1.5 rounded-full bg-safari animate-ping" />}
-                  </button>
-                ))}
-              </div>
-            </div>
+
 
           </aside>
 

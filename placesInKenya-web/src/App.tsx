@@ -294,6 +294,7 @@ const App: React.FC = () => {
             onToggleCompleted={handleToggleCompleted}
             onRemoveItem={handleRemoveItem}
             onReviewItem={setSelectedPlace}
+            onAddReview={handleAddReview}
             reviews={userReviews}
           />
         ) : (
@@ -332,7 +333,7 @@ const App: React.FC = () => {
         tripCount={savedItems.length}
       />
 
-      <div className="pt-0">
+      <div className="pt-0 pb-16 lg:pb-0">
         <Suspense fallback={<SkeletonLoader />}>
           <AnimatePresence mode="wait">
             {renderPage()}
@@ -348,15 +349,15 @@ const App: React.FC = () => {
             {/* Brand Column */}
             <div className="space-y-6">
               <div 
-                className="flex items-center gap-4 cursor-pointer group" 
+                className="flex items-center cursor-pointer group" 
                 onClick={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               >
-                <div className="w-12 h-12 flex items-center justify-center rounded-2xl overflow-hidden bg-white p-2 shadow-inner">
-                  <img src="/regenerated_image_1777526382608.png" alt="PlacesInKenya" className="w-full h-full object-contain" />
-                </div>
-                <div className="flex flex-col justify-center">
-                   <span className="font-serif text-2xl font-bold text-white group-hover:text-safari transition-colors">PlacesInKenya</span>
-                </div>
+                <img 
+                  src="https://lh3.googleusercontent.com/d/1G9iYeJQ4q67zu7dBwjXm9BTz_boLAzco" 
+                  alt="PlacesInKenya Logo" 
+                  className="h-16 w-16 object-contain -ml-4 -mr-4.5 shrink-0 transition-transform duration-300 group-hover:scale-105" 
+                />
+                <span className="font-serif text-2xl font-bold text-white group-hover:text-safari transition-colors">PlacesInKenya</span>
               </div>
               <p className="text-white/40 text-sm leading-relaxed max-w-xs">
                 Kenya's most comprehensive destination guide. Discover the magic of the wild and the pulse of the city through our curated aesthetic database.

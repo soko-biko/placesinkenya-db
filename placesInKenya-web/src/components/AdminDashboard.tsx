@@ -50,10 +50,12 @@ export const AdminDashboard: React.FC = () => {
     <div className="min-h-screen bg-navy text-white font-sans flex">
       {/* Sidebar */}
       <aside className="w-64 border-r border-white/5 flex flex-col p-6 fixed inset-y-0">
-        <div className="flex items-center gap-3 mb-12">
-          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center p-2">
-            <img src="/regenerated_image_1777526383628.png" className="w-full h-full object-contain" alt="Logo" />
-          </div>
+        <div className="flex items-center mb-12">
+          <img 
+            src="https://lh3.googleusercontent.com/d/1G9iYeJQ4q67zu7dBwjXm9BTz_boLAzco" 
+            className="h-14 w-14 object-contain -ml-3.5 -mr-4 shrink-0" 
+            alt="Logo" 
+          />
           <span className="font-serif font-bold text-lg">Architect</span>
         </div>
 

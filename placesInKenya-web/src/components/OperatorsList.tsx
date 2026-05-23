@@ -1,7 +1,6 @@
-
 import React, { useState, useMemo } from 'react';
 import { TourOperator, OperatorType } from '../types';
-import { Star, MessageCircle, Calendar, ShieldCheck, Search, Filter, ArrowRight, MapPin, Languages, Briefcase } from 'lucide-react';
+import { Star, MessageCircle, Calendar, ShieldCheck, Search, MapPin, Languages } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface OperatorsListProps {
@@ -38,74 +37,74 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
   const CompanyCard: React.FC<{ operator: TourOperator }> = ({ operator }) => (
     <motion.div 
       layout
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-[32px] overflow-hidden border border-navy/5 shadow-lux hover:shadow-2xl transition-all duration-500 flex flex-col h-full group"
+      className="bg-white rounded-2xl overflow-hidden border border-navy/5 shadow-sm hover:shadow-md hover:-translate-y-[2px] transition-all duration-300 flex flex-col h-full group"
     >
       <div className="relative aspect-video overflow-hidden">
         <img 
           src={operator.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(operator.name)}&background=0D1B2A&color=fff`} 
           alt={operator.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-navy/35 via-transparent to-transparent font-sans"></div>
         
         {operator.isVerified && (
-          <div className="absolute top-4 right-4">
-             <div className="bg-green-500 text-white px-3 h-7 rounded-full flex items-center gap-1.5 shadow-lg">
-                <ShieldCheck size={12} />
-                <span className="text-[9px] font-black uppercase tracking-widest">Verified</span>
+          <div className="absolute top-2.5 right-2.5">
+             <div className="bg-green-500 text-white px-2.5 h-6 rounded-full flex items-center gap-1 shadow">
+                <ShieldCheck size={10} />
+                <span className="text-[7.5px] font-black uppercase tracking-widest">Verified</span>
              </div>
           </div>
         )}
 
-        <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between text-white">
-           <div className="space-y-1">
-              <div className="flex items-center gap-1 text-safari">
+        <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between text-white font-sans">
+           <div className="space-y-0.5 min-w-0">
+              <div className="flex items-center gap-0.5 text-safari mb-0.5">
                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={10} fill={i < Math.floor(operator.rating) ? "currentColor" : "none"} />
+                    <Star key={i} size={8} fill={i < Math.floor(operator.rating) ? "currentColor" : "none"} className="text-safari border-none" />
                  ))}
-                 <span className="text-[10px] font-bold text-white/60 ml-1">({operator.reviewsCount || 0})</span>
+                 <span className="text-[8px] font-bold text-white/70 ml-1">({operator.reviewsCount || 0})</span>
               </div>
-              <h3 className="text-2xl font-serif font-bold tracking-tight">{operator.name}</h3>
+              <h3 className="text-lg md:text-xl font-serif font-bold tracking-tight truncate">{operator.name}</h3>
            </div>
         </div>
       </div>
 
-      <div className="p-8 flex flex-col flex-1">
-        <div className="space-y-4 flex-1">
-           <p className="text-navy/50 text-sm leading-relaxed line-clamp-2">
+      <div className="p-4 sm:p-5 flex flex-col flex-1">
+        <div className="space-y-3 flex-1">
+           <p className="text-navy/50 text-xs leading-normal line-clamp-2">
              {operator.bio}
            </p>
            
-           <div className="flex flex-wrap gap-2">
+           <div className="flex flex-wrap gap-1.5 pt-0.5">
               {operator.specialties?.slice(0, 3).map(s => (
-                <span key={s} className="bg-navy/5 text-navy/40 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border border-navy/5">
+                <span key={s} className="bg-navy/5 text-navy/50 text-[8px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-navy/5 leading-none">
                   {s}
                 </span>
               ))}
               {operator.specialties && operator.specialties.length > 3 && (
-                <span className="text-navy/20 text-[9px] font-black uppercase tracking-widest px-3 py-1.5">+ {operator.specialties.length - 3} More</span>
+                <span className="text-navy/20 text-[8px] font-black uppercase tracking-widest px-2.5 py-1.5 leading-none">+ {operator.specialties.length - 3}</span>
               )}
            </div>
         </div>
 
-        <div className="pt-8 mt-8 border-t border-navy/5 flex items-center justify-between">
+        <div className="pt-3.5 mt-3.5 border-t border-navy/5 flex items-center justify-between">
            <div className="flex flex-col">
-              <span className="text-[9px] font-black uppercase tracking-widest text-navy/20 leading-none mb-1">From</span>
-              <span className="text-lg font-bold text-navy font-sans">Ksh {operator.basePrice.toLocaleString()}</span>
+              <span className="text-[7.5px] font-black uppercase tracking-widest text-navy/20 leading-none mb-0.5">From</span>
+              <span className="text-[14px] sm:text-[15px] font-bold text-navy font-sans leading-none">Ksh {operator.basePrice.toLocaleString()}</span>
            </div>
-           <div className="flex gap-2">
-              <button className="w-12 h-12 flex items-center justify-center bg-navy/5 text-navy/40 rounded-xl hover:bg-safari hover:text-white hover:border-safari transition-all border border-transparent">
-                 <MessageCircle size={18} />
+           <div className="flex gap-1.5">
+              <button className="w-8 h-8 flex items-center justify-center bg-navy/5 text-navy/40 rounded-lg hover:bg-safari hover:text-white transition-all border border-transparent cursor-pointer">
+                 <MessageCircle size={14} />
               </button>
               <a 
                 href={operator.bookingLink || 'about:blank'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="h-12 px-6 bg-safari text-white rounded-xl font-black uppercase tracking-widest text-[9px] flex items-center justify-center gap-2 shadow-lg hover:bg-safari-light transition-all shadow-safari/20"
+                className="h-8 px-3 bg-safari text-white rounded-lg font-black uppercase tracking-widest text-[8px] flex items-center justify-center gap-1 shadow shadow-safari/10 hover:opacity-90 transition-opacity cursor-pointer"
               >
-                Reserve Now <Calendar size={14} />
+                Reserve <Calendar size={11} />
               </a>
            </div>
         </div>
@@ -116,81 +115,80 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
   const GuideCard: React.FC<{ operator: TourOperator }> = ({ operator }) => (
     <motion.div 
       layout
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-[40px] p-8 border border-navy/5 shadow-lux hover:shadow-2xl transition-all duration-500 group"
+      className="bg-white rounded-2xl p-4 sm:p-5 border border-navy/5 shadow-sm hover:shadow-md hover:-translate-y-[2px] transition-all duration-300 group"
     >
-      <div className="flex flex-col items-center text-center space-y-6">
+      <div className="flex flex-col items-center text-center space-y-4">
         <div className="relative">
-           <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-2xl relative z-10">
+           <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white shadow shadow-navy/5 relative z-10">
               <img 
                 src={operator.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(operator.name)}&background=0D1B2A&color=fff&rounded=true`} 
                 className="w-full h-full object-cover" 
                 alt={operator.name} 
               />
            </div>
-           <div className="absolute -inset-2 bg-gradient-to-tr from-safari via-transparent to-navy/10 rounded-full animate-spin-slow z-0 opacity-20" />
            {operator.isVerified && (
-             <div className="absolute top-0 right-0 z-20 w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center border-4 border-white shadow-lg">
-                <ShieldCheck size={18} />
+             <div className="absolute top-0 right-0 z-20 w-6.5 h-6.5 bg-green-500 text-white rounded-full flex items-center justify-center border-2 border-white shadow">
+                <ShieldCheck size={11} />
              </div>
            )}
         </div>
 
-        <div className="space-y-2">
-           <h3 className="text-2xl font-serif font-bold text-navy">{operator.name}</h3>
-           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-safari">{operator.title}</p>
+        <div className="space-y-0.5">
+           <h3 className="text-base sm:text-[17px] font-serif font-bold text-navy">{operator.name}</h3>
+           <p className="text-[8px] font-black uppercase tracking-[0.2em] text-safari leading-none">{operator.title}</p>
         </div>
 
-        <div className="flex items-center gap-1 justify-center text-safari">
+        <div className="flex items-center gap-0.5 justify-center text-safari">
            {[...Array(5)].map((_, i) => (
-              <Star key={i} size={12} fill={i < Math.floor(operator.rating) ? "currentColor" : "none"} />
+              <Star key={i} size={10} fill={i < Math.floor(operator.rating) ? "currentColor" : "none"} className="text-safari border-0" />
            ))}
-           <span className="text-[11px] font-bold text-navy/30 ml-2 uppercase tracking-widest">({operator.tripsCompleted} Trips)</span>
+           <span className="text-[9px] font-bold text-navy/30 ml-1.5 uppercase tracking-widest leading-none">({operator.tripsCompleted})</span>
         </div>
 
-        <p className="text-navy/50 text-sm italic line-clamp-2 max-w-xs mx-auto">
+        <p className="text-navy/50 text-xs italic line-clamp-2 max-w-xs mx-auto">
           "{operator.bio}"
         </p>
 
-        <div className="w-full space-y-4 pt-4">
-           <div className="flex flex-wrap gap-2 justify-center">
+        <div className="w-full space-y-3 pt-2">
+           <div className="flex flex-wrap gap-1 justify-center">
               {operator.specialties?.slice(0, 3).map(s => (
-                <span key={s} className="bg-navy/5 text-navy/50 text-[8px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-navy/5">
+                <span key={s} className="bg-navy/5 text-navy/50 text-[7px] font-black uppercase tracking-widest px-2 py-1 rounded-full border border-navy/5">
                   {s}
                 </span>
               ))}
            </div>
            
-           <div className="flex items-center justify-center gap-4 text-[9px] text-navy/30 uppercase font-black tracking-widest">
-              <div className="flex items-center gap-1.5">
-                 <Languages size={12} className="text-safari" />
-                 {operator.languages?.join(', ')}
+           <div className="flex items-center justify-center gap-3 text-[8px] text-navy/30 uppercase font-black tracking-widest">
+              <div className="flex items-center gap-1 leading-none">
+                 <Languages size={10} className="text-safari" />
+                 {operator.languages?.slice(0, 2).join(', ')}
               </div>
-              <div className="w-1 h-1 bg-navy/10 rounded-full" />
-              <div className="flex items-center gap-1.5">
-                 <MapPin size={12} className="text-safari" />
+              <div className="w-0.5 h-0.5 bg-navy/10 rounded-full" />
+              <div className="flex items-center gap-1 leading-none">
+                 <MapPin size={10} className="text-safari" />
                  {operator.location}
               </div>
            </div>
         </div>
 
-        <div className="w-full pt-8 mt-4 border-t border-navy/5 flex items-center justify-between">
-           <div className="text-left">
-              <p className="text-[9px] font-black uppercase tracking-widest text-navy/20 leading-none mb-1">Standard Rate</p>
-              <p className="text-lg font-bold text-navy font-sans tracking-tight">Ksh {operator.basePrice.toLocaleString()}<span className="text-xs font-normal text-navy/30"> / day</span></p>
+        <div className="w-full pt-3 mt-2 border-t border-navy/5 flex items-center justify-between">
+           <div className="text-left font-sans">
+              <p className="text-[7.5px] font-black uppercase tracking-widest text-navy/20 leading-none mb-0.5">Standard Rate</p>
+              <p className="text-[14px] sm:text-[15px] font-bold text-navy tracking-tight leading-none">Ksh {operator.basePrice.toLocaleString()}<span className="text-[8.5px] font-normal text-navy/30"> / day</span></p>
            </div>
-           <div className="flex gap-2">
-              <button className="w-12 h-12 flex items-center justify-center bg-navy/5 text-navy/40 rounded-2xl hover:bg-safari hover:text-white transition-all">
-                 <MessageCircle size={20} />
+           <div className="flex gap-1.5">
+              <button className="w-8 h-8 flex items-center justify-center bg-navy/5 text-navy/40 rounded-lg hover:bg-safari hover:text-white transition-all border border-transparent cursor-pointer">
+                 <MessageCircle size={14} />
               </button>
               <a 
                 href={operator.bookingLink || 'about:blank'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="h-12 px-6 bg-safari text-white rounded-2xl font-black uppercase tracking-widest text-[9px] flex items-center justify-center gap-2 shadow-lg hover:bg-safari-light transition-all shadow-safari/20"
+                className="h-8 px-3 bg-safari text-white rounded-lg font-black uppercase tracking-widest text-[8px] flex items-center justify-center gap-1 shadow shadow-safari/10 hover:opacity-90 transition-opacity cursor-pointer"
               >
-                Book {operator.name.split(' ')[0]} <Calendar size={14} />
+                Book <Calendar size={11} />
               </a>
            </div>
         </div>
@@ -199,44 +197,47 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
   );
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-8 select-none">
       {/* Search & Filter Header */}
-      <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-lux border border-navy/5 space-y-10">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-           <div className="md:col-span-4 relative group">
-              <div className="absolute inset-y-0 left-6 flex items-center text-navy/20 group-focus-within:text-safari transition-colors">
-                 <Search size={20} />
+      <div className="bg-white rounded-2xl p-4 sm:p-5 md:p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-navy/5 space-y-4">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 justify-between">
+           <div className="relative group flex-1 max-w-sm">
+              <div className="absolute inset-y-0 left-4 flex items-center text-navy/25 group-focus-within:text-safari transition-colors pointer-events-none">
+                 <Search size={16} />
               </div>
               <input 
                 type="text" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by name or specialty..."
-                className="w-full h-16 bg-navy/5 hover:bg-navy/10 focus:bg-white focus:ring-2 focus:ring-safari/20 rounded-2xl pl-16 pr-6 text-navy font-medium outline-none transition-all placeholder:text-navy/20"
+                placeholder="Search partners..."
+                className="w-full h-10 bg-navy/5 hover:bg-navy/10 focus:bg-white focus:ring-1 focus:ring-safari rounded-xl pl-10 pr-4 text-xs text-navy outline-none transition-all placeholder:text-navy/20"
               />
            </div>
 
-           <div className="md:col-span-8 flex flex-wrap items-center gap-4 justify-end">
-              <div className="flex items-center gap-2 p-1.5 bg-navy/5 rounded-2xl">
+           <div 
+             className="flex flex-row items-center gap-3 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 shrink-0"
+             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+           >
+              <div className="flex items-center gap-1 p-1 bg-navy/5 rounded-xl shrink-0">
                  <button 
                   onClick={() => setActiveTab('ALL')}
-                  className={`px-6 h-11 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'ALL' ? 'bg-white text-navy shadow-sm' : 'text-navy/40 hover:text-navy'}`}
+                  className={`px-3.5 h-8 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all cursor-pointer ${activeTab === 'ALL' ? 'bg-white text-navy shadow-sm' : 'text-navy/40 hover:text-navy'}`}
                  > All </button>
                  <button 
                   onClick={() => setActiveTab(OperatorType.COMPANY)}
-                  className={`px-6 h-11 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === OperatorType.COMPANY ? 'bg-white text-navy shadow-sm' : 'text-navy/40 hover:text-navy'}`}
+                  className={`px-3.5 h-8 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all cursor-pointer ${activeTab === OperatorType.COMPANY ? 'bg-white text-navy shadow-sm' : 'text-navy/40 hover:text-navy'}`}
                  > Companies </button>
                  <button 
                   onClick={() => setActiveTab(OperatorType.INDIVIDUAL)}
-                  className={`px-6 h-11 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === OperatorType.INDIVIDUAL ? 'bg-white text-navy shadow-sm' : 'text-navy/40 hover:text-navy'}`}
+                  className={`px-3.5 h-8 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all cursor-pointer ${activeTab === OperatorType.INDIVIDUAL ? 'bg-white text-navy shadow-sm' : 'text-navy/40 hover:text-navy'}`}
                  > Guides </button>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 shrink-0">
                  <select 
                    value={selectedSpecialty}
                    onChange={(e) => setSelectedSpecialty(e.target.value)}
-                   className="h-14 bg-navy/5 rounded-2xl px-6 text-[10px] font-black uppercase tracking-widest text-navy outline-none cursor-pointer border border-transparent hover:border-navy/10"
+                   className="h-9 bg-navy/5 rounded-xl px-3 text-[8.5px] font-black uppercase tracking-widest text-navy outline-none cursor-pointer border border-transparent hover:border-navy/10"
                  >
                     <option value="ALL">All Specialties</option>
                     {specialties.filter(s => s !== 'ALL').map(s => <option key={s as string} value={s as string}>{s as string}</option>)}
@@ -244,9 +245,9 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
                  <select 
                    value={selectedLocation}
                    onChange={(e) => setSelectedLocation(e.target.value)}
-                   className="h-14 bg-navy/5 rounded-2xl px-6 text-[10px] font-black uppercase tracking-widest text-navy outline-none cursor-pointer border border-transparent hover:border-navy/10"
+                   className="h-9 bg-navy/5 rounded-xl px-3 text-[8.5px] font-black uppercase tracking-widest text-navy outline-none cursor-pointer border border-transparent hover:border-navy/10"
                  >
-                    <option value="ALL">In Every Region</option>
+                    <option value="ALL">Every Region</option>
                     {locations.filter(l => l !== 'ALL').map(l => <option key={l as string} value={l as string}>{l as string}</option>)}
                  </select>
               </div>
@@ -258,7 +259,7 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
       <AnimatePresence mode="popLayout">
          {filteredOperators.length > 0 ? (
            <motion.div 
-             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
+             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
              initial={{ opacity: 0 }}
              animate={{ opacity: 1 }}
              exit={{ opacity: 0 }}
@@ -269,15 +270,15 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
            </motion.div>
          ) : (
            <motion.div 
-             initial={{ opacity: 0, scale: 0.9 }}
+             initial={{ opacity: 0, scale: 0.98 }}
              animate={{ opacity: 1, scale: 1 }}
-             className="py-32 flex flex-col items-center justify-center text-center bg-white rounded-[60px] border border-dashed border-navy/10"
+             className="py-20 flex flex-col items-center justify-center text-center bg-white rounded-2xl border border-dashed border-navy/10"
            >
-             <div className="w-24 h-24 bg-navy/5 rounded-full flex items-center justify-center text-navy/10 mb-8">
-               <Search size={48} />
+             <div className="w-16 h-16 bg-navy/5 rounded-full flex items-center justify-center text-navy/10 mb-5">
+               <Search size={24} />
              </div>
-             <h3 className="text-3xl font-serif font-bold text-navy mb-4">No Partners Found</h3>
-             <p className="text-navy/40 max-w-sm mx-auto text-lg leading-relaxed mb-8">
+             <h3 className="text-xl font-serif font-bold text-navy mb-1.5">No Partners Found</h3>
+             <p className="text-navy/40 max-w-sm mx-auto text-xs leading-normal mb-6 px-4">
                Our collective is vast, but these specific filters yield no results. Try broadening your criteria.
              </p>
              <button 
@@ -287,7 +288,7 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
                    setSelectedLocation('ALL');
                    setActiveTab('ALL');
                }}
-               className="h-16 px-10 bg-navy text-white rounded-2xl font-black uppercase tracking-widest text-[11px] hover:bg-safari transition-all"
+               className="h-10 px-6 bg-navy text-white rounded-xl font-black uppercase tracking-widest text-[9px] hover:bg-safari transition-all cursor-pointer"
              > Clear Refinements </button>
            </motion.div>
          )}

@@ -159,3 +159,17 @@ export interface Registration {
   reviewedBy?: string;
   reviewedAt?: any;
 }
+
+export interface PendingProvider {
+  id: string;
+  type: string;
+  submittedAt?: any;
+  businessName?: string;
+  name?: string;
+  description?: string;
+  bio?: string;
+  basePrice: number;
+  email: string;
+  phone: string;
+}
+

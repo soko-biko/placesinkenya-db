@@ -86,19 +86,23 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
               </button>
             </div>
           </motion.form>
+        </div>
+      </div>
 
-          {/* Category Chips Scrollbar Custom Row */}
+      {/* Category Chips Scrollbar Custom Row — Frosted Deck Bottom Section */}
+      <div className="absolute bottom-0 left-0 right-0 bg-black/25 backdrop-blur-md border-t border-white/5 py-6 z-10">
+        <div className="max-w-7xl mx-auto px-6">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="flex flex-wrap justify-center gap-3 md:gap-4 overflow-x-auto scrollbar-hide py-2"
+            className="flex flex-wrap justify-center gap-3 md:gap-4 overflow-x-auto scrollbar-hide"
           >
             {categories.map((cat, i) => (
               <button
                 key={i}
                 onClick={() => onSearch('', cat.id)}
-                className="flex items-center gap-3 px-6 h-12 bg-white/5 hover:bg-navy backdrop-blur-md border border-white/10 rounded-full text-white text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] transition-all hover:border-white/30 hover:scale-105 active:scale-95 group tap-target whitespace-nowrap"
+                className="flex items-center gap-3 px-5 h-11 bg-white/5 hover:bg-navy border border-white/10 rounded-full text-white text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] transition-all hover:border-white/30 hover:scale-[1.03] active:scale-95 group tap-target whitespace-nowrap"
               >
                 <span className="text-safari group-hover:scale-110 transition-transform">{cat.icon}</span>
                 {cat.label}

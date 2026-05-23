@@ -1,6 +1,6 @@
 import React from 'react';
 import { TourOperator } from '../types';
-import { Star, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Star, ShieldCheck, ArrowRight, MapPin } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface OperatorSpotlightProps {
@@ -9,61 +9,92 @@ interface OperatorSpotlightProps {
 
 export const OperatorSpotlight: React.FC<OperatorSpotlightProps> = ({ operators }) => {
   return (
-    <section className="py-12 sm:py-20 md:py-24 bg-cream relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-1/3 h-full bg-safari/5 -skew-x-12 translate-x-1/2"></div>
-      
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="space-y-3 mb-10 md:mb-14 text-center max-w-3xl mx-auto">
-          <span className="text-safari font-black uppercase tracking-[0.3em] text-[10px]">Verified Professionals</span>
-          <h2 className="text-[clamp(1.5rem,4vw,2.5rem)] font-serif font-bold text-navy leading-tight">Elite Tour Operators</h2>
-          <p className="text-navy/50 text-sm sm:text-base font-light leading-relaxed">Book directly with the most experienced and ethical guides in the region.</p>
+    <section className="py-12 sm:py-20 bg-white">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-10 md:mb-14">
+          <div className="space-y-3">
+            <span className="text-safari font-black uppercase tracking-[0.3em] text-[10px]">Verified Professionals</span>
+            <h2 className="text-[clamp(1.5rem,4vw,2.5rem)] font-serif font-bold text-navy tracking-tight leading-tight">Elite Tour Operators</h2>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10">
-          {operators.slice(0, 2).map((op, i) => (
+        {/* Horizontal scroll on mobile, responsive grid on desktop */}
+        <div className="flex overflow-x-auto pb-6 md:pb-0 md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 snap-x no-scrollbar">
+          {operators.slice(0, 6).map((op, i) => (
             <motion.div
               key={op.id}
-              initial={{ x: i % 2 === 0 ? -50 : 50, opacity: 0 }}
-              whileInView={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.8 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
               viewport={{ once: true }}
-              className="bg-white rounded-3xl p-6 sm:p-10 flex flex-col md:flex-row gap-6 md:gap-10 border border-navy/5 shadow-lux group hover:shadow-2xl transition-all duration-700"
+              className="min-w-[270px] sm:min-w-0 snap-center w-full"
             >
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden shrink-0 border-4 border-cream shadow-inner relative group-hover:rotate-6 transition-transform duration-500 mx-auto md:mx-0">
-                <img 
-                   src={i === 0 ? "https://images.unsplash.com/photo-1544005313-94ddf0286df2" : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"} 
-                   alt={op.name} 
-                   className="w-full h-full object-cover" 
-                />
-                <div className="absolute inset-0 bg-safari/10 mix-blend-overlay"></div>
-              </div>
-              
-              <div className="space-y-5 flex-1">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 justify-center md:justify-start">
-                    <ShieldCheck size={14} className="text-safari" />
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-safari">Verified Experience Provider</span>
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-navy text-center md:text-left">{op.name}</h3>
-                  <div className="flex items-center gap-1 justify-center md:justify-start">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={12} className={i < op.rating ? "fill-safari text-safari" : "text-navy/10"} />
-                    ))}
-                    <span className="text-[10px] font-bold text-navy/40 ml-2 uppercase tracking-widest">{op.rating}.0 • 45+ Expeditions</span>
-                  </div>
-                  <p className="text-navy/50 text-[0.8125rem] sm:text-[0.875rem] font-light italic leading-relaxed text-center md:text-left">"{op.bio}"</p>
+              <div className="group bg-white rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.12)] hover:-translate-y-[2px] transition-all duration-300 cursor-pointer flex flex-col h-full relative border border-navy/5">
+                {/* Image Section - aspect-[4/3] matching PlaceCard */}
+                <div className="relative aspect-[4/3] overflow-hidden bg-navy/5 shrink-0">
+                  <img 
+                    src={op.imageUrl || `https://images.unsplash.com/photo-1544005313-94ddf0286df2`} 
+                    alt={op.name}
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy/35 via-transparent to-transparent"></div>
+                  
+                  {/* Verified Badge */}
+                  {op.isVerified && (
+                    <div className="absolute top-2.5 right-2.5">
+                      <div className="bg-[#E8621A] text-white px-2 h-6 rounded-full shadow flex items-center justify-center gap-1 border border-white/10 backdrop-blur-sm">
+                        <ShieldCheck size={10} className="shrink-0 text-white" />
+                        <span className="text-[7px] font-black uppercase tracking-widest">Verified</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex flex-wrap gap-1.5 justify-center md:justify-start">
-                  {op.specialties?.slice(0, 3).map(s => (
-                    <span key={s} className="px-3 h-6 bg-cream rounded-full flex items-center text-[9px] font-bold uppercase tracking-[0.1em] text-navy/60">{s}</span>
-                  ))}
-                </div>
+                {/* Content Section - matching PlaceCard sizes */}
+                <div className="p-3 sm:p-3.5 flex flex-col flex-1">
+                  <div className="space-y-1.5 flex-1">
+                    <div className="space-y-0.5">
+                      <h3 className="text-[13px] sm:text-[14px] font-serif font-bold text-navy tracking-tight line-clamp-1 leading-tight group-hover:text-[#E8621A] transition-colors">
+                        {op.name}
+                      </h3>
+                      {op.location && (
+                        <div className="flex items-center gap-1 text-navy/40">
+                          <MapPin size={9} className="text-[#E8621A]" />
+                          <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.15em] truncate">{op.location}</span>
+                        </div>
+                      )}
+                    </div>
 
-                <div className="flex justify-center md:justify-start">
-                  <button className="h-10 bg-navy hover:bg-safari text-white px-6 rounded-full font-black uppercase tracking-[0.2em] text-[10px] transition-all flex items-center gap-2 group/btn shadow-xl active:scale-95">
-                    Book a Safari <ArrowRight size={14} className="group-hover/btn:translate-x-2 transition-transform" />
-                  </button>
+                    <p className="text-navy/60 text-[11.5px] sm:text-xs leading-normal line-clamp-2 font-sans">
+                      {op.bio}
+                    </p>
+
+                    <div className="flex items-center gap-0.5 text-[#E8621A] pt-0.5">
+                      {[...Array(5)].map((_, idx) => (
+                        <Star key={idx} size={10} fill={idx < Math.floor(op.rating || 5) ? "currentColor" : "none"} className={idx < Math.floor(op.rating || 5) ? "" : "text-navy/10"} />
+                      ))}
+                      <span className="text-[8.5px] font-bold text-navy/30 ml-1.5 uppercase tracking-[0.05em] leading-none">({(op.rating || 5).toFixed(1)})</span>
+                    </div>
+
+                    {/* Specialties */}
+                    <div className="flex flex-wrap gap-1 pt-1">
+                      {op.specialties?.slice(0, 2).map((s: string) => (
+                        <span key={s} className="px-2 py-0.5 bg-navy/5 text-navy/65 rounded text-[8px] font-bold uppercase tracking-wider">{s}</span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2.5 mt-2.5 border-t border-navy/5">
+                    <div className="flex flex-col">
+                      <span className="text-[7.5px] text-navy/20 uppercase font-black tracking-[0.15em] leading-none mb-0.5">From</span>
+                      <span className="text-navy text-sm font-bold font-sans tracking-tight">Ksh {(op.basePrice || 5000).toLocaleString()}</span>
+                    </div>
+                    <button className="h-7.5 px-2.5 sm:px-3 bg-navy text-white rounded-full flex items-center justify-center gap-1 transition-all hover:bg-[#E8621A] shadow cursor-pointer text-[7.5px] sm:text-[8px] font-black uppercase tracking-normal sm:tracking-wider whitespace-nowrap shrink-0">
+                      <span>Book Tour</span>
+                      <ArrowRight size={9} className="shrink-0" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>

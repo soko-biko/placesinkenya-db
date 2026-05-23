@@ -86,7 +86,7 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
       <CatalogueHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
       {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto w-full px-6 py-12 flex-1">
+      <div className="w-full max-w-7xl mx-auto px-0 sm:px-6 py-12 flex-1">
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Desktop Sidebar (Sticky) */}
           <aside className="hidden lg:block w-80 shrink-0 sticky top-32 h-fit">
@@ -201,7 +201,7 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
               </div>
             ) : filteredPlaces.length > 0 ? (
               <div className="space-y-12">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
                     {displayedPlaces.map((place, i) => (
                     <motion.div
                         key={place.id}

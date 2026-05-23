@@ -65,7 +65,7 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
       {/* ── Popup Panel ──
           Width and height adapt perfectly to mobile sheet / centered modal sizes with max-height limits.
       */}
-      <div className="relative bg-navy w-full sm:w-[600px] md:w-[640px] lg:w-[640px] h-[92vh] sm:h-[85vh] lg:h-[80vh] max-h-[92vh] sm:max-h-[85vh] lg:max-h-[80vh] overflow-hidden rounded-t-[2.5rem] sm:rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.6)] border border-white/5 animate-slide-up text-white flex flex-col">
+      <div className="relative bg-navy w-full sm:w-[600px] md:w-[640px] lg:w-[640px] h-auto max-h-[92vh] sm:max-h-[85vh] lg:max-h-[80vh] overflow-y-auto rounded-t-[2.5rem] sm:rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.6)] border border-white/5 animate-slide-up text-white flex flex-col no-scrollbar">
         
         {/* ══ SECTION A: IMAGE & HERO ══════════════════════════════════════ */}
         <div className="relative w-full aspect-[16/7] sm:aspect-[16/8] shrink-0 max-h-[30vh]">

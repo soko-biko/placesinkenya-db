@@ -32,8 +32,202 @@ interface MyKenyaProps {
   onToggleCompleted: (id: string) => void;
   onRemoveItem: (id: string) => void;
   onReviewItem: (place: Place) => void;
+  onAddReview?: (rating: number, comment: string, placeId: string) => void;
   reviews: Rating[];
 }
+
+export const ItineraryItemRow: React.FC<{
+  item: SavedItem;
+  place?: Place;
+  event?: Event;
+  onUpdateDate: (id: string, date: string) => void;
+  onToggleCompleted: (id: string) => void;
+  onRemoveItem: (id: string) => void;
+  onReviewItem: (place: Place) => void;
+  onAddReview?: (rating: number, comment: string, placeId: string) => void;
+}> = ({ item, place, event, onUpdateDate, onToggleCompleted, onRemoveItem, onReviewItem, onAddReview }) => {
+  const [flowState, setFlowState] = useState<'default' | 'completed' | 'reviewing' | 'posted'>('default');
+  const [reviewText, setReviewText] = useState('');
+  const [rating, setRating] = useState(5);
+  const [posting, setPosting] = useState(false);
+
+  const data = place || event;
+  if (!data) return null;
+
+  const handleMarkAttended = () => {
+    onToggleCompleted(item.id);
+    setFlowState('completed');
+  };
+
+  const handlePostReview = async () => {
+    if (!reviewText.trim()) return;
+    setPosting(true);
+    try {
+      if (onAddReview) {
+        onAddReview(rating, reviewText.trim(), item.placeId);
+      }
+      setFlowState('posted');
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setPosting(false);
+    }
+  };
+
+  const handleClose = () => {
+    setFlowState('default');
+  };
+
+  const imgUrl = place?.imageUrl || event?.imageUrl || '/placeholder.jpg';
+
+  return (
+    <div className={`flex flex-col md:flex-row items-stretch md:items-center gap-4 p-4 sm:p-5 bg-white rounded-3xl border transition-all ${item.completed ? 'border-green-100 bg-green-50/5 opacity-80' : 'border-navy/5 shadow-lux'} w-full overflow-hidden`}>
+      {/* Thumbnail */}
+      <div className="w-full md:w-24 h-48 md:h-24 rounded-2xl overflow-hidden shrink-0 relative">
+        <img src={imgUrl} className="w-full h-full object-cover" alt="" />
+      </div>
+
+      {/* Meta */}
+      <div className="flex-1 min-w-0">
+        <p className="text-[10px] font-black uppercase tracking-widest text-safari mb-1">
+          {item.isEvent ? 'Scheduled Event' : (place?.category || 'DESTINATION').replace('_', ' ')}
+        </p>
+        <h4 className="text-lg md:text-xl font-serif font-bold text-navy truncate">{place?.name || event?.title}</h4>
+        
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
+          <div className="relative group/reschedule">
+            <input 
+              type="date"
+              value={item.plannedDate || ''}
+              onChange={(e) => onUpdateDate(item.id, e.target.value)}
+              onClick={(e) => (e.target as any).showPicker?.()}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+            />
+            <div className="flex items-center gap-1.5 text-[10px] font-bold text-navy/40 uppercase group-hover/reschedule:text-safari transition-colors">
+              <Calendar size={13} className="text-safari" />
+              {item.plannedDate ? new Date(item.plannedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : 'Unscheduled'}
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 text-[10px] font-bold text-navy/40 uppercase">
+            <MapPin size={13} className="text-safari" />
+            {place?.location || event?.location}
+          </div>
+        </div>
+      </div>
+
+      {/* Button Row & State Machine (Adaptive Grid) */}
+      <div className="flex flex-col gap-2 shrink-0 w-full md:w-auto min-w-[200px] justify-center">
+        {flowState === 'default' && (
+          <div className="flex items-center gap-2 w-full">
+            {item.completed ? (
+              <>
+                {place && (
+                  <button 
+                    onClick={() => {
+                      setFlowState('reviewing');
+                    }}
+                    className="flex-1 h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest bg-safari/10 text-safari border border-safari/20 hover:bg-safari hover:text-white transition-all flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer"
+                  >
+                    <MessageCircle size={14} /> Review
+                  </button>
+                )}
+                <button 
+                  onClick={() => onToggleCompleted(item.id)}
+                  className="flex-1 h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest bg-green-600 text-white transition-all flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer"
+                >
+                  <CheckCircle2 size={14} /> Attended
+                </button>
+              </>
+            ) : (
+              <>
+                <button 
+                  onClick={handleMarkAttended}
+                  className="flex-1 h-10 px-4 bg-navy text-white hover:bg-safari rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer"
+                >
+                  Mark Attended
+                </button>
+              </>
+            )}
+            <button onClick={() => onRemoveItem(item.id)} className="p-2.5 text-navy/20 hover:text-red-500 transition-colors shrink-0 cursor-pointer">
+              <Trash2 size={16} />
+            </button>
+          </div>
+        )}
+
+        {flowState === 'completed' && (
+          <div className="flex gap-2 w-full">
+            <button 
+              onClick={() => setFlowState('reviewing')}
+              className="flex-1 h-10 bg-safari text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity whitespace-nowrap cursor-pointer"
+            >
+              Leave a Review
+            </button>
+            <button 
+              onClick={handleClose}
+              className="flex-1 h-10 border border-navy/15 text-navy/60 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-navy/5 transition-colors whitespace-nowrap cursor-pointer"
+            >
+              Close
+            </button>
+          </div>
+        )}
+
+        {flowState === 'reviewing' && (
+          <div className="w-full flex flex-col gap-2">
+            <div className="flex items-center gap-1 mt-1 justify-center">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setRating(star)}
+                  className="p-0.5 text-safari hover:scale-110 transition-transform cursor-pointer"
+                >
+                  <Star size={16} fill={star <= rating ? 'currentColor' : 'none'} className={star <= rating ? 'text-safari font-bold' : 'text-navy/10'} />
+                </button>
+              ))}
+            </div>
+            <textarea
+              value={reviewText}
+              onChange={(e) => setReviewText(e.target.value)}
+              placeholder="How was your visit?"
+              rows={2}
+              className="w-full px-3 py-1.5 rounded-xl border border-navy/10 text-xs text-navy bg-off-white focus:ring-1 focus:ring-safari outline-none resize-none"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={handlePostReview}
+                disabled={posting || !reviewText.trim()}
+                className="flex-1 h-9 bg-safari text-white rounded-xl text-[10px] font-black uppercase tracking-widest disabled:opacity-50 cursor-pointer"
+              >
+                {posting ? 'Posting...' : 'Post'}
+              </button>
+              <button 
+                onClick={() => setFlowState('default')}
+                className="h-9 px-3 border border-navy/15 text-[10px] font-black uppercase tracking-widest text-navy/60 rounded-xl hover:bg-navy/5 cursor-pointer"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {flowState === 'posted' && (
+          <div className="w-full flex flex-col gap-1.5">
+            <div className="flex items-center justify-center gap-1.5 bg-green-50 text-green-700 p-2 rounded-xl text-[10px] font-medium border border-green-100">
+              <CheckCircle2 size={12} />
+              <span>Review Posted!</span>
+            </div>
+            <button 
+              onClick={handleClose}
+              className="w-full h-8 border border-navy/15 text-navy/60 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-navy/5 cursor-pointer"
+            >
+              Done
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export const MyKenya: React.FC<MyKenyaProps> = ({ 
   savedPlaces, 
@@ -43,6 +237,7 @@ export const MyKenya: React.FC<MyKenyaProps> = ({
   onToggleCompleted,
   onRemoveItem,
   onReviewItem,
+  onAddReview,
   reviews
 }) => {
   const { userProfile, logout } = useAuth();
@@ -59,6 +254,9 @@ export const MyKenya: React.FC<MyKenyaProps> = ({
 
   const getPlaceById = (id: string) => savedPlaces.find(p => p.id === id);
   const getEventById = (id: string) => savedEvents.find(e => e.id === id);
+
+  const activeItineraries = savedItems.filter(i => i.plannedDate && !i.completed);
+  const completedItineraries = savedItems.filter(i => i.plannedDate && i.completed);
 
   return (
     <div className="min-h-screen bg-off-white pb-32">
@@ -78,7 +276,7 @@ export const MyKenya: React.FC<MyKenyaProps> = ({
                         <span className="text-4xl font-serif font-bold text-white/20">{userProfile.name?.charAt(0)}</span>
                       )}
                    </div>
-                   <button className="absolute bottom-2 right-2 z-20 w-12 h-12 bg-safari text-white rounded-2xl flex items-center justify-center shadow-xl hover:scale-110 transition-transform">
+                   <button className="absolute bottom-2 right-2 z-20 w-12 h-12 bg-safari text-white rounded-2xl flex items-center justify-center shadow-xl hover:scale-110 transition-transform cursor-pointer">
                       <Camera size={20} />
                    </button>
                    <div className="absolute -inset-4 bg-safari/20 rounded-[60px] blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -105,7 +303,7 @@ export const MyKenya: React.FC<MyKenyaProps> = ({
                 <div className="md:ml-auto flex gap-4">
                    <button 
                     onClick={logout}
-                    className="h-14 px-8 bg-white/5 hover:bg-red-500/10 border border-white/10 rounded-2xl flex items-center gap-3 transition-all group"
+                    className="h-14 px-8 bg-white/5 hover:bg-red-500/10 border border-white/10 rounded-2xl flex items-center gap-3 transition-all group cursor-pointer"
                    >
                      <LogOut size={18} className="text-white/20 group-hover:text-red-500" />
                      <span className="text-[10px] font-black uppercase tracking-widest text-white group-hover:text-red-500">End Session</span>
@@ -120,24 +318,24 @@ export const MyKenya: React.FC<MyKenyaProps> = ({
           <div className="max-w-7xl mx-auto px-6 overflow-x-auto scrollbar-hide">
              <div className="flex gap-12">
                 {tabs.map(tab => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id as any)}
-                    className={`h-20 flex items-center gap-3 relative transition-colors ${activeTab === tab.id ? 'text-navy' : 'text-navy/30 hover:text-navy/60'}`}
-                  >
-                    {React.cloneElement(tab.icon as React.ReactElement, { className: activeTab === tab.id ? 'text-safari' : '' })}
-                    <span className="text-[10px] font-black uppercase tracking-widest">{tab.label}</span>
-                    {activeTab === tab.id && (
-                      <motion.div layoutId="active-tab" className="absolute bottom-0 left-0 right-0 h-1 bg-safari rounded-t-full" />
-                    )}
-                  </button>
+                   <button
+                     key={tab.id}
+                     onClick={() => setActiveTab(tab.id as any)}
+                     className={`h-20 flex items-center gap-3 relative transition-colors cursor-pointer ${activeTab === tab.id ? 'text-navy' : 'text-navy/30 hover:text-navy/60'}`}
+                   >
+                     {React.cloneElement(tab.icon as React.ReactElement, { className: activeTab === tab.id ? 'text-safari' : '' })}
+                     <span className="text-[10px] font-black uppercase tracking-widest">{tab.label}</span>
+                     {activeTab === tab.id && (
+                       <motion.div layoutId="active-tab" className="absolute bottom-0 left-0 right-0 h-1 bg-safari rounded-t-full" />
+                     )}
+                   </button>
                 ))}
              </div>
           </div>
        </div>
 
-       {/* Tab Content */}
-       <main className="max-w-7xl mx-auto px-6 py-20">
+        {/* Tab Content */}
+        <main className="w-full max-w-7xl mx-auto px-0 sm:px-6 py-12 md:py-20 flex-1">
           <AnimatePresence mode="wait">
              {activeTab === 'saved' && (
                <motion.div 
@@ -159,29 +357,32 @@ export const MyKenya: React.FC<MyKenyaProps> = ({
                           </div>
                        </div>
                     ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                         {savedItems.filter(i => !i.plannedDate).map(item => {
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                         {savedItems.map(item => {
                             const place = getPlaceById(item.placeId);
                             const event = getEventById(item.placeId);
                             const data = place || event;
                             if (!data) return null;
 
+                            const imgUrl = place?.imageUrl || event?.imageUrl || '/placeholder.jpg';
+
                              return (
                               <div key={item.id} className="bg-white rounded-[32px] p-2 border border-navy/5 shadow-lux overflow-hidden group">
                                  <div className="aspect-[4/3] rounded-[26px] overflow-hidden relative">
-                                    <img src={'imageUrl' in data ? data.imageUrl : ''} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="" />
+                                    <img src={imgUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="" />
                                      <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-navy/20 to-transparent flex items-end p-6">
                                        <div className="w-full">
                                           <div className="relative w-full group/picker">
                                              <input 
                                                 type="date"
+                                                value={item.plannedDate || ''}
                                                 onChange={(e) => onUpdateDate(item.id, e.target.value)}
                                                 onClick={(e) => (e.target as any).showPicker?.()}
                                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                                 title="Select Visit Date"
                                              />
-                                             <button className="w-full h-12 bg-safari text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 group-hover/picker:bg-safari-light transition-all shadow-lg shadow-safari/40 relative z-0">
-                                                <Calendar size={14} /> Schedule Visit
+                                             <button className="w-full h-12 bg-safari text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 group-hover/picker:bg-safari-light transition-all shadow-lg shadow-safari/40 relative z-0 cursor-pointer">
+                                                <Calendar size={14} /> {item.plannedDate ? `Planned: ${new Date(item.plannedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}` : 'Schedule Visit'}
                                              </button>
                                           </div>
                                        </div>
@@ -192,7 +393,7 @@ export const MyKenya: React.FC<MyKenyaProps> = ({
                                       <h4 className="font-serif font-bold text-navy group-hover:text-safari transition-colors">{place?.name || event?.title}</h4>
                                       <p className="text-[9px] font-black uppercase tracking-widest text-navy/30 leading-none">{place?.location || event?.location}</p>
                                     </div>
-                                    <button onClick={() => onRemoveItem(item.id)} className="p-2 text-navy/10 hover:text-red-500 transition-colors">
+                                    <button onClick={() => onRemoveItem(item.id)} className="p-2 text-navy/10 hover:text-red-500 transition-colors cursor-pointer">
                                        <Trash2 size={16} />
                                     </button>
                                  </div>
@@ -218,70 +419,58 @@ export const MyKenya: React.FC<MyKenyaProps> = ({
                   </div>
 
                   <div className="space-y-6">
-                    {savedItems.filter(i => i.plannedDate).length === 0 ? (
+                    {activeItineraries.length === 0 ? (
                       <div className="py-24 bg-white rounded-[40px] border border-dashed border-navy/10 text-center space-y-6">
                          <MapIcon size={40} className="mx-auto text-navy/10" />
-                         <p className="text-navy/40 italic">No items scheduled. Add saved gems to your itinerary.</p>
+                         <p className="text-navy/40 italic">No active items scheduled. Add saved gems to your itinerary.</p>
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {savedItems.filter(i => i.plannedDate).sort((a,b) => new Date(a.plannedDate!).getTime() - new Date(b.plannedDate!).getTime()).map(item => {
+                        {activeItineraries.sort((a,b) => new Date(a.plannedDate!).getTime() - new Date(b.plannedDate!).getTime()).map(item => {
                           const place = getPlaceById(item.placeId);
                           const event = getEventById(item.placeId);
-                          const data = place || event;
-                          if (!data) return null;
-
                           return (
-                            <div key={item.id} className={`flex items-center gap-6 p-6 bg-white rounded-[2rem] border transition-all ${item.completed ? 'border-green-100 opacity-60' : 'border-navy/5 shadow-lux'}`}>
-                              <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0">
-                                <img src={'imageUrl' in data ? data.imageUrl : ''} className="w-full h-full object-cover" alt="" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-safari mb-1">{item.isEvent ? 'Scheduled Event' : (place?.category || 'DESTINATION').replace('_', ' ')}</p>
-                                <h4 className="text-xl font-serif font-bold text-navy truncate">{place?.name || event?.title}</h4>
-                                <div className="flex items-center gap-4 mt-2">
-                                  <div className="relative group/reschedule">
-                                    <input 
-                                      type="date"
-                                      value={item.plannedDate}
-                                      onChange={(e) => onUpdateDate(item.id, e.target.value)}
-                                      onClick={(e) => (e.target as any).showPicker?.()}
-                                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                    />
-                                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-navy/40 uppercase group-hover/reschedule:text-safari transition-colors">
-                                      <Calendar size={14} className="text-safari" />
-                                      {new Date(item.plannedDate!).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                                    </div>
-                                  </div>
-                                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-navy/40 uppercase">
-                                    <MapPin size={14} className="text-safari" />
-                                    {place?.location || event?.location}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                {item.completed && place && (
-                                  <button 
-                                    onClick={() => onReviewItem(place)}
-                                    className="h-12 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest bg-safari/10 text-safari border border-safari/20 hover:bg-safari hover:text-white transition-all flex items-center gap-2"
-                                  >
-                                    <MessageCircle size={16} /> Share Experience
-                                  </button>
-                                )}
-                                <button 
-                                  onClick={() => onToggleCompleted(item.id)}
-                                  className={`h-12 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${item.completed ? 'bg-green-600 text-white' : 'bg-navy text-white hover:bg-safari'}`}
-                                >
-                                  {item.completed ? <CheckCircle2 size={16} /> : null}
-                                  {item.completed ? 'Attended' : 'Mark Attended'}
-                                </button>
-                                <button onClick={() => onRemoveItem(item.id)} className="p-3 text-navy/10 hover:text-red-500 transition-colors">
-                                  <Trash2 size={20} />
-                                </button>
-                              </div>
-                            </div>
+                            <ItineraryItemRow
+                              key={item.id}
+                              item={item}
+                              place={place}
+                              event={event}
+                              onUpdateDate={onUpdateDate}
+                              onToggleCompleted={onToggleCompleted}
+                              onRemoveItem={onRemoveItem}
+                              onReviewItem={onReviewItem}
+                              onAddReview={onAddReview}
+                            />
                           );
                         })}
+                      </div>
+                    )}
+
+                    {completedItineraries.length > 0 && (
+                      <div className="mt-16 pt-16 border-t border-navy/10 space-y-6">
+                        <div className="space-y-1">
+                          <h3 className="text-2xl font-serif font-bold text-navy">Past Experiences</h3>
+                          <p className="text-navy/40 text-sm italic">Memories from your beautiful journeys across Kenya.</p>
+                        </div>
+                        <div className="space-y-4">
+                          {completedItineraries.map(item => {
+                            const place = getPlaceById(item.placeId);
+                            const event = getEventById(item.placeId);
+                            return (
+                              <ItineraryItemRow
+                                key={item.id}
+                                item={item}
+                                place={place}
+                                event={event}
+                                onUpdateDate={onUpdateDate}
+                                onToggleCompleted={onToggleCompleted}
+                                onRemoveItem={onRemoveItem}
+                                onReviewItem={onReviewItem}
+                                onAddReview={onAddReview}
+                              />
+                            );
+                          })}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -337,56 +526,56 @@ export const MyKenya: React.FC<MyKenyaProps> = ({
              )}
 
              {activeTab === 'settings' && (
-               <motion.div 
-                 key="settings" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                 className="max-w-2xl mx-auto bg-white rounded-[40px] p-12 shadow-lux border border-navy/5 space-y-12"
-               >
-                 <div className="space-y-8">
-                    <h3 className="text-2xl font-serif font-bold text-navy">Profile Nuance</h3>
-                    
-                    <div className="grid grid-cols-1 gap-6">
-                       <div className="space-y-2">
-                          <label className="text-[9px] font-black uppercase tracking-widest text-navy/40 ml-4">Full Identifier</label>
-                          <input 
-                            type="text" 
-                            defaultValue={userProfile.name}
-                            className="w-full h-16 bg-navy/5 rounded-2xl px-6 font-medium text-navy outline-none border border-transparent focus:border-safari/20 transition-all"
-                          />
-                       </div>
-                       <div className="space-y-2">
-                          <label className="text-[9px] font-black uppercase tracking-widest text-navy/40 ml-4">Communication Endpoint</label>
-                          <input 
-                            type="email" 
-                            disabled
-                            defaultValue={userProfile.email}
-                            className="w-full h-16 bg-navy/5 rounded-2xl px-6 font-medium text-navy/30 outline-none cursor-not-allowed"
-                          />
-                       </div>
-                    </div>
-                 </div>
+                <motion.div 
+                  key="settings" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                  className="max-w-2xl mx-auto bg-white rounded-[40px] p-12 shadow-lux border border-navy/5 space-y-12"
+                >
+                  <div className="space-y-8">
+                     <h3 className="text-2xl font-serif font-bold text-navy">Profile Nuance</h3>
+                     
+                     <div className="grid grid-cols-1 gap-6">
+                        <div className="space-y-2">
+                           <label className="text-[9px] font-black uppercase tracking-widest text-navy/40 ml-4">Full Identifier</label>
+                           <input 
+                             type="text" 
+                             defaultValue={userProfile.name}
+                             className="w-full h-16 bg-navy/5 rounded-2xl px-6 font-medium text-navy outline-none border border-transparent focus:border-safari/20 transition-all"
+                           />
+                        </div>
+                        <div className="space-y-2">
+                           <label className="text-[9px] font-black uppercase tracking-widest text-navy/40 ml-4">Communication Endpoint</label>
+                           <input 
+                             type="email" 
+                             disabled
+                             defaultValue={userProfile.email}
+                             className="w-full h-16 bg-navy/5 rounded-2xl px-6 font-medium text-navy/30 outline-none cursor-not-allowed"
+                           />
+                        </div>
+                     </div>
+                  </div>
 
-                 <div className="space-y-8">
-                    <h3 className="text-2xl font-serif font-bold text-navy">Signal Preferences</h3>
-                    <div className="space-y-4">
-                       {[
-                         { id: 'notifications', title: 'System Alerts', desc: 'Real-time updates on saved itinerary changes and booking status.' },
-                         { id: 'newsletter', title: 'The Kenya Dispatch', desc: 'A monthly editorial on hidden Kenyan gems and aesthetic routes.' }
-                       ].map((pref) => (
-                         <div key={pref.id} className="flex items-center justify-between p-6 bg-cream/30 rounded-3xl border border-navy/5">
-                            <div className="space-y-1">
-                               <p className="text-xs font-bold text-navy">{pref.title}</p>
-                               <p className="text-[10px] text-navy/40 font-medium italic">{pref.desc}</p>
-                            </div>
-                            <div className="w-12 h-6 bg-navy rounded-full relative cursor-pointer flex items-center px-1">
-                               <div className="w-4 h-4 bg-white rounded-full translate-x-6" />
-                            </div>
-                         </div>
-                       ))}
-                    </div>
-                 </div>
+                  <div className="space-y-8">
+                     <h3 className="text-2xl font-serif font-bold text-navy">Signal Preferences</h3>
+                     <div className="space-y-4">
+                        {[
+                          { id: 'notifications', title: 'System Alerts', desc: 'Real-time updates on saved itinerary changes and booking status.' },
+                          { id: 'newsletter', title: 'The Kenya Dispatch', desc: 'A monthly editorial on hidden Kenyan gems and aesthetic routes.' }
+                        ].map((pref) => (
+                          <div key={pref.id} className="flex items-center justify-between p-6 bg-[#FAFAF8] rounded-3xl border border-navy/5">
+                             <div className="space-y-1">
+                                <p className="text-xs font-bold text-navy">{pref.title}</p>
+                                <p className="text-[10px] text-navy/40 font-medium italic">{pref.desc}</p>
+                             </div>
+                             <div className="w-12 h-6 bg-navy rounded-full relative cursor-pointer flex items-center px-1">
+                                <div className="w-4 h-4 bg-white rounded-full translate-x-6" />
+                             </div>
+                          </div>
+                        ))}
+                     </div>
+                  </div>
 
-                 <button className="w-full h-16 bg-navy text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-safari transition-all shadow-xl active:scale-95">Synchronize Changes</button>
-               </motion.div>
+                  <button className="w-full h-16 bg-navy text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-safari transition-all shadow-xl active:scale-95 cursor-pointer">Synchronize Changes</button>
+                </motion.div>
              )}
           </AnimatePresence>
        </main>
