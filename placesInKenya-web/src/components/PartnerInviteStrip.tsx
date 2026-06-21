@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
+import { Container } from './Container';
 
 interface PartnerInviteStripProps {
   onPartnerClick: () => void;
@@ -8,8 +9,8 @@ interface PartnerInviteStripProps {
 
 export const PartnerInviteStrip: React.FC<PartnerInviteStripProps> = ({ onPartnerClick }) => {
   return (
-    <section className="bg-navy py-12 px-6 border-y border-white/5 overflow-hidden">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 md:gap-16">
+    <section className="bg-navy py-12 border-y border-white/5 overflow-hidden">
+      <Container className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-16">
         <div className="flex-1 space-y-4 text-center md:text-left">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -44,7 +45,7 @@ export const PartnerInviteStrip: React.FC<PartnerInviteStripProps> = ({ onPartne
             <ArrowRight size={16} className="relative z-10 group-hover:text-white group-hover:translate-x-1.5 transition-all duration-300" />
           </button>
         </motion.div>
-      </div>
+      </Container>
     </section>
   );
 };

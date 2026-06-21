@@ -28,7 +28,7 @@ export const TrendingNow: React.FC<TrendingNowProps> = ({ places, onPlaceClick, 
         </div>
 
         {/* Horizontal scroll on mobile, responsive grid on desktop */}
-        <div className="flex overflow-x-auto pb-6 md:pb-0 md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 snap-x no-scrollbar">
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 px-4 -mx-4 scrollbar-hide md:grid md:grid-cols-3 md:gap-6 md:mx-0 md:px-0 md:overflow-x-visible pb-6 md:pb-0">
           {places.slice(0, 6).map((place, i) => (
             <motion.div 
               key={place.id}
@@ -36,7 +36,7 @@ export const TrendingNow: React.FC<TrendingNowProps> = ({ places, onPlaceClick, 
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
               viewport={{ once: true }}
-              className="min-w-[270px] sm:min-w-0 snap-center w-full"
+              className="w-[85%] sm:w-[45%] md:w-auto shrink-0 snap-start"
             >
               <PlaceCard place={place} onClick={onPlaceClick} />
             </motion.div>

@@ -27,6 +27,7 @@ import { UpcomingExperiences } from './components/UpcomingExperiences';
 import { OperatorSpotlight } from './components/OperatorSpotlight';
 import { StatsBar } from './components/StatsBar';
 import { PartnerInviteStrip } from './components/PartnerInviteStrip';
+import { Container } from './components/Container';
 
 const SkeletonLoader = () => (
     <div className="min-h-screen bg-off-white flex flex-col items-center justify-center space-y-8">
@@ -77,6 +78,28 @@ const App: React.FC = () => {
   const { places, loading: placesLoading } = usePlaces();
   const { places: trendingPlaces, loading: trendingLoading } = useTrendingPlaces();
   const { operators, loading: operatorsLoading } = useOperators();
+
+  const [customEvents, setCustomEvents] = useState<Event[]>([]);
+  const [customPlaces, setCustomPlaces] = useState<Place[]>([]);
+
+  useEffect(() => {
+    const loadedEvents = localStorage.getItem('places_custom_events');
+    if (loadedEvents) {
+      try {
+        setCustomEvents(JSON.parse(loadedEvents));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    const loadedPlaces = localStorage.getItem('places_custom_partners');
+    if (loadedPlaces) {
+      try {
+        setCustomPlaces(JSON.parse(loadedPlaces));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, [activePage]);
 
   useEffect(() => {
     const storedItems = localStorage.getItem('places_saved_items');
@@ -167,7 +190,9 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const allDisplayPlaces = places.length > 0 ? places : MOCK_PLACES;
+  const mergedEvents = [...customEvents, ...MOCK_EVENTS];
+
+  const allDisplayPlaces = [...customPlaces, ...(places.length > 0 ? places : MOCK_PLACES)];
 
   const displayOperators = (operators.length > 0 ? operators : MOCK_OPERATORS);
   const filteredOperators = operatorFilter.length > 0 
@@ -179,6 +204,9 @@ const App: React.FC = () => {
   const handleNavigate = (page: string) => {
     setActivePage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 120);
   };
 
   const handleCityClick = (city: string) => {
@@ -211,7 +239,7 @@ const App: React.FC = () => {
             />
 
             <UpcomingExperiences 
-              events={MOCK_EVENTS} 
+              events={mergedEvents} 
               onViewAll={() => setActivePage('where-to-go')}
             />
             
@@ -236,7 +264,7 @@ const App: React.FC = () => {
           />
         );
       case 'where-to-go':
-        return <WhereToGo events={MOCK_EVENTS} onAddToTrip={handleSaveEvent} savedItemIds={savedItemIds} />;
+        return <WhereToGo events={mergedEvents} onAddToTrip={handleSaveEvent} savedItemIds={savedItemIds} />;
       case 'operators':
         return (
           <motion.main 
@@ -255,7 +283,7 @@ const App: React.FC = () => {
                   <div className="absolute inset-0 bg-gradient-to-b from-navy/40 via-navy to-navy"></div>
                </div>
 
-               <div className="max-w-7xl mx-auto px-6 relative z-10 text-center space-y-12">
+               <Container className="relative z-10 text-center space-y-12">
                   <div className="space-y-4">
                      <motion.span 
                        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
@@ -276,19 +304,19 @@ const App: React.FC = () => {
                        Connect with Kenya's most respected safari specialists, coastal masters, and local cultural hosts.
                      </motion.p>
                   </div>
-               </div>
+               </Container>
             </section>
 
-            <div className="max-w-7xl mx-auto px-6 -mt-10 relative z-20">
+            <Container className="-mt-10 relative z-20">
                <OperatorsList operators={displayOperators} />
-            </div>
+            </Container>
           </motion.main>
         );
       case 'trips':
         return isAuthenticated ? (
           <MyKenya 
             savedPlaces={allDisplayPlaces.filter(p => savedItems.filter(i => !i.isEvent).map(i => i.placeId).includes(p.id))}
-            savedEvents={MOCK_EVENTS.filter(e => savedItems.filter(i => i.isEvent).map(i => i.placeId).includes(e.id))}
+            savedEvents={mergedEvents.filter(e => savedItems.filter(i => i.isEvent).map(i => i.placeId).includes(e.id))}
             savedItems={savedItems}
             onUpdateDate={handleUpdateItemDate}
             onToggleCompleted={handleToggleCompleted}
@@ -344,7 +372,7 @@ const App: React.FC = () => {
       {/* Footer styled with Niko Free style sheets */}
       <footer className="bg-navy pt-20 pb-12 text-white relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-safari/30 to-transparent"></div>
-        <div className="max-w-[1200px] mx-auto px-6">
+        <Container>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-16 mb-20">
             {/* Brand Column */}
             <div className="space-y-6">
@@ -403,7 +431,7 @@ const App: React.FC = () => {
             </FooterSection>
 
             {/* Quick Links Column */}
-            <FooterSection title="Planning">
+            <FooterSection title="Support">
               <ul className="space-y-4">
                 <li><button onClick={() => handleNavigate('home')} className="text-white/50 hover:text-white transition-colors text-[11px] font-bold uppercase tracking-wider tap-target">All Destinations</button></li>
                 <li><button onClick={() => handleNavigate('where-to-go')} className="text-white/50 hover:text-white transition-colors text-[11px] font-bold uppercase tracking-wider tap-target">Upcoming Events</button></li>
@@ -446,7 +474,7 @@ const App: React.FC = () => {
                <a href="#" className="text-white/20 hover:text-white transition-colors text-[10px] font-bold uppercase tracking-widest">Terms</a>
             </div>
           </div>
-        </div>
+        </Container>
       </footer>
 
       {/* Detail Modal */}

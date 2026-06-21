@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { X, MapPin, Calendar, Users, Star, Share2, ShieldCheck, ArrowRight, ExternalLink } from 'lucide-react';
+import { X, MapPin, Calendar, Users, Star, Share2, ShieldCheck, ArrowRight, ExternalLink, CheckCircle2 } from 'lucide-react';
 import { Event } from '../types';
+import { motion } from 'motion/react';
 
 interface EventDetailModalProps {
   event: Event;
   onClose: () => void;
   isSaved: boolean;
+  onAddToTrip?: (event: Event) => void;
 }
 
-export const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClose, isSaved }) => {
+export const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClose, isSaved, onAddToTrip }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'capacity' | 'organizer'>('overview');
+  const [showSuccess, setShowSuccess] = useState(false);
   
   const isFull = event.bookedCapacity >= event.totalCapacity;
   const spotsLeft = event.totalCapacity - event.bookedCapacity;
@@ -31,15 +34,15 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClo
   }, [onClose]);
 
   return (
-    // ── Overlay: Dark blurred layout background ──
-    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6 lg:p-12 overflow-hidden">
+    // ── Overlay: Dark blurred layout background with z-index elevated to 150 ──
+    <div className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center p-0 sm:p-6 lg:p-12 overflow-hidden">
       <div className="absolute inset-0 bg-navy/95 backdrop-blur-md sm:backdrop-blur-lg" onClick={onClose}></div>
       
       {/* ── Modal Main Frame ── */}
-      <div className="relative bg-white w-full sm:w-[600px] md:w-[640px] lg:w-[640px] h-[92vh] sm:h-[85vh] lg:h-[80vh] max-h-[92vh] sm:max-h-[85vh] lg:max-h-[80vh] overflow-hidden rounded-t-[2.5rem] sm:rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.6)] border border-navy/5 animate-slide-up flex flex-col text-navy">
+      <div className="relative bg-white w-full sm:w-[600px] md:w-[640px] lg:w-[640px] h-auto max-h-[calc(100vh-120px)] sm:max-h-[85vh] lg:max-h-[80vh] overflow-hidden rounded-t-[2.5rem] sm:rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.6)] border border-navy/5 animate-slide-up flex flex-col text-navy">
         
         {/* ══ SECTION A: IMAGE HERO ZONE ══════════════════════════════════════ */}
-        <div className="relative w-full aspect-[16/7] sm:aspect-[16/8] shrink-0 max-h-[30vh]">
+        <div className="relative w-full aspect-[16/7] sm:aspect-[16/8] shrink-0 max-h-[25vh] sm:max-h-[30vh]">
           <img 
             src={event.imageUrl || '/placeholder.jpg'} 
             alt={event.title}
@@ -83,11 +86,11 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClo
           </div>
         </div>
 
-        {/* ══ SECTION C: TABS & EXPERIENCE INFO (FLEX REMAIN ZONE) ═════ */}
-        <div className="px-5 sm:px-6 py-2 flex-1 min-h-0 flex flex-col overflow-hidden">
+        {/* ══ SECTION C: SCROLLABLE EXPERIENCE DETAIL ── */}
+        <div className="flex-1 overflow-y-auto px-5 sm:px-6 py-4 space-y-4 no-scrollbar">
           
           {/* Tabs Selector row */}
-          <div className="flex border-b border-navy/10 shrink-0 mb-3.5 gap-2">
+          <div className="flex border-b border-navy/10 shrink-0 mb-3 gap-2 sticky top-0 bg-white z-10 pb-2">
             {[
               { id: 'overview', label: 'About Experience' },
               { id: 'capacity', label: 'Availability' },
@@ -96,9 +99,9 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClo
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`pb-2 px-1 text-[10px] font-black uppercase tracking-widest border-b-2 transition-all cursor-pointer ${
+                className={`pb-1 px-1 text-[10px] font-black uppercase tracking-widest border-b-2 transition-all cursor-pointer ${
                   activeTab === tab.id 
-                    ? 'border-safari text-safari' 
+                    ? 'border-safari text-safari font-extrabold' 
                     : 'border-transparent text-navy/40 hover:text-navy'
                 }`}
               >
@@ -107,12 +110,11 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClo
             ))}
           </div>
 
-          {/* Active Tab Container */}
-          <div className="flex-1 min-h-0 overflow-hidden flex flex-col justify-start">
-            
+          {/* Active Tab Content Dynamic Area */}
+          <div className="space-y-4">
             {activeTab === 'overview' && (
-              <div className="space-y-3 p-1">
-                <p className="text-[clamp(0.78rem,1.8vw,0.92rem)] text-navy/75 leading-relaxed line-clamp-4">
+              <div className="space-y-3">
+                <p className="text-[clamp(0.78rem,1.8vw,0.92rem)] text-navy/75 leading-relaxed font-light">
                   {event.description}
                 </p>
                 <div className="flex flex-wrap gap-2 pt-2">
@@ -127,7 +129,7 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClo
             )}
 
             {activeTab === 'capacity' && (
-              <div className="space-y-3 p-1 flex flex-col justify-start">
+              <div className="space-y-3 flex flex-col justify-start">
                 <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.15em] text-navy/50">
                   <span>Spots allocated: {event.totalCapacity}</span>
                   <span className={spotsLeft < 15 ? 'text-red-500 font-bold' : 'text-safari'}>{spotsLeft} remaining</span>
@@ -151,7 +153,7 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClo
             )}
 
             {activeTab === 'organizer' && (
-              <div className="space-y-3.5 p-1 flex flex-col">
+              <div className="space-y-3.5 flex flex-col">
                 {event.organizer ? (
                   <div className="flex items-center gap-3 bg-navy/5 p-3.5 rounded-[24px]">
                     <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white shadow-md shrink-0">
@@ -162,7 +164,7 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClo
                         <span className="font-serif font-bold text-xs text-navy leading-none">{event.providerName}</span>
                         <div className="flex text-safari shrink-0"><Star size={10} fill="currentColor" /></div>
                       </div>
-                      <p className="text-[10px] text-navy/50 mt-1 italic line-clamp-2">
+                      <p className="text-[10px] text-navy/50 mt-1 italic">
                         "{event.organizer.bio || 'Verified Host of Local Experiences'}"
                       </p>
                     </div>
@@ -174,12 +176,24 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClo
                 )}
               </div>
             )}
-
           </div>
         </div>
 
         {/* ══ SECTION D: RESERVATIONS AND ACTIONS (BOTTOM STICKY) ═════ */}
-        <div className="px-5 sm:px-6 pt-2 pb-4.5 sm:pb-5 border-t border-navy/5 bg-white flex flex-col gap-2 shrink-0 shadow-inner">
+        <div className="px-5 sm:px-6 pt-2 pb-4.5 sm:pb-5 border-t border-navy/5 bg-white flex flex-col gap-2 shrink-0 shadow-inner z-20">
+          {showSuccess && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-3 bg-green-500/10 border border-green-500/20 rounded-xl flex items-center gap-2.5 text-green-700 mb-1"
+            >
+              <CheckCircle2 size={16} className="text-green-600 shrink-0" />
+              <div className="flex-1 min-w-0 text-left">
+                <p className="text-[11px] font-bold">Successfully registered!</p>
+                <p className="text-[9.5px] text-green-600/80">Added to your My Kenya library. Follow the reservation link to complete payment.</p>
+              </div>
+            </motion.div>
+          )}
           <div className="flex gap-2 sm:gap-3 items-center">
             
             {/* Primary Reserve Button */}
@@ -187,7 +201,11 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClo
               href={event.bookingLink || 'https://wa.me/254700000000'}
               target="_blank"
               rel="noopener noreferrer"
-              className={`flex-1 h-11 bg-safari hover:bg-safari/95 text-white rounded-xl font-black uppercase text-[10px] tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all ${isFull ? 'pointer-events-none opacity-40 grayscale' : ''}`}
+              onClick={() => {
+                onAddToTrip?.(event);
+                setShowSuccess(true);
+              }}
+              className={`flex-1 h-11 bg-safari hover:bg-safari/95 text-white rounded-full font-black uppercase text-[10px] tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all ${isFull ? 'pointer-events-none opacity-40 grayscale' : ''}`}
             >
               <ExternalLink size={12} />
               <span>{isFull ? 'Sold Out' : 'Reserve My Spot'}</span>
@@ -199,7 +217,7 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClo
                 navigator.clipboard.writeText(`Join me at "${event.title}" on PlacesInKenya! 🇰🇪`);
                 alert('Event share link copied!');
               }}
-              className="px-4.5 h-11 bg-navy/5 hover:bg-navy/10 text-navy rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+              className="px-4.5 h-11 bg-navy/5 hover:bg-navy/10 text-navy rounded-full text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
             >
               <Share2 size={12} className="text-safari" />
               <span>Share</span>

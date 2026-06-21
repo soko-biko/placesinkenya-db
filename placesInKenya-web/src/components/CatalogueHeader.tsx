@@ -9,7 +9,7 @@ interface CatalogueHeaderProps {
 
 export const CatalogueHeader: React.FC<CatalogueHeaderProps> = ({ searchQuery, onSearchChange }) => {
   return (
-    <section className="relative pt-40 pb-20 overflow-hidden bg-navy">
+    <section className="relative pt-44 sm:pt-48 pb-20 overflow-hidden bg-navy">
       {/* Abstract Kenyan Landscape overlay */}
       <div className="absolute inset-0 z-0">
         <img 
@@ -25,7 +25,7 @@ export const CatalogueHeader: React.FC<CatalogueHeaderProps> = ({ searchQuery, o
           <motion.span 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-safari font-black uppercase tracking-[0.4em] text-[10px]"
+            className="text-safari font-black uppercase tracking-[0.4em] text-[10px] truncate max-w-full block"
           >
             The Curated Selection
           </motion.span>
@@ -33,7 +33,7 @@ export const CatalogueHeader: React.FC<CatalogueHeaderProps> = ({ searchQuery, o
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-5xl md:text-7xl font-serif font-bold text-white tracking-tight"
+            className="text-3xl sm:text-5xl md:text-7xl font-serif font-bold text-white tracking-tight leading-tight"
           >
             Catalogue of <span className="italic text-safari">Wonders</span>
           </motion.h1>

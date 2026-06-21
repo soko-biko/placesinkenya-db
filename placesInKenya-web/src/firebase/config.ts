@@ -1,9 +1,12 @@
 
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { initializeFirestore } from 'firebase/firestore';
+import { initializeFirestore, setLogLevel } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import firebaseConfig from '../../firebase-applet-config.json';
+
+// Silence verbose connection warnings in sandboxed preview environments
+setLogLevel('error');
 
 const app = initializeApp(firebaseConfig);
 

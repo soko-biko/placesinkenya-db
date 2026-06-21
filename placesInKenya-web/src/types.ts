@@ -147,6 +147,8 @@ export interface Registration {
     licenseNumber?: string;
     websiteUrl?: string;
     bookingLink?: string;
+    latitude?: number;
+    longitude?: number;
   };
   documents: {
     logoUrl?: string;

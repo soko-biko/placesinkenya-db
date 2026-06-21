@@ -14,6 +14,10 @@
     "functions:build": "npm run build -w functions"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.21",
     "typescript": "~5.8.2"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4"
   }
 }

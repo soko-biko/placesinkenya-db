@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Users, Calendar, MapPin, Star } from 'lucide-react';
+import { Container } from './Container';
 
 export const StatsBar: React.FC = () => {
     const stats = [
@@ -27,7 +28,7 @@ export const StatsBar: React.FC = () => {
     return (
         <section ref={sectionRef} className="py-12 sm:py-16 bg-navy text-white overflow-hidden relative">
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
-            <div className="max-w-7xl mx-auto px-6 relative z-10">
+            <Container className="relative z-10">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-12 md:gap-16">
                     {stats.map((stat, i) => (
                         <div key={i} className="flex flex-col items-center text-center space-y-3 group">
@@ -44,7 +45,7 @@ export const StatsBar: React.FC = () => {
                         </div>
                     ))}
                 </div>
-            </div>
+            </Container>
         </section>
     );
 };

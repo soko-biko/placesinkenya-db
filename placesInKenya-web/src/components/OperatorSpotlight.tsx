@@ -2,15 +2,21 @@ import React from 'react';
 import { TourOperator } from '../types';
 import { Star, ShieldCheck, ArrowRight, MapPin } from 'lucide-react';
 import { motion } from 'motion/react';
+import { Container } from './Container';
+import { Card } from './Card';
 
 interface OperatorSpotlightProps {
   operators: TourOperator[];
 }
 
 export const OperatorSpotlight: React.FC<OperatorSpotlightProps> = ({ operators }) => {
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    e.currentTarget.src = 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=600&auto=format&fit=crop';
+  };
+
   return (
-    <section className="py-12 sm:py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="py-12 sm:py-16 lg:py-20 bg-white">
+      <Container>
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-10 md:mb-14">
           <div className="space-y-3">
             <span className="text-safari font-black uppercase tracking-[0.3em] text-[10px]">Verified Professionals</span>
@@ -19,7 +25,7 @@ export const OperatorSpotlight: React.FC<OperatorSpotlightProps> = ({ operators 
         </div>
 
         {/* Horizontal scroll on mobile, responsive grid on desktop */}
-        <div className="flex overflow-x-auto pb-6 md:pb-0 md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 snap-x no-scrollbar">
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 px-4 -mx-4 scrollbar-hide md:grid md:grid-cols-3 lg:grid-cols-4 md:gap-6 md:mx-0 md:px-0 md:overflow-x-visible pb-6 md:pb-0">
           {operators.slice(0, 6).map((op, i) => (
             <motion.div
               key={op.id}
@@ -27,22 +33,23 @@ export const OperatorSpotlight: React.FC<OperatorSpotlightProps> = ({ operators 
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
               viewport={{ once: true }}
-              className="min-w-[270px] sm:min-w-0 snap-center w-full"
+              className="w-[85%] sm:w-[45%] md:w-auto shrink-0 snap-start"
             >
-              <div className="group bg-white rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.12)] hover:-translate-y-[2px] transition-all duration-300 cursor-pointer flex flex-col h-full relative border border-navy/5">
+              <Card className="flex flex-col h-full relative">
                 {/* Image Section - aspect-[4/3] matching PlaceCard */}
-                <div className="relative aspect-[4/3] overflow-hidden bg-navy/5 shrink-0">
+                <div className="relative aspect-[4/3] overflow-hidden bg-navy/5 shrink-0 z-0">
                   <img 
                     src={op.imageUrl || `https://images.unsplash.com/photo-1544005313-94ddf0286df2`} 
                     alt={op.name}
                     loading="lazy"
+                    onError={handleImageError}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-navy/35 via-transparent to-transparent"></div>
                   
-                  {/* Verified Badge */}
+                  {/* Verified Badge - grouped z-10 */}
                   {op.isVerified && (
-                    <div className="absolute top-2.5 right-2.5">
+                    <div className="absolute top-2.5 right-2.5 z-10">
                       <div className="bg-[#E8621A] text-white px-2 h-6 rounded-full shadow flex items-center justify-center gap-1 border border-white/10 backdrop-blur-sm">
                         <ShieldCheck size={10} className="shrink-0 text-white" />
                         <span className="text-[7px] font-black uppercase tracking-widest">Verified</span>
@@ -52,7 +59,7 @@ export const OperatorSpotlight: React.FC<OperatorSpotlightProps> = ({ operators 
                 </div>
 
                 {/* Content Section - matching PlaceCard sizes */}
-                <div className="p-3 sm:p-3.5 flex flex-col flex-1">
+                <div className="p-4 flex flex-col flex-1 space-y-2">
                   <div className="space-y-1.5 flex-1">
                     <div className="space-y-0.5">
                       <h3 className="text-[13px] sm:text-[14px] font-serif font-bold text-navy tracking-tight line-clamp-1 leading-tight group-hover:text-[#E8621A] transition-colors">
@@ -66,7 +73,7 @@ export const OperatorSpotlight: React.FC<OperatorSpotlightProps> = ({ operators 
                       )}
                     </div>
 
-                    <p className="text-navy/60 text-[11.5px] sm:text-xs leading-normal line-clamp-2 font-sans">
+                    <p className="text-navy/60 text-[11.5px] sm:text-xs leading-normal line-clamp-2 font-sans-serif">
                       {op.bio}
                     </p>
 
@@ -96,11 +103,11 @@ export const OperatorSpotlight: React.FC<OperatorSpotlightProps> = ({ operators 
                     </button>
                   </div>
                 </div>
-              </div>
+              </Card>
             </motion.div>
           ))}
         </div>
-      </div>
+      </Container>
     </section>
   );
 };

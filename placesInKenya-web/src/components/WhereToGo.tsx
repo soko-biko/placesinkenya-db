@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, MapPin, Calendar, Clock, Smile, Sparkles, St
 import { Event } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import { EventDetailModal } from './EventDetailModal';
+import { Container } from './Container';
 
 interface WhereToGoProps {
   events: Event[];
@@ -129,7 +130,7 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
   return (
     <div className="min-h-screen bg-off-white pb-32">
       {/* Dynamic Header Area */}
-      <section className="relative pt-40 pb-20 bg-navy overflow-hidden">
+      <section className="relative pt-28 sm:pt-32 pb-12 sm:pb-16 bg-navy overflow-hidden">
         <div id="events-header-bg" className="absolute inset-0 z-0">
           <img 
             src="https://images.unsplash.com/photo-1547448415-e9f5b28e570d"
@@ -139,11 +140,11 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
           <div className="absolute inset-0 bg-gradient-to-b from-navy/60 via-navy to-navy"></div>
         </div>
 
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 relative z-10 text-center space-y-4">
+        <div className="max-w-[1280px] mx-auto px-6 relative z-10 text-center space-y-4">
           <motion.span 
             initial={{ opacity: 0, y: 10 }} 
             animate={{ opacity: 1, y: 0 }}
-            className="text-safari font-black uppercase tracking-[0.4em] text-[10px]"
+            className="text-safari font-black uppercase tracking-[0.4em] text-[10px] truncate max-w-full block"
           >
             Temporal Excursions
           </motion.span>
@@ -151,7 +152,7 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
             initial={{ opacity: 0, y: 20 }} 
             animate={{ opacity: 1, y: 0 }} 
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-7xl font-serif font-bold text-white tracking-tight"
+            className="text-3xl sm:text-5xl md:text-7xl font-serif font-bold text-white tracking-tight leading-tight"
           >
             Ways to <span className="italic text-safari font-light">Experience</span> Kenya
           </motion.h1>
@@ -159,7 +160,7 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             transition={{ delay: 0.2 }}
-            className="text-white/40 max-w-2xl mx-auto text-sm sm:text-base font-light italic"
+            className="text-white/40 max-w-2xl mx-auto text-sm sm:text-base font-light italic line-clamp-1"
           >
             A sequence of scheduled prestige events, from athletic safaris to jazz festivals in the city.
           </motion.p>
@@ -167,10 +168,10 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
       </section>
 
       {/* Main Dual-Panel Layout Container */}
-      <main className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 space-y-8">
+      <Container className="py-10 md:py-14 space-y-8" id="events-main">
         {/* Events category filter chips */}
         <div 
-          className="flex flex-row gap-2 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0"
+          className="flex flex-row gap-2 overflow-x-auto pb-2 scrollbar-none w-full"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {categories.map(cat => (
@@ -291,139 +292,237 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
 
             <AnimatePresence mode="wait">
               {displayedEvents.length > 0 ? (
-                <div key="events-grid-view" className="space-y-4">
-                  {displayedEvents.map(event => {
-                    const spotsLeft = event.totalCapacity - event.bookedCapacity;
-                    const isFull = spotsLeft <= 0;
-                    const itemIsSaved = savedItemIds.includes(event.id);
+                <div key="events-responsive-wrapper" className="w-full">
+                  {/* Mobile View: Clean full-width list layout */}
+                  <div className="space-y-4 lg:hidden divide-y divide-navy/10">
+                    {displayedEvents.map(event => {
+                      const spotsLeft = event.totalCapacity - event.bookedCapacity;
+                      const isFull = spotsLeft <= 0;
+                      const itemIsSaved = savedItemIds.includes(event.id);
 
-                    return (
-                      <motion.article 
-                        key={event.id}
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.98 }}
-                        className="bg-white rounded-2xl border border-navy/5 shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-xl p-4 sm:p-5 flex flex-col md:flex-row gap-5 hover:-translate-y-0.5 transition-all duration-300 group cursor-pointer"
-                        onClick={() => setSelectedEvent(event)}
-                      >
-                        {/* Event Left Zone: Compact visual details */}
-                        <div className="flex items-start md:items-center gap-4 shrink-0 border-b md:border-b-0 md:border-r border-navy/5 pb-3 md:pb-0 md:pr-5 min-w-[70px] justify-between md:justify-center text-center">
-                          <div className="flex flex-col items-center justify-center w-full">
-                            <span className="text-[9px] font-black text-safari uppercase tracking-widest leading-none">
-                              {new Date(event.date).toLocaleString('en-KE', { month: 'short' }).toUpperCase()}
-                            </span>
-                            <span className="font-serif font-extrabold text-3xl leading-none text-navy my-1">
-                              {new Date(event.date).getDate()}
-                            </span>
-                            <span className="text-[9px] font-bold text-navy/40 uppercase">
-                              {new Date(event.date).toLocaleString('en-KE', { weekday: 'short' })}
-                            </span>
-                          </div>
-                          
-                          {/* Small bookmark wrapper for mobile screens */}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onAddToTrip(event);
-                            }}
-                            className="md:hidden p-2 rounded-full bg-navy/5 text-navy hover:text-safari"
-                          >
-                            {itemIsSaved ? <BookmarkCheck size={16} className="text-safari" /> : <Bookmark size={16} />}
-                          </button>
-                        </div>
-
-                        {/* Event Image Zone */}
-                        <div className="relative w-full md:w-[150px] aspect-[4/3] rounded-xl overflow-hidden shrink-0 group-hover:scale-[1.02] transition-transform duration-500">
-                          <img 
-                            src={event.imageUrl} 
-                            alt={event.title} 
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute top-2 left-2">
-                            <span className="bg-navy/80 backdrop-blur-md text-white font-black text-[8px] uppercase tracking-widest px-2.5 h-6 rounded-md flex items-center border border-white/5">
-                              {event.category.replace('_', ' ')}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Event Content & Actions Zone */}
-                        <div className="flex-1 flex flex-col justify-between min-w-0">
-                          <div className="space-y-2">
-                            {/* Meta items */}
-                            <div className="flex flex-wrap items-center gap-3 text-[10px] text-navy/50 font-semibold uppercase tracking-wider">
-                              <span className="flex items-center gap-1">
-                                <MapPin size={11} className="text-safari" />
-                                {event.location}
-                              </span>
-                              <span>•</span>
-                              <span className="flex items-center gap-1">
-                                <Clock size={11} className="text-safari" />
-                                {event.time || 'All Day'}
+                      return (
+                        <motion.article 
+                          key={event.id}
+                          initial={{ opacity: 0, y: 15 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.98 }}
+                          className="py-5 border-b border-navy/10 last:border-b-0 flex flex-col sm:flex-row gap-4 sm:gap-6 hover:bg-navy/[0.01] transition-all duration-200 group cursor-pointer"
+                          onClick={() => setSelectedEvent(event)}
+                        >
+                          {/* Event Image Zone */}
+                          <div className="relative w-full sm:w-32 md:w-40 aspect-[16/10] sm:aspect-[4/3] rounded-xl overflow-hidden bg-navy/5 shrink-0 z-0">
+                            <img 
+                              src={event.imageUrl} 
+                              alt={event.title} 
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
+                            />
+                            <div className="absolute top-1.5 left-1.5 z-10">
+                              <span className="bg-navy/80 backdrop-blur-md text-white font-black text-[7px] uppercase tracking-widest px-2 h-5 flex items-center border border-white/5 select-none">
+                                {event.category.replace('_', ' ')}
                               </span>
                             </div>
-
-                            {/* Title */}
-                            <h3 className="font-serif font-bold text-base sm:text-lg text-navy leading-snug group-hover:text-safari transition-colors line-clamp-2">
-                              {event.title}
-                            </h3>
-
-                            {/* Short bio if existing, or description */}
-                            <p className="text-navy/6 tracking-normal text-xs leading-relaxed line-clamp-2">
-                              {event.description}
-                            </p>
                           </div>
 
-                          {/* Capacity Indicator & Bottom Action Row inside Card */}
-                          <div className="mt-4 pt-4 border-t border-navy/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                            
-                            {/* Exclusivity spotsLeft gauge */}
-                            <div className="space-y-1.5 flex-1 max-w-[200px]">
-                              <div className="flex justify-between text-[8px] font-black uppercase tracking-wider text-navy/40">
-                                <span>Spots remaining</span>
-                                <span className={spotsLeft < 10 ? 'text-red-500' : 'text-safari'}>
-                                  {isFull ? 'Sold Out' : `${spotsLeft} / ${event.totalCapacity}`}
+                          {/* Event Content & Actions Zone */}
+                          <div className="flex-1 flex flex-col justify-between min-w-0">
+                            <div className="space-y-1.5">
+                              {/* Meta items */}
+                              <div className="flex flex-wrap items-center gap-3 text-[10px] text-navy/50 font-semibold uppercase tracking-wider">
+                                <span className="flex items-center gap-1 text-safari font-black">
+                                  <Calendar size={11} />
+                                  {new Date(event.date).toLocaleDateString('en-KE', { month: 'short', day: 'numeric', weekday: 'short' })}
+                                </span>
+                                <span>•</span>
+                                <span className="flex items-center gap-1">
+                                  <MapPin size={11} className="text-safari" />
+                                  {event.location}
+                                </span>
+                                <span>•</span>
+                                <span className="flex items-center gap-1">
+                                  <Clock size={11} className="text-safari" />
+                                  {event.time || 'All Day'}
                                 </span>
                               </div>
-                              <div className="h-1 bg-navy/5 rounded-full overflow-hidden">
-                                <div 
-                                  style={{ width: `${Math.min(100, (event.bookedCapacity / event.totalCapacity) * 100)}%` }}
-                                  className={`h-full transition-all duration-[600ms] ${spotsLeft < 10 ? 'bg-red-500' : 'bg-safari'}`}
-                                />
+
+                              {/* Title */}
+                              <h3 className="font-serif font-bold text-sm sm:text-base text-navy leading-snug group-hover:text-safari transition-colors line-clamp-1">
+                                {event.title}
+                              </h3>
+
+                              {/* Short bio if existing, or description */}
+                              <p className="text-navy/60 text-[11px] sm:text-xs leading-relaxed line-clamp-1 sm:line-clamp-2">
+                                {event.description}
+                              </p>
+                            </div>
+
+                            {/* Capacity Indicator & Bottom Action Row inside Card */}
+                            <div className="mt-3 pt-3 border-t border-navy/5 flex flex-row items-center justify-between gap-4">
+                              
+                              {/* Exclusivity spotsLeft gauge */}
+                              <div className="space-y-1 flex-1 max-w-[160px] hidden sm:block">
+                                <div className="flex justify-between text-[8px] font-black uppercase tracking-wider text-navy/40">
+                                  <span>Spots remaining</span>
+                                  <span className={spotsLeft < 10 ? 'text-red-500' : 'text-safari'}>
+                                    {isFull ? 'Sold Out' : `${spotsLeft} / ${event.totalCapacity}`}
+                                  </span>
+                                </div>
+                                <div className="h-1 bg-navy/5 rounded-full overflow-hidden">
+                                  <div 
+                                    style={{ width: `${Math.min(100, (event.bookedCapacity / event.totalCapacity) * 100)}%` }}
+                                    className={`h-full transition-all duration-[600ms] ${spotsLeft < 10 ? 'bg-red-500' : 'bg-safari'}`}
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Buttons */}
+                              <div className="flex items-center justify-end gap-2 shrink-0 ml-auto select-none">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onAddToTrip(event);
+                                  }}
+                                  className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all active:scale-90 ${
+                                    itemIsSaved 
+                                      ? 'bg-safari/15 border-safari text-safari' 
+                                      : 'border-navy/10 hover:border-navy text-navy hover:bg-navy/5'
+                                  }`}
+                                  title={itemIsSaved ? "Saved" : "Save to Trip"}
+                                >
+                                  {itemIsSaved ? <BookmarkCheck size={12} /> : <Bookmark size={12} />}
+                                </button>
+
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedEvent(event);
+                                  }}
+                                  className="h-8 px-3 bg-navy hover:bg-safari text-white text-[8px] font-black uppercase tracking-widest rounded-lg flex items-center gap-1 shadow-sm active:scale-95 transition-all"
+                                >
+                                  <span>Book Pass</span>
+                                  <ArrowRight size={9} />
+                                </button>
+                              </div>
+
+                            </div>
+                          </div>
+                        </motion.article>
+                      );
+                    })}
+                  </div>
+
+                  {/* Desktop/Tablet View: Pristine Grid Cards layout */}
+                  <div className="hidden lg:grid lg:grid-cols-2 gap-6">
+                    {displayedEvents.map(event => {
+                      const spotsLeft = event.totalCapacity - event.bookedCapacity;
+                      const isFull = spotsLeft <= 0;
+                      const itemIsSaved = savedItemIds.includes(event.id);
+
+                      return (
+                        <motion.div 
+                          key={event.id}
+                          initial={{ opacity: 0, scale: 0.98, y: 15 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                          className="bg-white rounded-2xl overflow-hidden border border-navy/5 shadow-sm hover:shadow-md hover:-translate-y-[2px] transition-all duration-300 flex flex-col h-full group cursor-pointer"
+                          onClick={() => setSelectedEvent(event)}
+                        >
+                          {/* Event Image Zone */}
+                          <div className="relative aspect-[16/10] overflow-hidden bg-navy/5 shrink-0">
+                            <img 
+                              src={event.imageUrl} 
+                              alt={event.title} 
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                            <div className="absolute top-2.5 left-2.5 z-10 w-max">
+                              <span className="bg-navy/80 backdrop-blur-md text-white font-black text-[7.5px] uppercase tracking-widest px-2.5 h-6 flex items-center border border-white/5 select-none rounded-full">
+                                {event.category.replace('_', ' ')}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Event Content & Actions Zone */}
+                          <div className="p-4 sm:p-5 flex flex-col flex-1 justify-between">
+                            <div className="space-y-1.5 flex-1">
+                              {/* Meta items */}
+                              <div className="flex flex-wrap items-center gap-2.5 text-[9px] text-navy/50 font-semibold uppercase tracking-wider font-sans">
+                                <span className="flex items-center gap-1 text-safari font-black">
+                                  <Calendar size={10} />
+                                  {new Date(event.date).toLocaleDateString('en-KE', { month: 'short', day: 'numeric' })}
+                                </span>
+                                <span>•</span>
+                                <span className="flex items-center gap-1">
+                                  <MapPin size={10} className="text-safari" />
+                                  {event.location}
+                                </span>
+                              </div>
+
+                              {/* Title */}
+                              <h3 className="font-serif font-bold text-sm text-navy leading-snug group-hover:text-safari transition-colors line-clamp-1">
+                                {event.title}
+                              </h3>
+
+                              {/* Description */}
+                              <p className="text-navy/60 text-[11px] leading-relaxed line-clamp-2">
+                                {event.description}
+                              </p>
+
+                              {/* Custom gauge */}
+                              <div className="space-y-1 pt-2 w-full">
+                                <div className="flex justify-between text-[8px] font-black uppercase tracking-wider text-navy/40">
+                                  <span>Spots remaining</span>
+                                  <span className={spotsLeft < 10 ? 'text-red-500' : 'text-safari'}>
+                                    {isFull ? 'Sold Out' : `${spotsLeft} / ${event.totalCapacity}`}
+                                  </span>
+                                </div>
+                                <div className="h-1 bg-navy/5 rounded-full overflow-hidden">
+                                  <div 
+                                    style={{ width: `${Math.min(100, (event.bookedCapacity / event.totalCapacity) * 100)}%` }}
+                                    className={`h-full transition-all duration-[600ms] ${spotsLeft < 10 ? 'bg-red-500' : 'bg-safari'}`}
+                                  />
+                                </div>
                               </div>
                             </div>
 
-                            {/* Buttons */}
-                            <div className="flex items-center justify-end gap-2.5 shrink-0">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onAddToTrip(event);
-                                }}
-                                className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all active:scale-90 ${
-                                  itemIsSaved 
-                                    ? 'bg-safari/15 border-safari text-safari' 
-                                    : 'border-navy/10 hover:border-navy text-navy hover:bg-navy/5'
-                                }`}
-                                title={itemIsSaved ? "Saved" : "Save to Trip"}
-                              >
-                                {itemIsSaved ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
-                              </button>
+                            {/* Actions and Pricing Footer */}
+                            <div className="mt-4 pt-3 border-t border-navy/5 flex items-center justify-between gap-2 select-none">
+                              <div className="flex flex-col">
+                                <span className="text-[7.5px] text-navy/20 uppercase font-black tracking-[0.15em] leading-none mb-0.5">Tickets from</span>
+                                <span className="text-navy text-xs font-bold font-sans tracking-tight">Ksh {(event.price * 130).toLocaleString()}</span>
+                              </div>
 
-                              <button
-                                onClick={() => setSelectedEvent(event)}
-                                className="h-9 px-4 bg-navy hover:bg-safari text-white text-[9px] font-black uppercase tracking-widest rounded-lg flex items-center gap-1.5 shadow-md active:scale-95 transition-all"
-                              >
-                                <span>Book Pass</span>
-                                <ArrowRight size={10} />
-                              </button>
+                              <div className="flex gap-1">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onAddToTrip(event);
+                                  }}
+                                  className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all active:scale-90 ${
+                                    itemIsSaved 
+                                      ? 'bg-safari/15 border-safari text-safari' 
+                                      : 'border-navy/10 hover:border-navy text-navy hover:bg-navy/5'
+                                  }`}
+                                  title={itemIsSaved ? "Saved" : "Save to Trip"}
+                                >
+                                  {itemIsSaved ? <BookmarkCheck size={12} /> : <Bookmark size={12} />}
+                                </button>
+
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedEvent(event);
+                                  }}
+                                  className="h-8 px-3 bg-navy hover:bg-safari text-white text-[8px] font-black uppercase tracking-widest rounded-lg flex items-center gap-1 shadow-sm active:scale-95 transition-all"
+                                >
+                                  <span>Book Pass</span>
+                                  <ArrowRight size={9} />
+                                </button>
+                              </div>
                             </div>
-
                           </div>
-                        </div>
-
-                      </motion.article>
-                    );
-                  })}
+                        </motion.div>
+                      );
+                    })}
+                  </div>
                 </div>
               ) : (
                 <motion.div 
@@ -477,7 +576,7 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
           </section>
 
         </div>
-      </main>
+      </Container>
 
       {/* Modals */}
       <AnimatePresence>
@@ -486,6 +585,7 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
             event={selectedEvent}
             onClose={() => setSelectedEvent(null)}
             isSaved={savedItemIds.includes(selectedEvent.id)}
+            onAddToTrip={onAddToTrip}
           />
         )}
       </AnimatePresence>

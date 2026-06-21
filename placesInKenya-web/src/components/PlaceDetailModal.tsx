@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, MapPin, Star, Users, Briefcase, PlusCircle, ExternalLink, Clock, DollarSign, MessageCircle, CheckCircle2, Calendar, AlertCircle } from 'lucide-react';
 import { Place, TourOperator, OperatorType, SavedItem } from '../types';
+import { motion } from 'motion/react';
 
 interface PlaceDetailModalProps {
   place: Place;
@@ -23,6 +24,7 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'guides' | 'reviews'>('overview');
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [plannedDate, setPlannedDate] = useState<string>('');
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
@@ -58,17 +60,18 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
   );
 
   return (
-    // ── Overlay: Covers full screen and darkens background ──
-    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6 lg:p-12 overflow-hidden">
+    // ── Overlay: Covers full screen, raised z-index to 150 to override bottom navigation bars ──
+    <div className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center p-0 sm:p-6 lg:p-12 overflow-hidden">
       <div className="absolute inset-0 bg-navy/95 backdrop-blur-md sm:backdrop-blur-lg" onClick={onClose}></div>
       
       {/* ── Popup Panel ──
           Width and height adapt perfectly to mobile sheet / centered modal sizes with max-height limits.
+          Use overflow-hidden so scroll is constrained to the center scrollable zone.
       */}
-      <div className="relative bg-navy w-full sm:w-[600px] md:w-[640px] lg:w-[640px] h-auto max-h-[92vh] sm:max-h-[85vh] lg:max-h-[80vh] overflow-y-auto rounded-t-[2.5rem] sm:rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.6)] border border-white/5 animate-slide-up text-white flex flex-col no-scrollbar">
+      <div className="relative bg-navy w-full sm:w-[600px] md:w-[640px] lg:w-[640px] h-auto max-h-[calc(100vh-120px)] sm:max-h-[85vh] rounded-t-[2.5rem] sm:rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.6)] border border-white/5 animate-slide-up text-white flex flex-col overflow-hidden">
         
         {/* ══ SECTION A: IMAGE & HERO ══════════════════════════════════════ */}
-        <div className="relative w-full aspect-[16/7] sm:aspect-[16/8] shrink-0 max-h-[30vh]">
+        <div className="relative w-full aspect-[16/7] sm:aspect-[16/8] shrink-0 max-h-[25vh] sm:max-h-[30vh]">
           <img 
             src={place.imageUrl || '/placeholder.jpg'} 
             alt={place.name}
@@ -120,11 +123,11 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
           </div>
         </div>
 
-        {/* ══ SECTION C: TABS & CORE EXP (FLEX REMAINING ZONE) ═════════ */}
-        <div className="px-5 sm:px-6 py-2 flex-1 min-h-0 flex flex-col overflow-hidden">
+        {/* ══ SECTION C: SCROLLABLE EXPERIENCE PORTAL ── */}
+        <div className="flex-1 overflow-y-auto px-5 sm:px-6 py-4 space-y-4 no-scrollbar">
           
           {/* Tab Selector Buttons */}
-          <div className="flex border-b border-white/10 shrink-0 mb-3.5 gap-2">
+          <div className="flex border-b border-white/10 shrink-0 mb-3 gap-2 sticky top-0 bg-navy z-10 pb-2">
             {[
               { id: 'overview', label: 'Overview' },
               { id: 'guides', label: 'Guides' },
@@ -136,9 +139,9 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
                   setActiveTab(tab.id as any);
                   if (tab.id !== 'reviews') setShowReviewForm(false);
                 }}
-                className={`pb-2 px-1 text-[10px] font-black uppercase tracking-widest border-b-2 transition-all cursor-pointer ${
+                className={`pb-1 px-1 text-[10px] font-black uppercase tracking-widest border-b-2 transition-all cursor-pointer ${
                   activeTab === tab.id 
-                    ? 'border-safari text-safari' 
+                    ? 'border-safari text-safari font-extrabold' 
                     : 'border-transparent text-white/40 hover:text-white'
                 }`}
               >
@@ -147,12 +150,11 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
             ))}
           </div>
 
-          {/* Dynamic Tab Panel Content — zero vertical scrolling allowed */}
-          <div className="flex-1 min-h-0 overflow-hidden flex flex-col justify-start">
-            
+          {/* Dynamic Tab Panel Content */}
+          <div className="space-y-4">
             {activeTab === 'overview' && (
-              <div className="space-y-3 p-1">
-                <p className="text-[clamp(0.78rem,1.8vw,0.92rem)] text-white/70 leading-relaxed line-clamp-4">
+              <div className="space-y-3">
+                <p className="text-[clamp(0.78rem,1.8vw,0.92rem)] text-white/70 leading-relaxed font-light">
                   {place.description}
                 </p>
                 
@@ -171,7 +173,7 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
             )}
 
             {activeTab === 'guides' && (
-              <div className="space-y-2.5 flex flex-col justify-start">
+              <div className="space-y-3 flex flex-col justify-start">
                 <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">
                   Verified Local Partners
                 </p>
@@ -210,9 +212,9 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
             )}
 
             {activeTab === 'reviews' && (
-              <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+              <div className="space-y-4">
                 {!showReviewForm ? (
-                  <div className="space-y-2.5 flex-1 flex flex-col min-h-0">
+                  <div className="space-y-3">
                     <div className="flex items-center justify-between shrink-0">
                       <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">
                         Guest Book Logs
@@ -231,20 +233,20 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
                       )}
                     </div>
                     
-                    <div className="flex-1 min-h-0 overflow-hidden flex flex-col justify-start">
+                    <div className="space-y-3">
                       <div className="p-3.5 bg-white/5 gap-2 rounded-2xl flex flex-col">
                         <div className="flex justify-between items-center text-xs">
                           <span className="font-bold text-white/95">Maina W.</span>
                           <span className="text-safari flex gap-0.5 shrink-0"><Star size={10} fill="currentColor" /><Star size={10} fill="currentColor" /><Star size={10} fill="currentColor" /></span>
                         </div>
-                        <p className="text-xs text-white/60 leading-normal italic line-clamp-2">
+                        <p className="text-xs text-white/60 leading-normal italic">
                           "An absolutely incredible experience. The views were completely breathtaking and we had great local assistance."
                         </p>
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-2 flex flex-col min-h-0">
+                  <div className="space-y-3 flex flex-col">
                     <div className="flex items-center justify-between">
                       <div className="flex gap-1 shrink-0">
                         {[1, 2, 3, 4, 5].map(i => (
@@ -267,14 +269,14 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
                     <textarea 
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
-                      className="w-full h-16 bg-navy border border-white/10 rounded-xl p-3 text-xs focus:ring-1 focus:ring-safari outline-none transition-all placeholder:text-white/25 resize-none"
+                      className="w-full h-20 bg-navy border border-white/10 rounded-xl p-3 text-xs focus:ring-1 focus:ring-safari outline-none transition-all placeholder:text-white/25 resize-none text-white bg-transparent"
                       placeholder="Detail your experience for other travellers..."
                     />
                     
                     <button 
                       onClick={handleSubmitReview}
                       disabled={!comment.trim()}
-                      className="w-full h-8 bg-safari text-white rounded-lg font-black uppercase text-[8px] tracking-widest hover:bg-safari-light transition-all disabled:opacity-40 flex items-center justify-center gap-1 cursor-pointer"
+                      className="w-full h-9 bg-safari text-white rounded-lg font-black uppercase text-[8px] tracking-widest hover:bg-safari-light transition-all disabled:opacity-40 flex items-center justify-center gap-1 cursor-pointer"
                     >
                       <MessageCircle size={10} />
                       <span>Submit Review Dossier</span>
@@ -283,13 +285,26 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
                 )}
               </div>
             )}
-
           </div>
         </div>
 
         {/* ══ SECTION D: ACTION PANEL (BOTTOM STICKY) ═══════════════════ */}
-        <div className="px-5 sm:px-6 pt-2 pb-4.5 sm:pb-5 border-t border-white/5 bg-navy shadow-inner flex flex-col gap-2 shrink-0">
+        <div className="px-5 sm:px-6 pt-3 pb-5 sm:pb-6 border-t border-white/5 bg-navy shadow-inner flex flex-col gap-2 shrink-0 z-20">
           
+          {showSuccess && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-3 bg-green-500/10 border border-green-500/20 rounded-xl flex items-center gap-2.5 text-green-400 mb-1"
+            >
+              <CheckCircle2 size={16} className="text-green-400 shrink-0" />
+              <div className="flex-1 min-w-0 text-left">
+                <p className="text-[11px] font-bold">Successfully booked!</p>
+                <p className="text-[9.5px] text-green-400/80">Added to your My Kenya library. Complete details via the booking link.</p>
+              </div>
+            </motion.div>
+          )}
+
           {/* Quick Schedule Date Row (rendered only if not saved yet) */}
           {!isSaved && (
             <div className="flex items-center gap-2 justify-between">
@@ -310,7 +325,10 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
             
             {/* Primary Action Button: Add to Planner */}
             <button 
-              onClick={() => onAddToTrip(place, plannedDate)}
+              onClick={() => {
+                onAddToTrip(place, plannedDate);
+                setShowSuccess(true);
+              }}
               className={`flex-1 flex items-center justify-center gap-2 h-11 ${
                 isSaved 
                   ? 'bg-green-600/20 text-green-400 border border-green-600/30' 
@@ -326,6 +344,10 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
               href={place.bookingLink || 'https://wa.me/254700000000'}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                onAddToTrip(place, plannedDate || new Date().toISOString().split('T')[0]);
+                setShowSuccess(true);
+              }}
               className="flex-1 h-11 bg-white hover:bg-safari hover:text-white text-navy rounded-xl font-black uppercase text-[10px] tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-md"
             >
               <ExternalLink size={12} />

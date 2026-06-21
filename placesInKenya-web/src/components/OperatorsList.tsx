@@ -196,6 +196,81 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
     </motion.div>
   );
 
+  const MobileOperatorListItem: React.FC<{ operator: TourOperator }> = ({ operator }) => (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      className="py-5 flex gap-4 items-start w-full border-b border-navy/10 last:border-b-0"
+    >
+      {/* Left Side: Image/Avatar */}
+      <div className="relative shrink-0 select-none">
+        <div className="w-20 h-20 rounded-xl overflow-hidden bg-navy/5 border border-navy/5">
+          <img 
+            src={operator.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(operator.name)}&background=0D1B2A&color=fff`} 
+            alt={operator.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+        {operator.isVerified && (
+          <div className="absolute -top-1 -right-1 bg-green-500 text-white w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow">
+            <ShieldCheck size={11} />
+          </div>
+        )}
+      </div>
+
+      {/* Right Side: Info and CTA */}
+      <div className="flex-1 min-w-0 flex flex-col justify-between h-20">
+        <div className="space-y-1">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <span className="text-[7.5px] font-black uppercase tracking-widest text-safari leading-none block mb-0.5">
+                {operator.type === OperatorType.COMPANY ? 'Featured Fleet' : operator.title || 'Elite Guide'}
+              </span>
+              <h3 className="text-sm font-serif font-bold text-navy truncate leading-none">
+                {operator.name}
+              </h3>
+            </div>
+            
+            <div className="flex items-center gap-0.5 text-safari shrink-0">
+              <Star size={10} fill="currentColor" />
+              <span className="text-[10px] font-bold text-navy ml-1 leading-none">
+                {operator.rating.toFixed(1)}
+              </span>
+            </div>
+          </div>
+
+          <p className="text-navy/60 text-[11px] leading-relaxed line-clamp-1 pr-2">
+            {operator.bio}
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between gap-4 border-t border-navy/5 pt-1.5">
+          <div>
+            <span className="text-[11px] font-bold text-navy font-sans leading-none">
+              Ksh {operator.basePrice.toLocaleString()} {operator.type === OperatorType.INDIVIDUAL && <span className="text-[8.5px] font-normal text-navy/30"> / day</span>}
+            </span>
+          </div>
+
+          <div className="flex gap-1 shrink-0 select-none">
+            <button className="w-7.5 h-7.5 flex items-center justify-center bg-navy/5 text-navy/40 rounded-lg hover:bg-safari hover:text-white transition-all cursor-pointer">
+              <MessageCircle size={12} />
+            </button>
+            <a 
+              href={operator.bookingLink || 'about:blank'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="h-7.5 px-3 bg-safari text-white rounded-lg font-black uppercase tracking-widest text-[8px] flex items-center justify-center gap-1 shadow shadow-safari/10 hover:opacity-90 transition-opacity cursor-pointer"
+            >
+              Book <Calendar size={11} />
+            </a>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+
   return (
     <div className="space-y-8 select-none">
       {/* Search & Filter Header */}
@@ -255,19 +330,34 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
         </div>
       </div>
 
-      {/* Grid Rendering */}
+      {/* Responsive Layout Representation */}
       <AnimatePresence mode="popLayout">
          {filteredOperators.length > 0 ? (
-           <motion.div 
-             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             exit={{ opacity: 0 }}
-           >
-             {filteredOperators.map(o => (
-               o.type === OperatorType.COMPANY ? <CompanyCard key={o.id} operator={o} /> : <GuideCard key={o.id} operator={o} />
-             ))}
-           </motion.div>
+           <div className="w-full">
+             {/* Mobile View: List-based Layout */}
+             <motion.div 
+               className="flex flex-col w-full divide-y divide-navy/5 md:hidden"
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+             >
+               {filteredOperators.map(o => (
+                 <MobileOperatorListItem key={o.id} operator={o} />
+               ))}
+             </motion.div>
+
+             {/* Big Screen View: Grid of Cards Layout */}
+             <motion.div 
+               className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+             >
+               {filteredOperators.map(o => (
+                 o.type === OperatorType.COMPANY ? <CompanyCard key={o.id} operator={o} /> : <GuideCard key={o.id} operator={o} />
+               ))}
+             </motion.div>
+           </div>
          ) : (
            <motion.div 
              initial={{ opacity: 0, scale: 0.98 }}

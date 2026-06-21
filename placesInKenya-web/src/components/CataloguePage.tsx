@@ -3,8 +3,9 @@ import { Place, PlaceCategory } from '../types';
 import { CatalogueHeader } from './CatalogueHeader';
 import { FilterPanel } from './FilterPanel';
 import { PlaceCard } from './PlaceCard';
-import { Filter, X, LayoutGrid, List, SlidersHorizontal, Loader2, Search } from 'lucide-react';
+import { Filter, X, LayoutGrid, List, SlidersHorizontal, Loader2, Search, Map } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { DestinationMap } from './DestinationMap';
 
 interface CataloguePageProps {
   initialPlaces: Place[];
@@ -32,6 +33,7 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(12);
+  const [isMapExpanded, setIsMapExpanded] = useState(true);
 
   // Sync with props if search/category changes from outside
   useEffect(() => {
@@ -86,7 +88,7 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
       <CatalogueHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
       {/* Main Content Area */}
-      <div className="w-full max-w-7xl mx-auto px-0 sm:px-6 py-12 flex-1">
+      <div className="w-full max-w-7xl mx-auto px-6 sm:px-6 py-12 flex-1">
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Desktop Sidebar (Sticky) */}
           <aside className="hidden lg:block w-80 shrink-0 sticky top-32 h-fit">
@@ -141,12 +143,23 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
                         />
                     </div>
                 </div>
-                <button 
-                  onClick={() => setIsSidebarOpen(true)}
-                  className="lg:hidden flex items-center justify-center gap-3 w-full sm:w-auto px-8 h-14 bg-navy text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl tap-target"
-                >
-                  <SlidersHorizontal size={14} /> Filter Treasures
-                </button>
+
+                <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto shrink-0">
+                  <button 
+                    onClick={() => setIsMapExpanded(!isMapExpanded)}
+                    className={`flex-1 sm:flex-initial flex items-center justify-center gap-2.5 px-6 h-12 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all duration-300 shadow-sm cursor-pointer ${isMapExpanded ? 'bg-navy text-white border-navy hover:bg-navy/90' : 'bg-white text-navy border-navy/5 hover:border-navy/10'}`}
+                  >
+                    <Map size={14} className={isMapExpanded ? 'text-safari' : ''} />
+                    <span>{isMapExpanded ? 'Hide Map View' : 'Show Map View'}</span>
+                  </button>
+
+                  <button 
+                    onClick={() => setIsSidebarOpen(true)}
+                    className="lg:hidden flex-1 sm:flex-initial flex items-center justify-center gap-2.5 px-6 h-12 bg-navy text-white rounded-xl font-black uppercase tracking-widest text-[10px] shadow-md tap-target"
+                  >
+                    <SlidersHorizontal size={14} /> <span>Filter Treasures</span>
+                  </button>
+                </div>
               </div>
 
               {activeFilters.length > 0 && (
@@ -176,90 +189,100 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
               )}
             </div>
 
-            {/* Grid */}
-            {isLoading && visibleCount === 12 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-2xl overflow-hidden border border-navy/5 shadow-lux animate-pulse h-[380px] relative">
-                    <div className="aspect-[4/3] bg-navy/5 relative overflow-hidden">
-                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
-                    </div>
-                    <div className="p-4 sm:p-5 space-y-3">
-                       <div className="h-6 bg-navy/5 rounded-lg w-3/4"></div>
-                       <div className="h-3 bg-navy/5 rounded-full w-1/4"></div>
-                       <div className="space-y-1.5 pt-2">
-                           <div className="h-3 bg-navy/5 rounded-full w-full"></div>
-                           <div className="h-3 bg-navy/5 rounded-full w-2/3"></div>
-                       </div>
-                       <div className="pt-4 flex justify-between border-t border-navy/5">
-                           <div className="h-8 bg-navy/5 rounded-lg w-16"></div>
-                           <div className="h-8 bg-navy/5 rounded-lg w-24"></div>
-                       </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : filteredPlaces.length > 0 ? (
-              <div className="space-y-12">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-                    {displayedPlaces.map((place, i) => (
-                    <motion.div
-                        key={place.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ delay: (i % 3) * 0.1 }}
-                        viewport={{ once: true }}
-                    >
-                        <PlaceCard 
-                          place={place} 
-                          onClick={onPlaceClick} 
-                          onSave={() => onSave(place.id)}
-                          isSaved={savedItemIds.includes(place.id)}
-                        />
-                    </motion.div>
+            {/* Grid & Map Split Container */}
+            <div className="flex flex-col lg:flex-row gap-8 items-start">
+              {/* Left Side: Results List */}
+              <div className="flex-1 w-full min-w-0">
+                {isLoading && visibleCount === 12 ? (
+                  <div className="flex flex-col">
+                    {[...Array(6)].map((_, i) => (
+                      <div key={i} className="flex flex-col sm:flex-row gap-4 sm:gap-6 py-5 border-b border-navy/10 animate-pulse w-full">
+                        <div className="w-full sm:w-32 md:w-40 aspect-[16/10] sm:aspect-[4/3] bg-navy/5 rounded-xl shrink-0" />
+                        <div className="flex-1 space-y-3 py-1">
+                          <div className="h-4 bg-navy/10 rounded-full w-1/3" />
+                          <div className="h-3 bg-navy/5 rounded-full w-1/4" />
+                          <div className="space-y-1.5 pt-2">
+                            <div className="h-3 bg-navy/5 rounded-full w-3/4" />
+                            <div className="h-3 bg-navy/5 rounded-full w-1/2" />
+                          </div>
+                        </div>
+                      </div>
                     ))}
-                </div>
-
-                {visibleCount < filteredPlaces.length && (
-                    <div className="flex flex-col items-center gap-4 py-8 border-t border-navy/5">
-                        <p className="text-[10px] font-bold text-navy/30 uppercase tracking-[0.2em]">
-                            You've revealed {displayedPlaces.length} of {filteredPlaces.length} gems
-                        </p>
-                        <button 
-                            onClick={handleLoadMore}
-                            disabled={isLoading}
-                            className="group h-12 px-10 bg-white hover:bg-navy text-navy hover:text-white border-2 border-navy rounded-full font-black uppercase tracking-[0.3em] text-[10px] sm:text-[11px] transition-all flex items-center justify-center gap-3 shadow-lux active:scale-95 disabled:opacity-50"
+                  </div>
+                ) : filteredPlaces.length > 0 ? (
+                  <div className="space-y-8">
+                    <div className="flex flex-col">
+                        {displayedPlaces.map((place, i) => (
+                        <motion.div
+                            key={place.id}
+                            initial={{ opacity: 0, y: 15 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ delay: (i % 4) * 0.05 }}
+                            viewport={{ once: true }}
                         >
-                            {isLoading ? <Loader2 className="animate-spin" size={16} /> : (
-                                <>Reveal More Wonders <div className="w-8 h-8 bg-navy/5 group-hover:bg-white/10 rounded-full flex items-center justify-center transition-colors"><LayoutGrid size={14} /></div></>
-                            )}
-                        </button>
+                            <PlaceCard 
+                              place={place} 
+                              layout="list"
+                              onClick={onPlaceClick} 
+                              onSave={() => onSave(place.id)}
+                              isSaved={savedItemIds.includes(place.id)}
+                            />
+                        </motion.div>
+                        ))}
                     </div>
+
+                    {visibleCount < filteredPlaces.length && (
+                        <div className="flex flex-col items-center gap-4 py-8 border-t border-navy/5">
+                            <p className="text-[10px] font-bold text-navy/30 uppercase tracking-[0.2em]">
+                                You've revealed {displayedPlaces.length} of {filteredPlaces.length} gems
+                            </p>
+                            <button 
+                                onClick={handleLoadMore}
+                                disabled={isLoading}
+                                className="group h-12 px-10 bg-white hover:bg-navy text-navy hover:text-white border-2 border-navy rounded-full font-black uppercase tracking-[0.3em] text-[10px] sm:text-[11px] transition-all flex items-center justify-center gap-3 shadow-lux active:scale-95 disabled:opacity-50 cursor-pointer"
+                            >
+                                {isLoading ? <Loader2 className="animate-spin" size={16} /> : (
+                                    <>Reveal More Wonders <div className="w-8 h-8 bg-navy/5 group-hover:bg-white/10 rounded-full flex items-center justify-center transition-colors"><LayoutGrid size={14} /></div></>
+                                )}
+                            </button>
+                        </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="py-16 md:py-24 flex flex-col items-center justify-center text-center space-y-6 bg-white rounded-2xl border border-dashed border-navy/10 px-6 animate-fade-in">
+                    <div className="w-16 h-16 bg-navy/5 rounded-full flex items-center justify-center text-navy/10">
+                      <Search size={32} />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-xl sm:text-2xl font-serif font-bold text-navy">No Treasures Found</h3>
+                      <p className="text-navy/40 max-w-sm mx-auto text-sm leading-relaxed">
+                        The wild spirit is vast, but it seems we couldn't find a match for your current filters. Broaden your horizons.
+                      </p>
+                    </div>
+                    <button 
+                        onClick={() => {
+                            setSearchQuery('');
+                            setSelectedCategory('ALL');
+                            setSelectedCity('');
+                        }}
+                        className="h-10 px-6 bg-navy text-white rounded-full font-black uppercase tracking-widest text-[10px] hover:bg-safari transition-all cursor-pointer"
+                    >
+                        Clear All Filters
+                    </button>
+                  </div>
                 )}
               </div>
-            ) : (
-              <div className="py-16 md:py-24 flex flex-col items-center justify-center text-center space-y-6 bg-white rounded-2xl border border-dashed border-navy/10 px-6">
-                <div className="w-16 h-16 bg-navy/5 rounded-full flex items-center justify-center text-navy/10">
-                  <Search size={32} />
+
+              {/* Right Side Sticky Map (Desktop) / Collapsible Map (Mobile) */}
+              {isMapExpanded && filteredPlaces.length > 0 && (
+                <div className="w-full lg:w-[420px] xl:w-[480px] lg:sticky lg:top-32 h-[50vh] sm:h-[60vh] lg:h-[70vh] shrink-0 rounded-3xl overflow-hidden shadow-lux border border-navy/5 order-first lg:order-last mb-8 lg:mb-0 transition-all duration-300">
+                  <DestinationMap 
+                    places={filteredPlaces}
+                    onPlaceClick={onPlaceClick}
+                  />
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-navy">No Treasures Found</h3>
-                  <p className="text-navy/40 max-w-sm mx-auto text-sm leading-relaxed">
-                    The wild spirit is vast, but it seems we couldn't find a match for your current filters. Broaden your horizons.
-                  </p>
-                </div>
-                <button 
-                    onClick={() => {
-                        setSearchQuery('');
-                        setSelectedCategory('ALL');
-                        setSelectedCity('');
-                    }}
-                    className="h-10 px-6 bg-navy text-white rounded-full font-black uppercase tracking-widest text-[10px] hover:bg-safari transition-all"
-                >
-                    Clear All Filters
-                </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

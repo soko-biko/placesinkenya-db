@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { MapPin, ChevronLeft, ChevronRight, Star, Search, Utensils, Tent, Building2, Ticket, Users } from 'lucide-react';
 import { Place, PlaceCategory } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
+import { Container } from './Container';
 
 interface HeroProps {
   onSearch: (val: string, category?: string) => void;
@@ -26,7 +27,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
   ];
 
   return (
-    <div className="relative min-h-screen md:h-[90vh] w-full overflow-hidden flex items-center justify-center pt-24 md:pt-40 pb-20">
+    <div className="relative min-h-[92vh] sm:min-h-screen md:h-[90vh] w-full overflow-hidden flex flex-col justify-between pt-24 md:pt-36">
       {/* Background - Single Image and Linear Gradient Blend */}
       <div className="absolute inset-0 z-0">
         <img 
@@ -37,12 +38,12 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/10 to-black/70" style={{ background: 'linear-gradient(160deg, rgba(0,0,0,0.55), rgba(0,0,0,0.2), rgba(0,0,0,0.7))' }}></div>
       </div>
 
-      <div className="relative z-10 text-center px-4 max-w-6xl mx-auto space-y-10 md:space-y-14">
-        <div className="space-y-6">
+      <div className="relative z-10 text-center px-4 max-w-6xl mx-auto space-y-8 md:space-y-12 flex-1 flex flex-col justify-center items-center py-6">
+        <div className="space-y-4 md:space-y-6">
           <motion.h1 
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="font-serif text-[clamp(2rem,6vw,3.5rem)] md:text-[clamp(3.5rem,8vw,5.5rem)] font-bold leading-[1.05] text-white tracking-tighter"
+            className="font-serif text-[clamp(2.2rem,6vw,3.5rem)] md:text-[clamp(3.5rem,8vw,5.5rem)] font-bold leading-[1.05] text-white tracking-tighter"
           >
             Experience the <br />
             <span className="text-safari italic">Majesty</span> of Kenya
@@ -57,7 +58,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
           </motion.p>
         </div>
 
-        <div className="space-y-8 w-full max-w-4xl mx-auto">
+        <div className="space-y-8 w-full max-w-4xl mx-auto shrink-0">
           {/* Main Search Bar - Rounded Pill Shape with Focus Shadow Glow */}
           <motion.form 
             initial={{ y: 30, opacity: 0 }}
@@ -90,26 +91,26 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
       </div>
 
       {/* Category Chips Scrollbar Custom Row — Frosted Deck Bottom Section */}
-      <div className="absolute bottom-0 left-0 right-0 bg-black/25 backdrop-blur-md border-t border-white/5 py-6 z-10">
-        <div className="max-w-7xl mx-auto px-6">
+      <div className="relative bg-black/40 backdrop-blur-md border-t border-white/5 py-5 sm:py-6 z-10 w-full shrink-0">
+        <Container>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="flex flex-wrap justify-center gap-3 md:gap-4 overflow-x-auto scrollbar-hide"
+            className="flex flex-wrap justify-center gap-2 md:gap-4 overflow-x-auto scrollbar-hide"
           >
             {categories.map((cat, i) => (
               <button
                 key={i}
                 onClick={() => onSearch('', cat.id)}
-                className="flex items-center gap-3 px-5 h-11 bg-white/5 hover:bg-navy border border-white/10 rounded-full text-white text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] transition-all hover:border-white/30 hover:scale-[1.03] active:scale-95 group tap-target whitespace-nowrap"
+                className="flex items-center gap-2 px-4 sm:px-5 h-10 sm:h-11 bg-white/5 hover:bg-navy border border-white/10 rounded-full text-white text-[9px] sm:text-[11px] font-black uppercase tracking-[0.15em] transition-all hover:border-white/30 hover:scale-[1.03] active:scale-95 group tap-target whitespace-nowrap"
               >
                 <span className="text-safari group-hover:scale-110 transition-transform">{cat.icon}</span>
                 {cat.label}
               </button>
             ))}
           </motion.div>
-        </div>
+        </Container>
       </div>
     </div>
   );
