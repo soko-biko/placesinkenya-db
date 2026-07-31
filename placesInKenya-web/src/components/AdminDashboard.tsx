@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { pendingProvidersService, providersService, placesService } from '../firebase/services';
 import { PendingProvider, TourOperator, Place } from '../types';
-import { ShieldCheck, MapPin, Plus, CheckCircle2, XCircle, Clock, Search, ChevronRight, BarChart3, Users, Settings } from 'lucide-react';
+import { ShieldCheck, MapPin, Plus, CheckCircle2, XCircle, Clock, Search, ChevronRight, BarChart3, Users, Settings, FileText, Eye, Paperclip } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export const AdminDashboard: React.FC = () => {
@@ -177,7 +177,7 @@ export const AdminDashboard: React.FC = () => {
                              <h3 className="text-2xl font-serif font-bold mb-2">{app.businessName || app.name}</h3>
                              <p className="text-white/50 text-sm leading-relaxed max-w-xl">{app.description || app.bio}</p>
                           </div>
-                          <div className="flex gap-12 pt-2">
+                          <div className="flex flex-wrap gap-8 pt-2">
                              <div>
                                 <p className="text-[9px] font-black uppercase tracking-widest text-white/20 mb-1">Base Price</p>
                                 <p className="text-white font-bold">Ksh {app.basePrice.toLocaleString()}</p>
@@ -187,6 +187,34 @@ export const AdminDashboard: React.FC = () => {
                                 <p className="text-white font-bold">{app.email} • {app.phone}</p>
                              </div>
                           </div>
+
+                          {/* Uploaded Verification Documents & PDF Assets */}
+                          {(app.documents?.attachedFiles && app.documents.attachedFiles.length > 0) && (
+                             <div className="pt-3 border-t border-white/5 space-y-2">
+                                <p className="text-[9px] font-black uppercase tracking-widest text-white/30 flex items-center gap-1.5">
+                                   <Paperclip size={12} className="text-safari" /> Uploaded Credentials & Verification Documents ({app.documents.attachedFiles.length})
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                   {app.documents.attachedFiles.map((file, idx) => (
+                                      <a
+                                        key={file.id || idx}
+                                        href={file.dataUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="px-3 py-1.5 bg-white/5 hover:bg-safari hover:text-white border border-white/10 rounded-xl text-xs font-medium text-white/80 transition-all flex items-center gap-2 group"
+                                      >
+                                         {file.type?.includes('pdf') ? (
+                                            <FileText size={14} className="text-red-400 group-hover:text-white" />
+                                         ) : (
+                                            <Eye size={14} className="text-safari group-hover:text-white" />
+                                         )}
+                                         <span className="truncate max-w-[160px]">{file.name}</span>
+                                         <span className="text-[8px] opacity-40 uppercase font-mono">{file.size}</span>
+                                      </a>
+                                   ))}
+                                </div>
+                             </div>
+                          )}
                        </div>
                        
                        <div className="flex items-center gap-4">

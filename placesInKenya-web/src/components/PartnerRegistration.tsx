@@ -16,7 +16,16 @@ import {
   Upload,
   Plus,
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  FileText,
+  File,
+  X,
+  Eye,
+  Download,
+  Trash2,
+  Paperclip,
+  Image as ImageIcon,
+  FileCheck
 } from 'lucide-react';
 import { db } from '../firebase/config';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -37,6 +46,15 @@ const REG_TYPES = [
   { id: 'CREATOR', label: 'Creator', icon: <Camera />, desc: 'Travel photographers & storytellers' }
 ];
 
+interface UploadedDocument {
+  id: string;
+  name: string;
+  size: string;
+  type: string;
+  dataUrl: string;
+  category: 'logo' | 'certificate' | 'supporting';
+}
+
 export const PartnerRegistration: React.FC = () => {
   const [step, setStep] = useState(0); // 0 is Landing, 1-3 are Form steps, 4 is Success
   const [type, setType] = useState<Registration['type'] | ''>('');
@@ -55,6 +73,12 @@ export const PartnerRegistration: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Uploaded Document States
+  const [logoDoc, setLogoDoc] = useState<UploadedDocument | null>(null);
+  const [certificateDoc, setCertificateDoc] = useState<UploadedDocument | null>(null);
+  const [galleryDocs, setGalleryDocs] = useState<UploadedDocument[]>([]);
+  const [eventDoc, setEventDoc] = useState<UploadedDocument | null>(null);
 
   const [isEventRegistration, setIsEventRegistration] = useState(false);
   const [eventFormData, setEventFormData] = useState({
@@ -82,6 +106,66 @@ export const PartnerRegistration: React.FC = () => {
 
   const nextStep = () => setStep(prev => prev + 1);
   const prevStep = () => setStep(prev => prev - 1);
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  };
+
+  const handleFileUpload = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    category: 'logo' | 'certificate' | 'supporting' | 'event'
+  ) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    Array.from(files).forEach((file: File) => {
+      const isImage = file.type.startsWith('image/');
+      const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
+      if (!isImage && !isPdf) {
+        alert(`File "${file.name}" is not a supported format. Please upload images (PNG, JPG, WEBP, SVG, etc.) or PDF files.`);
+        return;
+      }
+
+      if (file.size > 8 * 1024 * 1024) {
+        alert(`File "${file.name}" exceeds the maximum 8MB size limit.`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        const newDoc: UploadedDocument = {
+          id: Math.random().toString(36).substring(2, 9),
+          name: file.name,
+          size: formatFileSize(file.size),
+          type: file.type || (isPdf ? 'application/pdf' : 'image/png'),
+          dataUrl: result,
+          category: category === 'event' ? 'supporting' : category
+        };
+
+        if (category === 'logo') {
+          setLogoDoc(newDoc);
+        } else if (category === 'certificate') {
+          setCertificateDoc(newDoc);
+        } else if (category === 'supporting') {
+          setGalleryDocs(prev => [...prev, newDoc]);
+        } else if (category === 'event') {
+          setEventDoc(newDoc);
+          if (isImage) {
+            setEventFormData(prev => ({ ...prev, imageUrl: result }));
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    e.target.value = '';
+  };
 
   const handleTypeSelect = (selectedType: Registration['type']) => {
     setIsEventRegistration(false);
@@ -127,11 +211,11 @@ export const PartnerRegistration: React.FC = () => {
           totalCapacity: Number(eventFormData.totalCapacity) || 100,
           bookedCapacity: 0,
           organizer: {
-            logo: 'https://images.unsplash.com/photo-1533107862482-0e6974b06ef4',
+            logo: eventDoc && eventDoc.type.startsWith('image/') ? eventDoc.dataUrl : 'https://images.unsplash.com/photo-1533107862482-0e6974b06ef4',
             bio: eventFormData.organizerBio || 'Verified Host of Curated events',
             rating: 5.0
           },
-          gallery: [],
+          gallery: eventDoc && eventDoc.type.startsWith('image/') ? [eventDoc.dataUrl] : [],
           latitude: parseFloat(eventFormData.latitude) || null,
           longitude: parseFloat(eventFormData.longitude) || null,
           bookingLink: eventFormData.bookingLink || 'https://wa.me/254700000000'
@@ -143,6 +227,15 @@ export const PartnerRegistration: React.FC = () => {
           console.warn('Direct firestore events write failed. Saving registrations log and local storage backup.', e);
         }
 
+        const eventAttachedFiles = eventDoc ? [{
+          id: eventDoc.id,
+          name: eventDoc.name,
+          size: eventDoc.size,
+          type: eventDoc.type,
+          dataUrl: eventDoc.dataUrl,
+          category: eventDoc.category
+        }] : [];
+
         await addDoc(collection(db, 'registrations'), {
           type: 'EXPERIENCE',
           status: 'PENDING',
@@ -150,13 +243,16 @@ export const PartnerRegistration: React.FC = () => {
           businessName: eventFormData.providerName,
           email: 'event-partner@placesinkenya.com',
           phone: '+254700000000',
-          description: `curated Event listed: ${eventFormData.title}. Desc: ${eventFormData.description}`,
+          description: `Curated Event listed: ${eventFormData.title}. Desc: ${eventFormData.description}`,
           details: {
             latitude: parseFloat(eventFormData.latitude) || undefined,
             longitude: parseFloat(eventFormData.longitude) || undefined,
             bookingLink: eventFormData.bookingLink
           },
-          documents: { photos: [] }
+          documents: {
+            photos: eventFormData.imageUrl ? [eventFormData.imageUrl] : [],
+            attachedFiles: eventAttachedFiles
+          }
         });
 
         const existingLocal = localStorage.getItem('places_custom_events');
@@ -164,15 +260,36 @@ export const PartnerRegistration: React.FC = () => {
         localArr.unshift(eventData);
         localStorage.setItem('places_custom_events', JSON.stringify(localArr));
       } else {
+        const allAttachedFiles = [
+          ...(logoDoc ? [logoDoc] : []),
+          ...(certificateDoc ? [certificateDoc] : []),
+          ...galleryDocs
+        ];
+
+        const uploadedPhotos = [
+          ...(logoDoc && logoDoc.type.startsWith('image/') ? [logoDoc.dataUrl] : []),
+          ...galleryDocs.filter(d => d.type.startsWith('image/')).map(d => d.dataUrl)
+        ];
+
         const registrationData = {
           ...formData,
           type,
           status: 'PENDING',
           submittedAt: serverTimestamp(),
           documents: {
-            photos: [],
-            logoUrl: 'https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&q=80&w=200',
-            certificateUrl: '',
+            photos: uploadedPhotos,
+            logoUrl: logoDoc?.dataUrl || 'https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&q=80&w=200',
+            certificateUrl: certificateDoc?.dataUrl || '',
+            certificateName: certificateDoc?.name || '',
+            licenseUrl: certificateDoc?.dataUrl || '',
+            attachedFiles: allAttachedFiles.map(d => ({
+              id: d.id,
+              name: d.name,
+              size: d.size,
+              type: d.type,
+              dataUrl: d.dataUrl,
+              category: d.category
+            }))
           }
         };
 
@@ -185,7 +302,7 @@ export const PartnerRegistration: React.FC = () => {
           category: type === 'HOTEL' ? 'STAYS' : type === 'RESTAURANT' ? 'FOOD_DRINK' : 'ARTS_CULTURE',
           location: 'Kenya',
           description: formData.description || 'Verified Partner Venue',
-          imageUrl: 'https://images.unsplash.com/photo-1547448415-e9f5b28e570d',
+          imageUrl: logoDoc && logoDoc.type.startsWith('image/') ? logoDoc.dataUrl : 'https://images.unsplash.com/photo-1547448415-e9f5b28e570d',
           rating: 4.9,
           reviewsCount: 1,
           isTrending: false,
@@ -518,8 +635,39 @@ export const PartnerRegistration: React.FC = () => {
                            <input required type="text" value={eventFormData.bookingLink} onChange={(e) => setEventFormData(prev => ({ ...prev, bookingLink: e.target.value }))} placeholder="e.g. https://wa.me/254712345678" className="w-full h-18 bg-white border border-navy/5 rounded-3xl px-8 font-medium text-navy focus:ring-4 focus:ring-safari/10 outline-none transition-all tap-target" />
                         </div>
                         <div className="space-y-3">
-                           <label className="text-[10px] font-black uppercase tracking-widest text-navy/40 ml-4">Event Poster Image URL (Optional)</label>
-                           <input type="text" value={eventFormData.imageUrl} onChange={(e) => setEventFormData(prev => ({ ...prev, imageUrl: e.target.value }))} placeholder="https://unsplash.com/..." className="w-full h-18 bg-white border border-navy/5 rounded-3xl px-8 font-medium text-navy focus:ring-4 focus:ring-safari/10 outline-none transition-all tap-target" />
+                           <label className="text-[10px] font-black uppercase tracking-widest text-navy/40 ml-4 font-bold">Event Poster / Flyer Document (PDF or Images)</label>
+                           {eventDoc ? (
+                              <div className="bg-white border border-navy/10 rounded-3xl p-5 flex items-center justify-between gap-4 shadow-sm">
+                                 <div className="flex items-center gap-3.5 min-w-0">
+                                    {eventDoc.type.startsWith('image/') ? (
+                                       <img src={eventDoc.dataUrl} alt={eventDoc.name} className="w-12 h-12 object-cover rounded-xl shrink-0" />
+                                    ) : (
+                                       <div className="w-12 h-12 bg-red-500/10 text-red-500 rounded-xl flex items-center justify-center shrink-0">
+                                          <FileText size={22} />
+                                       </div>
+                                    )}
+                                    <div className="min-w-0">
+                                       <p className="font-bold text-navy text-xs truncate">{eventDoc.name}</p>
+                                       <span className="text-[9px] uppercase font-black tracking-widest text-navy/40">{eventDoc.size} • {eventDoc.type.includes('pdf') ? 'PDF Document' : 'Image Asset'}</span>
+                                    </div>
+                                 </div>
+                                 <div className="flex items-center gap-2 shrink-0">
+                                    <a href={eventDoc.dataUrl} target="_blank" rel="noopener noreferrer" className="p-2 text-navy/40 hover:text-safari transition-colors" title="View Document"><Eye size={16} /></a>
+                                    <button onClick={() => setEventDoc(null)} className="p-2 text-navy/40 hover:text-red-500 transition-colors" title="Remove"><Trash2 size={16} /></button>
+                                 </div>
+                              </div>
+                           ) : (
+                              <label className="h-28 rounded-3xl border-2 border-dashed border-navy/10 bg-white hover:border-safari/50 hover:bg-safari/5 flex items-center justify-center gap-4 px-6 cursor-pointer transition-all group">
+                                 <input type="file" accept="image/*,.pdf,application/pdf" onChange={(e) => handleFileUpload(e, 'event')} className="hidden" />
+                                 <div className="w-10 h-10 bg-navy/5 text-navy/30 group-hover:bg-safari group-hover:text-white rounded-full flex items-center justify-center transition-colors">
+                                    <Upload size={18} />
+                                 </div>
+                                 <div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-navy">Upload Event Poster / Flyer (PDF or Images)</p>
+                                    <p className="text-[9px] text-navy/30 font-medium">Supports all PDF documents and PNG, JPG, WEBP images up to 8MB</p>
+                                 </div>
+                              </label>
+                           )}
                         </div>
                         <div className="space-y-3">
                            <label className="text-[10px] font-black uppercase tracking-widest text-navy/40 ml-4 font-bold">Host Bio-Editorial</label>
@@ -813,16 +961,131 @@ export const PartnerRegistration: React.FC = () => {
                      )}
 
                      <div className="space-y-6 text-left">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-navy/40 ml-4">Asset Uploads (Certification & Gallery)</label>
+                        <div>
+                           <label className="text-[10px] font-black uppercase tracking-widest text-navy/40 ml-4">Verification Assets & Documents (Images & PDF)</label>
+                           <p className="text-navy/30 text-xs ml-4 mt-1">Upload enterprise credentials, official licences, brand logos, or media photos. Accepts all image formats and PDF files.</p>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                           <div className="h-48 rounded-[40px] border-2 border-dashed border-navy/5 bg-white flex flex-col items-center justify-center space-y-4 cursor-pointer hover:border-safari/40 transition-all group">
-                              <div className="w-12 h-12 bg-navy/5 text-navy/20 rounded-full flex items-center justify-center group-hover:bg-safari group-hover:text-white transition-colors"><Upload size={20} /></div>
-                              <p className="text-[10px] font-black uppercase tracking-widest text-navy/30">Logo / Profile Photo</p>
+                           {/* Logo / Profile Upload */}
+                           <div className="space-y-2">
+                              <span className="text-[9px] font-black uppercase tracking-widest text-navy/40 ml-2">Logo or Profile Photo</span>
+                              {logoDoc ? (
+                                 <div className="h-44 rounded-[32px] border border-navy/10 bg-white p-5 flex flex-col justify-between shadow-sm relative overflow-hidden group">
+                                    <div className="flex items-center gap-4">
+                                       {logoDoc.type.startsWith('image/') ? (
+                                          <img src={logoDoc.dataUrl} alt={logoDoc.name} className="w-14 h-14 object-cover rounded-2xl border border-navy/10" />
+                                       ) : (
+                                          <div className="w-14 h-14 bg-safari/10 text-safari rounded-2xl flex items-center justify-center shrink-0">
+                                             <FileText size={24} />
+                                          </div>
+                                       )}
+                                       <div className="min-w-0 flex-1">
+                                          <p className="font-bold text-navy text-xs truncate">{logoDoc.name}</p>
+                                          <span className="text-[9px] font-black uppercase tracking-widest text-navy/40 block mt-0.5">{logoDoc.size} • {logoDoc.type.includes('pdf') ? 'PDF Document' : 'Image'}</span>
+                                       </div>
+                                    </div>
+                                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-navy/5">
+                                       <a href={logoDoc.dataUrl} target="_blank" rel="noopener noreferrer" className="h-8 px-3 bg-navy/5 hover:bg-safari hover:text-white text-navy text-[9px] font-bold rounded-full flex items-center gap-1 transition-colors">
+                                          <Eye size={12} /> <span>View</span>
+                                       </a>
+                                       <button onClick={() => setLogoDoc(null)} className="h-8 px-3 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-500 text-[9px] font-bold rounded-full flex items-center gap-1 transition-colors">
+                                          <Trash2 size={12} /> <span>Remove</span>
+                                       </button>
+                                    </div>
+                                 </div>
+                              ) : (
+                                 <label className="h-44 rounded-[32px] border-2 border-dashed border-navy/10 bg-white hover:border-safari/50 hover:bg-safari/5 flex flex-col items-center justify-center p-6 space-y-3 cursor-pointer transition-all group text-center">
+                                    <input type="file" accept="image/*,.pdf,application/pdf" onChange={(e) => handleFileUpload(e, 'logo')} className="hidden" />
+                                    <div className="w-12 h-12 bg-navy/5 text-navy/20 rounded-full flex items-center justify-center group-hover:bg-safari group-hover:text-white transition-colors">
+                                       <Upload size={20} />
+                                    </div>
+                                    <div>
+                                       <p className="text-[10px] font-black uppercase tracking-widest text-navy">Upload Logo / Avatar</p>
+                                       <p className="text-[9px] font-medium text-navy/30 mt-0.5">PNG, JPG, WEBP, SVG or PDF</p>
+                                    </div>
+                                 </label>
+                              )}
                            </div>
-                           <div className="h-48 rounded-[40px] border-2 border-dashed border-navy/5 bg-white flex flex-col items-center justify-center space-y-4 cursor-pointer hover:border-safari/40 transition-all group">
-                              <div className="w-12 h-12 bg-navy/5 text-navy/20 rounded-full flex items-center justify-center group-hover:bg-safari group-hover:text-white transition-colors"><ShieldCheck size={20} /></div>
-                              <p className="text-[10px] font-black uppercase tracking-widest text-navy/30">License / Certificate PDF</p>
+
+                           {/* License / Certificate Upload */}
+                           <div className="space-y-2">
+                              <span className="text-[9px] font-black uppercase tracking-widest text-navy/40 ml-2">License or Certificate Document</span>
+                              {certificateDoc ? (
+                                 <div className="h-44 rounded-[32px] border border-navy/10 bg-white p-5 flex flex-col justify-between shadow-sm relative overflow-hidden group">
+                                    <div className="flex items-center gap-4">
+                                       {certificateDoc.type.startsWith('image/') ? (
+                                          <img src={certificateDoc.dataUrl} alt={certificateDoc.name} className="w-14 h-14 object-cover rounded-2xl border border-navy/10" />
+                                       ) : (
+                                          <div className="w-14 h-14 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center shrink-0">
+                                             <FileText size={24} />
+                                          </div>
+                                       )}
+                                       <div className="min-w-0 flex-1">
+                                          <p className="font-bold text-navy text-xs truncate">{certificateDoc.name}</p>
+                                          <span className="text-[9px] font-black uppercase tracking-widest text-navy/40 block mt-0.5">{certificateDoc.size} • {certificateDoc.type.includes('pdf') ? 'PDF Document' : 'Image'}</span>
+                                       </div>
+                                    </div>
+                                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-navy/5">
+                                       <a href={certificateDoc.dataUrl} target="_blank" rel="noopener noreferrer" className="h-8 px-3 bg-navy/5 hover:bg-safari hover:text-white text-navy text-[9px] font-bold rounded-full flex items-center gap-1 transition-colors">
+                                          <Eye size={12} /> <span>View Document</span>
+                                       </a>
+                                       <button onClick={() => setCertificateDoc(null)} className="h-8 px-3 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-500 text-[9px] font-bold rounded-full flex items-center gap-1 transition-colors">
+                                          <Trash2 size={12} /> <span>Remove</span>
+                                       </button>
+                                    </div>
+                                 </div>
+                              ) : (
+                                 <label className="h-44 rounded-[32px] border-2 border-dashed border-navy/10 bg-white hover:border-safari/50 hover:bg-safari/5 flex flex-col items-center justify-center p-6 space-y-3 cursor-pointer transition-all group text-center">
+                                    <input type="file" accept="image/*,.pdf,application/pdf" onChange={(e) => handleFileUpload(e, 'certificate')} className="hidden" />
+                                    <div className="w-12 h-12 bg-navy/5 text-navy/20 rounded-full flex items-center justify-center group-hover:bg-safari group-hover:text-white transition-colors">
+                                       <ShieldCheck size={20} />
+                                    </div>
+                                    <div>
+                                       <p className="text-[10px] font-black uppercase tracking-widest text-navy">Upload License / Certificate PDF</p>
+                                       <p className="text-[9px] font-medium text-navy/30 mt-0.5">KRA PIN, TRA License, or Permit (PDF & Images)</p>
+                                    </div>
+                                 </label>
+                              )}
                            </div>
+                        </div>
+
+                        {/* Additional Gallery / Supporting Documents */}
+                        <div className="space-y-3 pt-2">
+                           <div className="flex items-center justify-between">
+                              <span className="text-[9px] font-black uppercase tracking-widest text-navy/40 ml-2">Additional Supporting Documents & Media</span>
+                              <label className="h-8 px-4 bg-navy/5 hover:bg-navy text-navy hover:text-white rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 cursor-pointer transition-all">
+                                 <input type="file" accept="image/*,.pdf,application/pdf" multiple onChange={(e) => handleFileUpload(e, 'supporting')} className="hidden" />
+                                 <Plus size={12} /> <span>Attach More Files</span>
+                              </label>
+                           </div>
+
+                           {galleryDocs.length > 0 ? (
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                 {galleryDocs.map((doc) => (
+                                    <div key={doc.id} className="bg-white border border-navy/5 rounded-2xl p-3.5 flex items-center justify-between gap-3 shadow-sm">
+                                       <div className="flex items-center gap-3 min-w-0">
+                                          {doc.type.startsWith('image/') ? (
+                                             <img src={doc.dataUrl} alt={doc.name} className="w-10 h-10 object-cover rounded-xl shrink-0" />
+                                          ) : (
+                                             <div className="w-10 h-10 bg-navy/5 text-navy/40 rounded-xl flex items-center justify-center shrink-0">
+                                                <FileText size={18} />
+                                             </div>
+                                          )}
+                                          <div className="min-w-0">
+                                             <p className="font-bold text-navy text-xs truncate">{doc.name}</p>
+                                             <span className="text-[9px] font-medium text-navy/30 block">{doc.size} • {doc.type.includes('pdf') ? 'PDF Document' : 'Image Asset'}</span>
+                                          </div>
+                                       </div>
+                                       <div className="flex items-center gap-1 shrink-0">
+                                          <a href={doc.dataUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 text-navy/30 hover:text-safari transition-colors"><Eye size={14} /></a>
+                                          <button onClick={() => setGalleryDocs(prev => prev.filter(d => d.id !== doc.id))} className="p-1.5 text-navy/30 hover:text-red-500 transition-colors"><Trash2 size={14} /></button>
+                                       </div>
+                                    </div>
+                                 ))}
+                              </div>
+                           ) : (
+                              <p className="text-[10px] text-navy/30 italic ml-4">No additional files attached yet. You can attach supporting brochures, additional photos, or ID documents above.</p>
+                           )}
                         </div>
                      </div>
 
@@ -877,6 +1140,52 @@ export const PartnerRegistration: React.FC = () => {
                                 <p className="text-sm text-navy/60">Lat: {formData.details.latitude}, Lon: {formData.details.longitude}</p>
                              </div>
                            )}
+
+                           {/* Attached Verification Documents Summary */}
+                           <div className="space-y-3 col-span-1 pt-4 border-t border-navy/5">
+                              <p className="text-[9px] font-black uppercase tracking-widest text-navy/20">Attached Verification Documents & Media</p>
+                              {(logoDoc || certificateDoc || galleryDocs.length > 0) ? (
+                                 <div className="flex flex-wrap gap-3 pt-1">
+                                    {logoDoc && (
+                                       <div className="px-3.5 py-2 bg-navy/5 border border-navy/10 rounded-2xl flex items-center gap-2.5">
+                                          {logoDoc.type.startsWith('image/') ? (
+                                             <img src={logoDoc.dataUrl} alt={logoDoc.name} className="w-6 h-6 object-cover rounded-lg" />
+                                          ) : (
+                                             <FileText size={14} className="text-safari" />
+                                          )}
+                                          <div>
+                                             <p className="text-[10px] font-bold text-navy truncate max-w-[140px]">{logoDoc.name}</p>
+                                             <span className="text-[8px] font-black uppercase tracking-wider text-navy/40">Logo Asset</span>
+                                          </div>
+                                       </div>
+                                    )}
+                                    {certificateDoc && (
+                                       <div className="px-3.5 py-2 bg-navy/5 border border-navy/10 rounded-2xl flex items-center gap-2.5">
+                                          <ShieldCheck size={16} className="text-safari shrink-0" />
+                                          <div>
+                                             <p className="text-[10px] font-bold text-navy truncate max-w-[140px]">{certificateDoc.name}</p>
+                                             <span className="text-[8px] font-black uppercase tracking-wider text-navy/40">License / Permit</span>
+                                          </div>
+                                       </div>
+                                    )}
+                                    {galleryDocs.map(doc => (
+                                       <div key={doc.id} className="px-3.5 py-2 bg-navy/5 border border-navy/10 rounded-2xl flex items-center gap-2.5">
+                                          {doc.type.startsWith('image/') ? (
+                                             <img src={doc.dataUrl} alt={doc.name} className="w-6 h-6 object-cover rounded-lg" />
+                                          ) : (
+                                             <FileText size={14} className="text-navy/50" />
+                                          )}
+                                          <div>
+                                             <p className="text-[10px] font-bold text-navy truncate max-w-[120px]">{doc.name}</p>
+                                             <span className="text-[8px] font-black uppercase tracking-wider text-navy/40">{doc.type.includes('pdf') ? 'PDF Doc' : 'Image'}</span>
+                                          </div>
+                                       </div>
+                                    ))}
+                                 </div>
+                              ) : (
+                                 <p className="text-xs text-navy/40 italic">No verification documents uploaded. You can go back to Curation step to attach licences or logos.</p>
+                              )}
+                           </div>
                         </div>
                      </div>
 

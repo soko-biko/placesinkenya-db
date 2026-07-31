@@ -173,5 +173,19 @@ export interface PendingProvider {
   basePrice: number;
   email: string;
   phone: string;
+  documents?: {
+    logoUrl?: string;
+    certificateUrl?: string;
+    certificateName?: string;
+    photos?: string[];
+    attachedFiles?: Array<{
+      id: string;
+      name: string;
+      size: string;
+      type: string;
+      dataUrl: string;
+      category?: string;
+    }>;
+  };
 }
 
