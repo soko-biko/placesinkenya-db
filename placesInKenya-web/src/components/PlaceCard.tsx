@@ -17,6 +17,7 @@ export const PlaceCard: React.FC<PlaceCardProps> = React.memo(({ place, onClick,
     switch (category) {
       case PlaceCategory.RESTAURANT: return 'Reserve Table';
       case PlaceCategory.HOTEL: return 'Book Now';
+      case PlaceCategory.SHOPPING: return 'Visit Store';
       case PlaceCategory.SAFARI:
       case PlaceCategory.EXPERIENCE:
       case PlaceCategory.ADVENTURES: return 'Book Now';

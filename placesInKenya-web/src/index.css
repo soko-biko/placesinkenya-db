@@ -66,33 +66,33 @@
   --radius-card: var(--radius-card);
   --radius-button: var(--radius-button);
 
-  @keyframes scroll {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
-  @keyframes shimmer {
-    0% { background-position: -1000px 0; }
-    100% { background-position: 1000px 0; }
-  }
-  @keyframes bounce-slow {
-    0%, 100% { transform: translateY(-10%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
-    50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); }
-  }
-  @keyframes slide-up {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-  }
-  @keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
   --animate-scroll: scroll 40s linear infinite;
   --animate-marquee: scroll 50s linear infinite;
   --animate-bounce-slow: bounce-slow 3s infinite;
   --animate-shimmer: shimmer 2s infinite linear;
   --animate-slide-up: slide-up 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   --animate-fade-in: fade-in 0.3s ease-out;
+}
+
+@keyframes scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(-10%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
+  50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); }
+}
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @utility pause-marquee {

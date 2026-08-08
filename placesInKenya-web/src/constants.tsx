@@ -136,6 +136,51 @@ export const MOCK_PLACES: Place[] = [
     tags: ['Adventure', 'Rafting', 'Extreme'],
     ownerId: 'admin',
     bookingLink: 'https://savagewilderness.org/rafting'
+  },
+  {
+    id: 's1',
+    name: 'Two Rivers Mall & Retail Hub',
+    category: PlaceCategory.SHOPPING,
+    description: 'East Africa\'s premier shopping and entertainment destination with international retail stores, hypermarkets, and fashion boutiques.',
+    price: 0,
+    location: 'Ruaka, Nairobi',
+    imageUrl: 'https://images.unsplash.com/photo-1567449303078-57ad995bd301',
+    rating: 4.8,
+    isTrending: true,
+    isVerified: true,
+    tags: ['Shopping Mall', 'Retail', 'Supermarket', 'Fashion'],
+    ownerId: 'admin',
+    bookingLink: 'https://tworivers.co.ke'
+  },
+  {
+    id: 's2',
+    name: 'Maasai Artisan Market',
+    category: PlaceCategory.SHOPPING,
+    description: 'World-famous open-air artisan craft market featuring authentic hand-carved woodwork, beaded jewelry, Kente & Kanga textiles, and souvenirs.',
+    price: 500,
+    location: 'CBD, Nairobi',
+    imageUrl: 'https://images.unsplash.com/photo-1511556532299-8f662fc26c06',
+    rating: 4.9,
+    isTrending: true,
+    isVerified: true,
+    tags: ['Souvenirs', 'Artisan Crafts', 'African Art', 'Local Market'],
+    ownerId: 'admin',
+    bookingLink: 'https://wa.me/254700888999'
+  },
+  {
+    id: 's3',
+    name: 'The Village Market Mall & Stores',
+    category: PlaceCategory.SHOPPING,
+    description: 'Open-air Mediterranean style shopping complex with boutique stores, Carrefour supermarket, craft shops, and gourmet food stalls.',
+    price: 0,
+    location: 'Gigiri, Nairobi',
+    imageUrl: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8',
+    rating: 4.7,
+    isTrending: false,
+    isVerified: true,
+    tags: ['Boutique', 'Supermarket', 'Luxury Shopping'],
+    ownerId: 'admin',
+    bookingLink: 'https://villagemarket-kenya.com'
   }
 ];
 

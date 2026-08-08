@@ -7,7 +7,8 @@ export enum PlaceCategory {
   SAFARI = 'SAFARI',
   ADVENTURES = 'ADVENTURES',
   HOTEL = 'HOTEL',
-  EXPERIENCE = 'EXPERIENCE'
+  EXPERIENCE = 'EXPERIENCE',
+  SHOPPING = 'SHOPPING'
 }
 
 export enum OperatorType {
@@ -127,7 +128,7 @@ export interface Rating {
 
 export interface Registration {
   id?: string;
-  type: 'OPERATOR' | 'GUIDE' | 'RESTAURANT' | 'HOTEL' | 'EXPERIENCE' | 'CREATOR';
+  type: 'OPERATOR' | 'GUIDE' | 'RESTAURANT' | 'HOTEL' | 'EXPERIENCE' | 'CREATOR' | 'SHOPPING';
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'MORE_INFO_NEEDED';
   submittedAt: any; // Firestore Timestamp or Date
   businessName: string;
@@ -187,5 +188,23 @@ export interface PendingProvider {
       category?: string;
     }>;
   };
+}
+
+export interface SiteSettings {
+  heroTitle: string;
+  heroTitleHighlight: string;
+  heroSubtitle: string;
+  heroBgImage: string;
+  heroSearchPlaceholder: string;
+  eventsTitle: string;
+  eventsSubtitle: string;
+  eventsBgImage: string;
+  partnerTitle: string;
+  partnerSubtitle: string;
+  partnerBgImage: string;
+  siteName: string;
+  siteTagline: string;
+  contactEmail: string;
+  contactPhone: string;
 }
 

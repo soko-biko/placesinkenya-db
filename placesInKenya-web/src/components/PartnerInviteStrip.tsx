@@ -2,15 +2,23 @@ import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Container } from './Container';
+import { useSiteSettings } from '../hooks/useFirestore';
 
 interface PartnerInviteStripProps {
   onPartnerClick: () => void;
 }
 
 export const PartnerInviteStrip: React.FC<PartnerInviteStripProps> = ({ onPartnerClick }) => {
+  const { settings } = useSiteSettings();
+
   return (
-    <section className="bg-navy py-12 border-y border-white/5 overflow-hidden">
-      <Container className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-16">
+    <section className="bg-navy py-12 border-y border-white/5 overflow-hidden relative">
+      {settings.partnerBgImage && (
+        <div className="absolute inset-0 z-0 opacity-15 pointer-events-none">
+          <img src={settings.partnerBgImage} alt="" className="w-full h-full object-cover" />
+        </div>
+      )}
+      <Container className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-16 relative z-10">
         <div className="flex-1 space-y-4 text-center md:text-left">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -26,8 +34,8 @@ export const PartnerInviteStrip: React.FC<PartnerInviteStripProps> = ({ onPartne
             transition={{ delay: 0.1 }}
             className="text-2xl md:text-4xl font-serif font-bold text-white leading-tight"
           >
-            Own a business in Kenya? <br className="hidden md:block" />
-            <span className="text-white/40">Join our elite collective.</span>
+            {settings.partnerTitle || "Own a business in Kenya?"} <br className="hidden md:block" />
+            <span className="text-white/40">{settings.partnerSubtitle || "Join our elite collective."}</span>
           </motion.h2>
         </div>
 
@@ -38,7 +46,7 @@ export const PartnerInviteStrip: React.FC<PartnerInviteStripProps> = ({ onPartne
         >
           <button 
             onClick={onPartnerClick}
-            className="group relative h-12 bg-white text-navy px-8 rounded-full font-black uppercase tracking-[0.2em] text-[10px] md:text-xs transition-all shadow-2xl active:scale-95 overflow-hidden flex items-center gap-4"
+            className="group relative h-12 bg-white text-navy px-8 rounded-full font-black uppercase tracking-[0.2em] text-[10px] md:text-xs transition-all shadow-2xl active:scale-95 overflow-hidden flex items-center gap-4 cursor-pointer"
           >
             <div className="absolute inset-0 bg-safari translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-in-out" />
             <span className="relative z-10 group-hover:text-white transition-colors duration-300">Become a Partner</span>
@@ -49,3 +57,4 @@ export const PartnerInviteStrip: React.FC<PartnerInviteStripProps> = ({ onPartne
     </section>
   );
 };
+

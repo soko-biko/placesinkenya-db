@@ -7,7 +7,7 @@ import { LOGO, MOCK_PLACES, MOCK_OPERATORS, MOCK_EVENTS } from './constants';
 import { Place, TourOperator, SavedItem, PlaceCategory, Event, Rating } from './types';
 import { X, Mail, Lock, ShieldCheck, Plus, AlertCircle, CheckCircle2, MapPin, Star, Calendar, ArrowRight, ChevronRight, Search, ChevronDown } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
-import { usePlaces, useTrendingPlaces, useOperators } from './hooks/useFirestore';
+import { usePlaces, useTrendingPlaces, useOperators, useEvents } from './hooks/useFirestore';
 import { motion, AnimatePresence } from 'motion/react';
 
 // Lazy Components
@@ -78,6 +78,7 @@ const App: React.FC = () => {
   const { places, loading: placesLoading } = usePlaces();
   const { places: trendingPlaces, loading: trendingLoading } = useTrendingPlaces();
   const { operators, loading: operatorsLoading } = useOperators();
+  const { events: firestoreEvents } = useEvents();
 
   const [customEvents, setCustomEvents] = useState<Event[]>([]);
   const [customPlaces, setCustomPlaces] = useState<Place[]>([]);
@@ -190,11 +191,20 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const mergedEvents = [...customEvents, ...MOCK_EVENTS];
+  const rawEvents = [...firestoreEvents, ...customEvents, ...MOCK_EVENTS];
+  const mergedEvents = rawEvents.filter((ev, idx, self) => self.findIndex(e => e.id === ev.id) === idx);
 
-  const allDisplayPlaces = [...customPlaces, ...(places.length > 0 ? places : MOCK_PLACES)];
+  const rawPlaces = [...customPlaces, ...places];
+  MOCK_PLACES.forEach(mp => {
+    if (!rawPlaces.some(p => p.id === mp.id)) rawPlaces.push(mp);
+  });
+  const allDisplayPlaces = rawPlaces;
 
-  const displayOperators = (operators.length > 0 ? operators : MOCK_OPERATORS);
+  const rawOperators = [...operators];
+  MOCK_OPERATORS.forEach(mo => {
+    if (!rawOperators.some(o => o.id === mo.id)) rawOperators.push(mo);
+  });
+  const displayOperators = rawOperators;
   const filteredOperators = operatorFilter.length > 0 
     ? displayOperators.filter(o => o.specialties?.some(s => operatorFilter.includes(s)))
     : displayOperators;
@@ -345,6 +355,8 @@ const App: React.FC = () => {
         );
       case 'partner-registration':
         return <PartnerRegistration />;
+      case 'admin':
+        return <AdminDashboard />;
       default:
         return null;
     }

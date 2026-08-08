@@ -4,6 +4,7 @@ import { MapPin, ChevronLeft, ChevronRight, Star, Search, Utensils, Tent, Buildi
 import { Place, PlaceCategory } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import { Container } from './Container';
+import { useSiteSettings } from '../hooks/useFirestore';
 
 interface HeroProps {
   onSearch: (val: string, category?: string) => void;
@@ -12,6 +13,7 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
   const [val, setVal] = useState('');
+  const { settings } = useSiteSettings();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,9 +33,9 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
       {/* Background - Single Image and Linear Gradient Blend */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1516426122078-c23e76319801" 
+          src={settings.heroBgImage || "https://images.unsplash.com/photo-1516426122078-c23e76319801"} 
           alt="Kenyan Safari" 
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-all duration-700"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/10 to-black/70" style={{ background: 'linear-gradient(160deg, rgba(0,0,0,0.55), rgba(0,0,0,0.2), rgba(0,0,0,0.7))' }}></div>
       </div>
@@ -45,8 +47,8 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
             animate={{ y: 0, opacity: 1 }}
             className="font-serif text-[clamp(2.2rem,6vw,3.5rem)] md:text-[clamp(3.5rem,8vw,5.5rem)] font-bold leading-[1.05] text-white tracking-tighter"
           >
-            Experience the <br />
-            <span className="text-safari italic">Majesty</span> of Kenya
+            {settings.heroTitle} <br />
+            <span className="text-safari italic">{settings.heroTitleHighlight}</span> of Kenya
           </motion.h1>
           <motion.p 
             initial={{ y: 30, opacity: 0 }}
@@ -54,7 +56,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
             transition={{ delay: 0.1 }}
             className="font-sans text-[clamp(0.9rem,2.2vw,1.125rem)] text-white/85 max-w-2xl mx-auto font-light leading-relaxed"
           >
-            A curated collective of the most authentic destinations in the heart of Africa.
+            {settings.heroSubtitle}
           </motion.p>
         </div>
 
@@ -75,9 +77,10 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
               type="text"
               value={val}
               onChange={(e) => setVal(e.target.value)}
-              placeholder="Where will your spirit wander?"
+              placeholder={settings.heroSearchPlaceholder || "Where will your spirit wander?"}
               className="absolute inset-0 bg-transparent pl-16 pr-32 md:pr-40 text-white group-focus-within:text-navy text-base md:text-lg font-medium outline-none placeholder:text-white/60 group-focus-within:placeholder:text-navy/45 tap-target text-left"
             />
+
             <div className="absolute inset-y-2 right-2 flex items-center">
               <button 
                 type="submit"

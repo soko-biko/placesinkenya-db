@@ -4,12 +4,14 @@ import { Event } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import { EventDetailModal } from './EventDetailModal';
 import { Container } from './Container';
+import { useSiteSettings } from '../hooks/useFirestore';
 
 interface WhereToGoProps {
   events: Event[];
   onAddToTrip: (event: Event) => void;
   savedItemIds: string[];
 }
+
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -21,6 +23,8 @@ const DAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, savedItemIds }) => {
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const { settings } = useSiteSettings();
+
 
   // Initialize selectedDate to today
   const [selectedDate, setSelectedDate] = useState<Date>(() => {
@@ -133,8 +137,8 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
       <section className="relative pt-28 sm:pt-32 pb-12 sm:pb-16 bg-navy overflow-hidden">
         <div id="events-header-bg" className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1547448415-e9f5b28e570d"
-            className="w-full h-full object-cover opacity-20 grayscale mix-blend-overlay"
+            src={settings.eventsBgImage || "https://images.unsplash.com/photo-1547448415-e9f5b28e570d"}
+            className="w-full h-full object-cover opacity-20 grayscale mix-blend-overlay transition-all duration-700"
             alt="Scenic Landscape"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-navy/60 via-navy to-navy"></div>
@@ -154,7 +158,7 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
             transition={{ delay: 0.1 }}
             className="text-3xl sm:text-5xl md:text-7xl font-serif font-bold text-white tracking-tight leading-tight"
           >
-            Ways to <span className="italic text-safari font-light">Experience</span> Kenya
+            {settings.eventsTitle || "Ways to Experience Kenya"}
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0 }} 
@@ -162,10 +166,11 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
             transition={{ delay: 0.2 }}
             className="text-white/40 max-w-2xl mx-auto text-sm sm:text-base font-light italic line-clamp-1"
           >
-            A sequence of scheduled prestige events, from athletic safaris to jazz festivals in the city.
+            {settings.eventsSubtitle || "A sequence of scheduled prestige events, from athletic safaris to jazz festivals in the city."}
           </motion.p>
         </div>
       </section>
+
 
       {/* Main Dual-Panel Layout Container */}
       <Container className="py-10 md:py-14 space-y-8" id="events-main">

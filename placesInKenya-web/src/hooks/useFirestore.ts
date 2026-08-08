@@ -2,13 +2,49 @@
 import { useState, useEffect } from 'react';
 import { 
   collection, 
+  doc,
   query, 
   where, 
   orderBy, 
   onSnapshot
 } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
-import { Place, TourOperator, Itinerary } from '../types';
+import { Place, TourOperator, Itinerary, Event, SiteSettings } from '../types';
+import { DEFAULT_SITE_SETTINGS } from '../firebase/services';
+
+export const useSiteSettings = () => {
+  const [settings, setSettings] = useState<SiteSettings>(() => {
+    const cached = localStorage.getItem('places_site_settings');
+    if (cached) {
+      try { return { ...DEFAULT_SITE_SETTINGS, ...JSON.parse(cached) }; } catch (e) {}
+    }
+    return DEFAULT_SITE_SETTINGS;
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const docRef = doc(db, 'site_config', 'main');
+    const unsubscribe = onSnapshot(docRef, 
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data() as SiteSettings;
+          const merged = { ...DEFAULT_SITE_SETTINGS, ...data };
+          setSettings(merged);
+          localStorage.setItem('places_site_settings', JSON.stringify(merged));
+        }
+        setLoading(false);
+      },
+      () => {
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  return { settings, loading };
+};
+
 
 enum OperationType {
   CREATE = 'create',
@@ -195,4 +231,32 @@ export const useItineraries = (userId: string | undefined) => {
   }, [userId]);
 
   return { itineraries, loading };
+};
+
+export const useEvents = () => {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const q = query(collection(db, 'events'), orderBy('date', 'asc'));
+
+    const unsubscribe = onSnapshot(q, 
+      (snapshot) => {
+        const data = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        } as Event));
+        setEvents(data);
+        setLoading(false);
+      },
+      (err) => {
+        handleFirestoreError(err, OperationType.GET, 'events');
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  return { events, loading };
 };

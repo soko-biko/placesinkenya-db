@@ -88,8 +88,9 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
       <CatalogueHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
       {/* Main Content Area */}
-      <div className="w-full max-w-7xl mx-auto px-6 sm:px-6 py-12 flex-1">
-        <div className="flex flex-col lg:flex-row gap-12">
+      <div className={`w-full ${isMapExpanded ? 'max-w-[1920px] px-4 sm:px-6 xl:px-8' : 'max-w-7xl mx-auto px-6 sm:px-6'} py-12 flex-1 transition-all duration-300`}>
+        <div className="flex flex-col lg:flex-row gap-8 xl:gap-10">
+
           {/* Desktop Sidebar (Sticky) */}
           <aside className="hidden lg:block w-80 shrink-0 sticky top-32 h-fit">
             <FilterPanel 
@@ -275,13 +276,14 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
 
               {/* Right Side Sticky Map (Desktop) / Collapsible Map (Mobile) */}
               {isMapExpanded && filteredPlaces.length > 0 && (
-                <div className="w-full lg:w-[420px] xl:w-[480px] lg:sticky lg:top-32 h-[50vh] sm:h-[60vh] lg:h-[70vh] shrink-0 rounded-3xl overflow-hidden shadow-lux border border-navy/5 order-first lg:order-last mb-8 lg:mb-0 transition-all duration-300">
+                <div className="w-full lg:w-[460px] xl:w-[560px] 2xl:w-[680px] lg:sticky lg:top-32 h-[50vh] sm:h-[60vh] lg:h-[75vh] shrink-0 rounded-3xl overflow-hidden shadow-lux border border-navy/5 order-first lg:order-last mb-8 lg:mb-0 transition-all duration-300">
                   <DestinationMap 
                     places={filteredPlaces}
                     onPlaceClick={onPlaceClick}
                   />
                 </div>
               )}
+
             </div>
           </div>
         </div>

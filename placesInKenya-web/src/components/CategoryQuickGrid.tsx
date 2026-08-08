@@ -1,5 +1,5 @@
 import React from 'react';
-import { Utensils, Music, Coffee, TreePine, Compass, Mountain } from 'lucide-react';
+import { Utensils, Music, Coffee, TreePine, Compass, Mountain, ShoppingBag } from 'lucide-react';
 import { PlaceCategory } from '../types';
 
 interface CategoryQuickGridProps {
@@ -10,6 +10,7 @@ export const CategoryQuickGrid: React.FC<CategoryQuickGridProps> = ({ onCategory
   const categories = [
     { id: PlaceCategory.RESTAURANT, label: 'Restaurants', icon: Utensils, color: 'bg-orange-50 text-orange-600' },
     { id: PlaceCategory.ENTERTAINMENT, label: 'Entertainment', icon: Music, color: 'bg-purple-50 text-purple-600' },
+    { id: PlaceCategory.SHOPPING, label: 'Shopping', icon: ShoppingBag, color: 'bg-teal-50 text-teal-600' },
     { id: PlaceCategory.OUTDOORS, label: 'Outdoors', icon: TreePine, color: 'bg-green-50 text-green-600' },
     { id: PlaceCategory.HANGOUT_SPOTS, label: 'Hangout Spots', icon: Coffee, color: 'bg-amber-50 text-amber-600' },
     { id: PlaceCategory.SAFARI, label: 'Safaris', icon: Compass, color: 'bg-yellow-50 text-yellow-600' },
@@ -20,7 +21,7 @@ export const CategoryQuickGrid: React.FC<CategoryQuickGridProps> = ({ onCategory
     <section className="max-w-[1200px] mx-auto px-4 -mt-12 relative z-20">
       <div className="bg-white rounded-3xl p-8 shadow-[0_15px_50px_rgba(0,0,0,0.1)] border border-navy/5">
         <h3 className="text-navy/40 text-[11px] font-bold uppercase tracking-[0.2em] mb-8 text-center">What Are You Looking For?</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
           {categories.map((cat) => (
             <button
               key={cat.id}

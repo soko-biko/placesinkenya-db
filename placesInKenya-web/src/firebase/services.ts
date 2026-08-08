@@ -5,6 +5,7 @@ import {
   getDoc, 
   getDocs, 
   addDoc, 
+  setDoc,
   updateDoc, 
   deleteDoc, 
   query, 
@@ -13,7 +14,26 @@ import {
   serverTimestamp 
 } from 'firebase/firestore';
 import { db, auth } from './config';
-import { Place, TourOperator, PendingProvider } from '../types';
+import { Place, TourOperator, PendingProvider, Event, SiteSettings } from '../types';
+
+export const DEFAULT_SITE_SETTINGS: SiteSettings = {
+  heroTitle: "Experience the",
+  heroTitleHighlight: "Majesty",
+  heroSubtitle: "A curated collective of the most authentic destinations in the heart of Africa.",
+  heroBgImage: "https://images.unsplash.com/photo-1516426122078-c23e76319801",
+  heroSearchPlaceholder: "Where will your spirit wander?",
+  eventsTitle: "Ways to Experience Kenya",
+  eventsSubtitle: "A sequence of scheduled prestige events, from athletic safaris to jazz festivals in the city.",
+  eventsBgImage: "https://images.unsplash.com/photo-1547448415-e9f5b28e570d",
+  partnerTitle: "Represent a Kenyan Destination or Tour Service?",
+  partnerSubtitle: "Join our exclusive verified provider directory.",
+  partnerBgImage: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+  siteName: "PlacesInKenya",
+  siteTagline: "Curated Discovery Platform",
+  contactEmail: "concierge@placesinkenya.com",
+  contactPhone: "+254 700 000 000"
+};
+
 
 enum OperationType {
   CREATE = 'create',
@@ -163,6 +183,59 @@ export const placesService = {
   }
 };
 
+// ========== EVENTS SERVICES ==========
+export const eventsService = {
+  // Get all events
+  getAll: async () => {
+    const path = 'events';
+    try {
+      const q = query(collection(db, path), orderBy('date', 'asc'));
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Event));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.LIST, path);
+      return [];
+    }
+  },
+
+  // Create event
+  create: async (data: Partial<Event>) => {
+    const path = 'events';
+    try {
+      const docRef = await addDoc(collection(db, path), {
+        ...data,
+        createdAt: serverTimestamp()
+      });
+      return { id: docRef.id, ...data };
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, path);
+    }
+  },
+
+  // Update event
+  update: async (id: string, data: Partial<Event>) => {
+    const path = `events/${id}`;
+    try {
+      const docRef = doc(db, 'events', id);
+      await updateDoc(docRef, data as any);
+      return { id, ...data };
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, path);
+    }
+  },
+
+  // Delete event
+  delete: async (id: string) => {
+    const path = `events/${id}`;
+    try {
+      await deleteDoc(doc(db, 'events', id));
+      return { success: true };
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, path);
+    }
+  }
+};
+
 // ========== PROVIDERS SERVICES ==========
 export const providersService = {
   // Get all providers
@@ -191,18 +264,41 @@ export const providersService = {
     }
   },
   
-  // Create provider (used during approval)
+  // Create provider
   create: async (data: Partial<TourOperator>) => {
     const path = 'providers';
     try {
       const docRef = await addDoc(collection(db, path), {
         ...data,
-        rating: 0,
+        rating: data.rating || 5.0,
         createdAt: serverTimestamp()
       });
       return { id: docRef.id, ...data };
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, path);
+    }
+  },
+
+  // Update provider
+  update: async (id: string, data: Partial<TourOperator>) => {
+    const path = `providers/${id}`;
+    try {
+      const docRef = doc(db, 'providers', id);
+      await updateDoc(docRef, data as any);
+      return { id, ...data };
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, path);
+    }
+  },
+
+  // Delete provider
+  delete: async (id: string) => {
+    const path = `providers/${id}`;
+    try {
+      await deleteDoc(doc(db, 'providers', id));
+      return { success: true };
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, path);
     }
   }
 };
@@ -285,3 +381,53 @@ export const pendingProvidersService = {
     }
   }
 };
+
+// ========== SITE SETTINGS SERVICE ==========
+export const siteSettingsService = {
+  getSettings: async (): Promise<SiteSettings> => {
+    const path = 'site_config/main';
+    try {
+      const docRef = doc(db, 'site_config', 'main');
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data() as SiteSettings;
+        const merged = { ...DEFAULT_SITE_SETTINGS, ...data };
+        localStorage.setItem('places_site_settings', JSON.stringify(merged));
+        return merged;
+      }
+    } catch (error) {
+      console.warn('Could not fetch site settings from Firestore, using local fallback:', error);
+    }
+
+    // LocalStorage fallback
+    const cached = localStorage.getItem('places_site_settings');
+    if (cached) {
+      try {
+        return { ...DEFAULT_SITE_SETTINGS, ...JSON.parse(cached) };
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    return DEFAULT_SITE_SETTINGS;
+  },
+
+  updateSettings: async (settings: Partial<SiteSettings>): Promise<SiteSettings> => {
+    const path = 'site_config/main';
+    const current = await siteSettingsService.getSettings();
+    const updated = { ...current, ...settings };
+
+    // Always update local storage for immediate feedback
+    localStorage.setItem('places_site_settings', JSON.stringify(updated));
+
+    try {
+      const docRef = doc(db, 'site_config', 'main');
+      await setDoc(docRef, { ...updated, updatedAt: serverTimestamp() }, { merge: true });
+    } catch (error) {
+      console.warn('Failed to persist site settings to Firestore, saved to local cache:', error);
+    }
+
+    return updated;
+  }
+};
+

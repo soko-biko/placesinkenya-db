@@ -25,7 +25,8 @@ import {
   Trash2,
   Paperclip,
   Image as ImageIcon,
-  FileCheck
+  FileCheck,
+  ShoppingBag
 } from 'lucide-react';
 import { db } from '../firebase/config';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -42,6 +43,7 @@ const REG_TYPES = [
   { id: 'GUIDE', label: 'Private Guide', icon: <Compass />, desc: 'Licensed individual safari or city guides' },
   { id: 'RESTAURANT', label: 'Eatery / Café', icon: <Utensils />, desc: 'Local highlights & coastal masters' },
   { id: 'HOTEL', label: 'Stay / Lodge', icon: <Hotel />, desc: 'Boutique stays & wilderness lodges' },
+  { id: 'SHOPPING', label: 'Store / Mall', icon: <ShoppingBag />, desc: 'Supermarkets, stores, artisan markets & malls' },
   { id: 'EXPERIENCE', label: 'Experiences', icon: <Ticket />, desc: 'Workshops, events, & cultural hosts' },
   { id: 'CREATOR', label: 'Creator', icon: <Camera />, desc: 'Travel photographers & storytellers' }
 ];
@@ -299,7 +301,7 @@ export const PartnerRegistration: React.FC = () => {
         const customPlace = {
           id: customPlaceId,
           title: formData.businessName,
-          category: type === 'HOTEL' ? 'STAYS' : type === 'RESTAURANT' ? 'FOOD_DRINK' : 'ARTS_CULTURE',
+          category: type === 'HOTEL' ? 'HOTEL' : type === 'RESTAURANT' ? 'RESTAURANT' : type === 'SHOPPING' ? 'SHOPPING' : 'EXPERIENCE',
           location: 'Kenya',
           description: formData.description || 'Verified Partner Venue',
           imageUrl: logoDoc && logoDoc.type.startsWith('image/') ? logoDoc.dataUrl : 'https://images.unsplash.com/photo-1547448415-e9f5b28e570d',

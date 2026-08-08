@@ -84,8 +84,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Right Zone: List Business + Profile Indicators */}
-          <div id="navbar-actions" className="flex items-center gap-2 sm:gap-4 shrink-0">
-            
+          <div id="navbar-actions" className="flex items-center gap-2 sm:gap-3 shrink-0">
+
             {/* CTA Button — list business onboarding trigger */}
             <button 
               id="navbar-cta-list"
