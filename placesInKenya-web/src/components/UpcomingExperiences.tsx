@@ -4,6 +4,7 @@ import { Calendar, MapPin, ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Container } from './Container';
 import { Card } from './Card';
+import { useSiteSettings } from '../hooks/useFirestore';
 
 interface UpcomingExperiencesProps {
   events: Event[];
@@ -11,17 +12,31 @@ interface UpcomingExperiencesProps {
 }
 
 export const UpcomingExperiences: React.FC<UpcomingExperiencesProps> = ({ events, onViewAll }) => {
+  const { settings } = useSiteSettings();
+
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     e.currentTarget.src = 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?q=80&w=600&auto=format&fit=crop';
   };
 
   return (
-    <section className="py-12 sm:py-16 lg:py-20 bg-off-white">
-      <Container>
+    <section className="py-12 sm:py-16 lg:py-20 bg-off-white relative">
+      {settings.eventsBgImage && (
+        <div className="absolute inset-0 z-0 opacity-5 pointer-events-none">
+          <img src={settings.eventsBgImage} alt="" className="w-full h-full object-cover" />
+        </div>
+      )}
+      <Container className="relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-10 md:mb-14">
           <div className="space-y-3">
             <span className="text-safari font-black uppercase tracking-[0.3em] text-[10px]">Upcoming Events</span>
-            <h2 className="text-[clamp(1.5rem,4vw,2.5rem)] font-serif font-bold text-navy tracking-tight leading-tight">Elite Experiences</h2>
+            <h2 className="text-[clamp(1.5rem,4vw,2.5rem)] font-serif font-bold text-navy tracking-tight leading-tight">
+              {settings.eventsTitle || 'Elite Experiences'}
+            </h2>
+            {settings.eventsSubtitle && (
+              <p className="text-navy/60 text-xs md:text-sm font-light max-w-xl">
+                {settings.eventsSubtitle}
+              </p>
+            )}
           </div>
           <button 
             type="button"
