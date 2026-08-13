@@ -1,18 +1,19 @@
 import React from 'react';
 import { PlaceCategory } from '../types';
-import { Check, X, Filter, ChevronDown, SlidersHorizontal, Calendar } from 'lucide-react';
+import { Check, Filter, Calendar, X } from 'lucide-react';
 
 interface FilterPanelProps {
   selectedCategory: PlaceCategory | 'ALL';
   onCategoryChange: (cat: PlaceCategory | 'ALL') => void;
   selectedCity: string;
   onCityChange: (city: string) => void;
-  priceRange: [number, number];
-  onPriceChange: (range: [number, number]) => void;
+  maxPrice: number | null;
+  onPriceChange: (price: number | null) => void;
   minRating: number;
   onRatingChange: (rating: number) => void;
   verifiedOnly: boolean;
   onVerifiedToggle: () => void;
+  landscape?: boolean;
 }
 
 export const FilterPanel: React.FC<FilterPanelProps> = ({
@@ -20,26 +21,113 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   onCategoryChange,
   selectedCity,
   onCityChange,
-  priceRange,
+  maxPrice,
   onPriceChange,
   minRating,
   onRatingChange,
   verifiedOnly,
   onVerifiedToggle,
+  landscape = false,
 }) => {
   const cities = ['Nairobi', 'Mombasa', 'Kisumu', 'Eldoret', 'Nakuru', 'Diani', 'Watamu'];
 
+  const formatCategoryName = (cat: string) => {
+    if (cat === 'ALL') return 'All Collections';
+    return cat
+      .toLowerCase()
+      .split('_')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+  };
+
+  if (landscape) {
+    return (
+      <div className="w-full bg-white rounded-2xl p-4 border border-navy/10 shadow-sm flex flex-wrap items-center gap-4 text-[12px] font-semibold text-navy">
+        {/* Category Filter */}
+        <div className="flex items-center gap-2">
+          <span className="text-[12px] font-bold text-navy/50 flex items-center gap-1 shrink-0">
+            <Filter size={13} className="text-safari" /> Category:
+          </span>
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide max-w-xs">
+            <button
+              onClick={() => onCategoryChange('ALL')}
+              className={`px-3 py-1 rounded-lg text-[12px] font-semibold transition-all shrink-0 ${selectedCategory === 'ALL' ? 'bg-navy text-white shadow-sm' : 'bg-navy/5 text-navy/60 hover:bg-navy/10'}`}
+            >
+              All Collections
+            </button>
+            {Object.values(PlaceCategory).map(cat => (
+              <button
+                key={cat}
+                onClick={() => onCategoryChange(cat)}
+                className={`px-3 py-1 rounded-lg text-[12px] font-semibold transition-all shrink-0 ${selectedCategory === cat ? 'bg-navy text-white shadow-sm' : 'bg-navy/5 text-navy/60 hover:bg-navy/10'}`}
+              >
+                {formatCategoryName(cat)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Geographic Hub / Region */}
+        <div className="flex items-center gap-2">
+          <span className="text-[12px] font-bold text-navy/50 shrink-0">Region:</span>
+          <select
+            value={selectedCity}
+            onChange={(e) => onCityChange(e.target.value)}
+            className="h-9 bg-navy/5 border border-navy/10 rounded-xl px-3 text-[12px] font-semibold text-navy outline-none cursor-pointer"
+          >
+            <option value="">All Regions</option>
+            {cities.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+
+        {/* Max Price */}
+        <div className="flex items-center gap-2">
+          <span className="text-[12px] font-bold text-navy/50 shrink-0">Max Price:</span>
+          <input
+            type="number"
+            placeholder="e.g. 15000"
+            value={maxPrice && maxPrice > 0 ? maxPrice : ''}
+            onChange={(e) => onPriceChange(e.target.value ? Math.max(0, Number(e.target.value)) : null)}
+            className="w-28 h-9 bg-navy/5 border border-navy/10 rounded-xl px-3 text-[12px] font-semibold text-navy outline-none placeholder:text-navy/30"
+          />
+        </div>
+
+        {/* Rating */}
+        <div className="flex items-center gap-1.5">
+          <span className="text-[12px] font-bold text-navy/50 shrink-0">Rating:</span>
+          {[3, 4, 4.5].map(rating => (
+            <button
+              key={rating}
+              onClick={() => onRatingChange(minRating === rating ? 0 : rating)}
+              className={`px-2.5 py-1 rounded-lg text-[12px] font-semibold transition-all border ${minRating === rating ? 'bg-navy text-white border-navy' : 'bg-navy/5 border-transparent text-navy/60 hover:bg-navy/10'}`}
+            >
+              {rating}+ Stars
+            </button>
+          ))}
+        </div>
+
+        {/* Verified Toggle */}
+        <button
+          onClick={onVerifiedToggle}
+          className={`px-3 py-1.5 rounded-xl text-[12px] font-semibold transition-all border ${verifiedOnly ? 'bg-navy text-white border-navy' : 'bg-navy/5 border-transparent text-navy/60 hover:bg-navy/10'}`}
+        >
+          Verified Only
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-12">
+    <div className="space-y-4">
       {/* Category Section */}
-      <div className="space-y-6">
-        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-navy/40 flex items-center gap-2">
-            <Filter size={12} className="text-safari" /> Sphere of Interest
+      <div className="space-y-2">
+        <h4 className="text-[12px] font-bold text-navy/50 flex items-center gap-2">
+          <Filter size={13} className="text-safari" /> Sphere Of Interest
         </h4>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
            <button 
              onClick={() => onCategoryChange('ALL')}
-             className={`px-5 h-10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${selectedCategory === 'ALL' ? 'bg-navy text-white shadow-lg' : 'bg-navy/5 text-navy/40 hover:bg-navy/10'}`}
+             className={`px-3 py-1.5 rounded-xl text-[12px] font-semibold transition-all ${selectedCategory === 'ALL' ? 'bg-navy text-white shadow-md' : 'bg-navy/5 text-navy/60 hover:bg-navy/10'}`}
            >
              All Collections
            </button>
@@ -47,23 +135,23 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
              <button 
                key={cat}
                onClick={() => onCategoryChange(cat)}
-               className={`px-5 h-10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${selectedCategory === cat ? 'bg-navy text-white shadow-lg' : 'bg-navy/5 text-navy/40 hover:bg-navy/10'}`}
+               className={`px-3 py-1.5 rounded-xl text-[12px] font-semibold transition-all ${selectedCategory === cat ? 'bg-navy text-white shadow-md' : 'bg-navy/5 text-navy/60 hover:bg-navy/10'}`}
              >
-               {cat.replace('_', ' ')}
+               {formatCategoryName(cat)}
              </button>
            ))}
         </div>
       </div>
 
       {/* Region Section */}
-      <div className="space-y-6">
-        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-navy/40">Geographic Hub</h4>
-        <div className="grid grid-cols-2 gap-2">
+      <div className="space-y-2">
+        <h4 className="text-[12px] font-bold text-navy/50">Geographic Hub</h4>
+        <div className="grid grid-cols-2 gap-1.5">
            {cities.map(city => (
              <button 
                key={city}
                onClick={() => onCityChange(selectedCity === city ? '' : city)}
-               className={`flex items-center justify-between px-5 h-12 rounded-2xl text-[11px] font-bold transition-all border ${selectedCity === city ? 'bg-safari/5 border-safari text-navy' : 'bg-white border-navy/5 text-navy/40 hover:border-navy/10'}`}
+               className={`flex items-center justify-between px-3 h-9 rounded-xl text-[12px] font-semibold transition-all border ${selectedCity === city ? 'bg-safari/10 border-safari text-navy' : 'bg-white border-navy/5 text-navy/60 hover:border-navy/10'}`}
              >
                {city}
                {selectedCity === city && <Check size={14} className="text-safari" />}
@@ -72,32 +160,77 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
         </div>
       </div>
 
-      {/* Price Range */}
-      <div className="space-y-6">
+      {/* Price Spectrum Input */}
+      <div className="space-y-2">
         <div className="flex items-center justify-between">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-navy/40">Price Spectrum</h4>
-            <span className="text-[11px] font-bold text-safari">Up to Ksh {priceRange[1].toLocaleString()}</span>
+            <h4 className="text-[12px] font-bold text-navy/50">Maximum Price (Ksh)</h4>
+            <span className="text-[12px] font-bold text-safari">
+              {maxPrice && maxPrice > 0 ? `Up to Ksh ${(maxPrice * 2).toLocaleString()}` : 'Any Price'}
+            </span>
         </div>
-        <input 
-          type="range"
-          min="0"
-          max="50000"
-          step="500"
-          value={priceRange[1]}
-          onChange={(e) => onPriceChange([0, parseInt(e.target.value)])}
-          className="w-full h-1.5 bg-navy/5 rounded-lg appearance-none cursor-pointer accent-safari"
-        />
+        
+        <div className="relative flex items-center">
+          <input 
+            type="number"
+            min="0"
+            step="500"
+            placeholder="Enter max price (e.g. 15000)"
+            value={maxPrice && maxPrice > 0 ? maxPrice : ''}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === '' || isNaN(Number(val))) {
+                onPriceChange(null);
+              } else {
+                onPriceChange(Math.max(0, Number(val)));
+              }
+            }}
+            className="w-full h-10 bg-white border border-navy/10 rounded-xl px-3.5 pr-16 text-[12px] font-semibold text-navy focus:ring-2 focus:ring-safari/20 outline-none transition-all placeholder:text-navy/30"
+          />
+          {maxPrice && maxPrice > 0 && (
+            <button 
+              type="button"
+              onClick={() => onPriceChange(null)}
+              className="absolute right-2.5 px-2 py-0.5 bg-navy/5 hover:bg-navy/10 rounded-lg text-[12px] font-semibold text-navy/60 hover:text-navy cursor-pointer flex items-center gap-1"
+            >
+              <X size={12} /> Clear
+            </button>
+          )}
+        </div>
+
+        {maxPrice && maxPrice > 0 && (
+          <p className="text-[11px] text-navy/40 font-medium">
+            Filters items priced up to Ksh {(maxPrice * 2).toLocaleString()} (2× threshold)
+          </p>
+        )}
+
+        {/* Quick price presets */}
+        <div className="flex flex-wrap gap-1.5 pt-0.5">
+          {[2500, 5000, 10000, 25000, 50000].map(preset => (
+            <button
+              key={preset}
+              type="button"
+              onClick={() => onPriceChange(maxPrice === preset ? null : preset)}
+              className={`px-2.5 py-1 rounded-lg text-[12px] font-semibold transition-all border ${
+                maxPrice === preset 
+                  ? 'bg-navy text-white border-navy shadow-sm' 
+                  : 'bg-navy/5 border-transparent text-navy/60 hover:bg-navy/10'
+              }`}
+            >
+              Under {preset >= 1000 ? `${preset / 1000}k` : preset}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Minimum Rating */}
-      <div className="space-y-6">
-        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-navy/40">Minimum Distinction</h4>
-        <div className="flex gap-2">
+      <div className="space-y-2">
+        <h4 className="text-[12px] font-bold text-navy/50">Minimum Rating</h4>
+        <div className="flex gap-1.5">
            {[3, 4, 4.5].map(rating => (
              <button 
                key={rating}
-               onClick={() => onRatingChange(rating)}
-               className={`flex-1 h-12 rounded-2xl text-[11px] font-bold border transition-all ${minRating === rating ? 'bg-navy text-white shadow-lg border-navy' : 'bg-white border-navy/5 text-navy/40'}`}
+               onClick={() => onRatingChange(minRating === rating ? 0 : rating)}
+               className={`flex-1 h-9 rounded-xl text-[12px] font-semibold border transition-all ${minRating === rating ? 'bg-navy text-white shadow-md border-navy' : 'bg-white border-navy/5 text-navy/60 hover:border-navy/10'}`}
              >
                {rating}+ Stars
              </button>
@@ -105,25 +238,25 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
         </div>
       </div>
 
-      {/* Temporal Window (Date) */}
-      <div className="space-y-6">
-        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-navy/40 flex items-center gap-2">
-            <Calendar size={12} className="text-safari" /> Temporal Window
+      {/* Date Filter */}
+      <div className="space-y-2">
+        <h4 className="text-[12px] font-bold text-navy/50 flex items-center gap-2">
+            <Calendar size={13} className="text-safari" /> Date Filter
         </h4>
         <div className="relative group">
            <input 
              type="date" 
-             className="w-full h-14 bg-white border border-navy/5 rounded-2xl px-6 font-bold text-navy text-sm focus:ring-4 focus:ring-safari/10 outline-none transition-all cursor-pointer appearance-none"
+             className="w-full h-10 bg-white border border-navy/10 rounded-xl px-3.5 font-semibold text-navy text-[12px] focus:ring-2 focus:ring-safari/20 outline-none transition-all cursor-pointer appearance-none"
            />
-           <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-safari group-hover:scale-110 transition-transform">
-              <Calendar size={18} />
+           <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-safari group-hover:scale-110 transition-transform">
+              <Calendar size={15} />
            </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-1.5">
            {['This Weekend', 'Next Week'].map(period => (
              <button 
                key={period} 
-               className="flex-1 h-10 bg-navy/5 hover:bg-safari hover:text-white rounded-xl text-[9px] font-black uppercase tracking-widest text-navy/40 transition-all"
+               className="flex-1 h-8 bg-navy/5 hover:bg-safari hover:text-white rounded-xl text-[12px] font-semibold text-navy/60 transition-all"
              >
                 {period}
              </button>
@@ -131,18 +264,19 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
         </div>
       </div>
 
-      {/* verified only */}
-      <div className="pt-6 border-t border-navy/5">
+      {/* Verified Only */}
+      <div className="pt-2 border-t border-navy/5">
         <button 
           onClick={onVerifiedToggle}
-          className={`w-full h-16 rounded-3xl flex items-center justify-between px-6 transition-all ${verifiedOnly ? 'bg-navy text-white' : 'bg-navy/5 text-navy/40'}`}
+          className={`w-full h-10 rounded-xl flex items-center justify-between px-3.5 transition-all ${verifiedOnly ? 'bg-navy text-white' : 'bg-navy/5 text-navy/60'}`}
         >
-          <span className="text-[11px] font-black uppercase tracking-widest">Verified Only</span>
-          <div className={`w-10 h-6 rounded-full relative transition-all ${verifiedOnly ? 'bg-safari' : 'bg-navy/10'}`}>
-             <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${verifiedOnly ? 'left-5' : 'left-1'}`}></div>
+          <span className="text-[12px] font-semibold">Verified Only</span>
+          <div className={`w-8 h-4.5 rounded-full relative transition-all ${verifiedOnly ? 'bg-safari' : 'bg-navy/10'}`}>
+             <div className={`absolute top-0.5 w-3.5 h-3.5 bg-white rounded-full transition-all ${verifiedOnly ? 'left-4' : 'left-0.5'}`}></div>
           </div>
         </button>
       </div>
     </div>
   );
 };
+

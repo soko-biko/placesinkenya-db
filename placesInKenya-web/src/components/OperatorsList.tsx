@@ -35,6 +35,30 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
     });
   }, [operators, searchQuery, selectedSpecialty, selectedLocation, activeTab]);
 
+  const operatorGridCols = useMemo(() => {
+    const count = filteredOperators.length;
+    if (count > 500) return 5;
+    if (count > 350) return 4;
+    if (count > 200) return 3;
+    if (count > 50) return 2;
+    return 1;
+  }, [filteredOperators.length]);
+
+  const operatorGridClass = useMemo(() => {
+    switch (operatorGridCols) {
+      case 5:
+        return 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5';
+      case 4:
+        return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
+      case 3:
+        return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4';
+      case 2:
+        return 'grid grid-cols-1 md:grid-cols-2 gap-4';
+      default:
+        return 'flex flex-col w-full divide-y divide-navy/10';
+    }
+  }, [operatorGridCols]);
+
   const HorizontalOperatorCard: React.FC<{ operator: TourOperator }> = ({ operator }) => {
     const isCompany = operator.type === OperatorType.COMPANY;
 
@@ -432,7 +456,7 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
       <AnimatePresence mode="popLayout">
          {filteredOperators.length > 0 ? (
            <div className="w-full">
-             {viewMode === 'list' ? (
+             {viewMode === 'list' && operatorGridCols === 1 ? (
                /* Horizontal Listing Presentation */
                <motion.div 
                  className="flex flex-col w-full divide-y divide-navy/10"
@@ -447,7 +471,7 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
              ) : (
                /* Grid Presentation */
                <motion.div 
-                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                 className={operatorGridClass}
                  initial={{ opacity: 0 }}
                  animate={{ opacity: 1 }}
                  exit={{ opacity: 0 }}

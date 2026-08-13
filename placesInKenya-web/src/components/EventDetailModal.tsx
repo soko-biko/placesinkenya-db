@@ -34,8 +34,8 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClo
   }, [onClose]);
 
   return (
-    // ── Overlay: Dark blurred layout background with z-index elevated to 150 ──
-    <div className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center p-0 sm:p-6 lg:p-12 overflow-hidden">
+    // ── Overlay: Dark blurred layout background with z-index elevated to 9999 ──
+    <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-6 lg:p-12 overflow-hidden">
       <div className="absolute inset-0 bg-navy/95 backdrop-blur-md sm:backdrop-blur-lg" onClick={onClose}></div>
       
       {/* ── Modal Main Frame ── */}

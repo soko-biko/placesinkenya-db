@@ -358,6 +358,10 @@ export const DestinationMap: React.FC<DestinationMapProps> = ({
         className: 'pk-popup'
       });
 
+      marker.on('click', () => {
+        onPlaceClick(place);
+      });
+
       marker.on('popupopen', () => {
         const btn = document.getElementById(`popup-explore-btn-${place.id}`);
         if (btn) {

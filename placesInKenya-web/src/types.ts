@@ -43,6 +43,7 @@ export interface Event {
   providerId: string;
   providerName: string;
   date: string;
+  time?: string;
   description: string;
   price: number;
   location: string;
@@ -148,6 +149,7 @@ export interface Registration {
     licenseNumber?: string;
     websiteUrl?: string;
     bookingLink?: string;
+    location?: string;
     latitude?: number;
     longitude?: number;
   };

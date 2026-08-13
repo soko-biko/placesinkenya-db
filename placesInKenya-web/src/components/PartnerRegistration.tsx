@@ -241,7 +241,7 @@ export const PartnerRegistration: React.FC = () => {
         await addDoc(collection(db, 'registrations'), {
           type: 'EXPERIENCE',
           status: 'PENDING',
-          submittedAt: serverTimestamp(),
+          submittedAt: new Date().toISOString(),
           businessName: eventFormData.providerName,
           email: 'event-partner@placesinkenya.com',
           phone: '+254700000000',
@@ -277,7 +277,7 @@ export const PartnerRegistration: React.FC = () => {
           ...formData,
           type,
           status: 'PENDING',
-          submittedAt: serverTimestamp(),
+          submittedAt: new Date().toISOString(),
           documents: {
             photos: uploadedPhotos,
             logoUrl: logoDoc?.dataUrl || 'https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&q=80&w=200',
@@ -302,7 +302,7 @@ export const PartnerRegistration: React.FC = () => {
           id: customPlaceId,
           title: formData.businessName,
           category: type === 'HOTEL' ? 'HOTEL' : type === 'RESTAURANT' ? 'RESTAURANT' : type === 'SHOPPING' ? 'SHOPPING' : 'EXPERIENCE',
-          location: 'Kenya',
+          location: formData.details?.location || 'Nairobi, Kenya',
           description: formData.description || 'Verified Partner Venue',
           imageUrl: logoDoc && logoDoc.type.startsWith('image/') ? logoDoc.dataUrl : 'https://images.unsplash.com/photo-1547448415-e9f5b28e570d',
           rating: 4.9,
@@ -788,6 +788,18 @@ export const PartnerRegistration: React.FC = () => {
                            />
                         </div>
                         <div className="space-y-3">
+                           <label className="text-[10px] font-black uppercase tracking-widest text-navy/40 ml-4">Region / Operating Place (e.g. Nairobi, Diani, Naivasha, Masai Mara)</label>
+                           <input 
+                             type="text" 
+                             value={formData.details?.location || ''}
+                             onChange={(e) => handleDetailChange('location', e.target.value)}
+                             placeholder="e.g. Nairobi, Mombasa, Diani, Naivasha, Masai Mara"
+                             className="w-full h-18 bg-white border border-navy/5 rounded-3xl px-8 font-medium text-navy focus:ring-4 focus:ring-safari/10 outline-none transition-all tap-target"
+                           />
+                           <p className="text-[9px] text-navy/20 ml-4 italic text-left">Specify your primary region to enable geographical filtering on the map and catalog.</p>
+                        </div>
+
+                        <div className="space-y-3">
                            <label className="text-[10px] font-black uppercase tracking-widest text-navy/40 ml-4">Digital Realm (Optional)</label>
                            <input 
                              type="url" 
@@ -1117,7 +1129,7 @@ export const PartnerRegistration: React.FC = () => {
                               <p className="text-[9px] font-black uppercase tracking-widest text-navy/20">Registry Class</p>
                               <div className="flex items-center gap-2">
                                  <div className="w-6 h-6 bg-safari/10 text-safari rounded-lg flex items-center justify-center">
-                                    {REG_TYPES.find(t => t.id === type)?.icon && React.cloneElement(REG_TYPES.find(t => t.id === type)?.icon as React.ReactElement, { size: 14 })}
+                                    {REG_TYPES.find(t => t.id === type)?.icon && React.cloneElement(REG_TYPES.find(t => t.id === type)?.icon as React.ReactElement<any>, { size: 14 })}
                                  </div>
                                  <p className="font-bold text-navy text-sm uppercase tracking-wider">{type}</p>
                                </div>

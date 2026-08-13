@@ -415,7 +415,13 @@ export const siteSettingsService = {
   updateSettings: async (settings: Partial<SiteSettings>): Promise<SiteSettings> => {
     const path = 'site_config/main';
     const current = await siteSettingsService.getSettings();
-    const updated = { ...current, ...settings };
+    const updated: SiteSettings = {
+      ...current,
+      ...settings,
+      heroBgImage: (settings.heroBgImage ?? current.heroBgImage ?? '').trim(),
+      eventsBgImage: (settings.eventsBgImage ?? current.eventsBgImage ?? '').trim(),
+      partnerBgImage: (settings.partnerBgImage ?? current.partnerBgImage ?? '').trim(),
+    };
 
     // Always update local storage for immediate feedback
     localStorage.setItem('places_site_settings', JSON.stringify(updated));

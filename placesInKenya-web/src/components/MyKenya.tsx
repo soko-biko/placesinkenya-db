@@ -323,7 +323,7 @@ export const MyKenya: React.FC<MyKenyaProps> = ({
                      onClick={() => setActiveTab(tab.id as any)}
                      className={`h-20 flex items-center gap-3 relative transition-colors cursor-pointer ${activeTab === tab.id ? 'text-navy' : 'text-navy/30 hover:text-navy/60'}`}
                    >
-                     {React.cloneElement(tab.icon as React.ReactElement, { className: activeTab === tab.id ? 'text-safari' : '' })}
+                     {React.cloneElement(tab.icon as React.ReactElement<any>, { className: activeTab === tab.id ? 'text-safari' : '' })}
                      <span className="text-[10px] font-black uppercase tracking-widest">{tab.label}</span>
                      {activeTab === tab.id && (
                        <motion.div layoutId="active-tab" className="absolute bottom-0 left-0 right-0 h-1 bg-safari rounded-t-full" />

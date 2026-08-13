@@ -26,16 +26,12 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
   const { settings } = useSiteSettings();
 
 
-  // Initialize selectedDate to today
-  const [selectedDate, setSelectedDate] = useState<Date>(() => {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    return d;
-  });
+  // Initialize selectedDate to null (display all events by default)
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   // Calendar navigation state
-  const [viewMonth, setViewMonth] = useState(selectedDate.getMonth());
-  const [viewYear, setViewYear] = useState(selectedDate.getFullYear());
+  const [viewMonth, setViewMonth] = useState(() => new Date().getMonth());
+  const [viewYear, setViewYear] = useState(() => new Date().getFullYear());
 
   const categories = ['ALL', 'FESTIVALS', 'FOOD_DRINK', 'ADVENTURES', 'CULTURE', 'WILDLIFE'];
 
@@ -62,6 +58,7 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
   };
 
   const isSelectedDate = (day: number) => {
+    if (!selectedDate) return false;
     return selectedDate.getDate() === day &&
            selectedDate.getMonth() === viewMonth &&
            selectedDate.getFullYear() === viewYear;
@@ -95,7 +92,16 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
   const handleDaySelect = (day: number) => {
     const newDate = new Date(viewYear, viewMonth, day);
     newDate.setHours(0, 0, 0, 0);
-    setSelectedDate(newDate);
+    if (
+      selectedDate &&
+      selectedDate.getDate() === day &&
+      selectedDate.getMonth() === viewMonth &&
+      selectedDate.getFullYear() === viewYear
+    ) {
+      setSelectedDate(null);
+    } else {
+      setSelectedDate(newDate);
+    }
   };
 
   const handleJumpToToday = () => {
@@ -106,27 +112,61 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
     setViewYear(today.getFullYear());
   };
 
+  const handleClearDate = () => {
+    setSelectedDate(null);
+  };
+
   // Filter events based on active filters
   const displayedEvents = useMemo(() => {
     return events.filter(e => {
+      const matchesCat = selectedCategory === 'ALL' || e.category === selectedCategory;
+      if (!selectedDate) return matchesCat;
+
       const eDate = new Date(e.date);
       const isSameDay = eDate.getDate() === selectedDate.getDate() &&
                          eDate.getMonth() === selectedDate.getMonth() &&
                          eDate.getFullYear() === selectedDate.getFullYear();
-      const matchesCat = selectedCategory === 'ALL' || e.category === selectedCategory;
       return isSameDay && matchesCat;
     });
   }, [events, selectedDate, selectedCategory]);
 
+  const eventGridCols = useMemo(() => {
+    const count = displayedEvents.length;
+    if (count > 500) return 5;
+    if (count > 350) return 4;
+    if (count > 200) return 3;
+    if (count > 50) return 2;
+    return 1;
+  }, [displayedEvents.length]);
+
+  const isEventsLargeSet = displayedEvents.length > 500;
+
+  const eventGridClass = useMemo(() => {
+    switch (eventGridCols) {
+      case 5:
+        return 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5';
+      case 4:
+        return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
+      case 3:
+        return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4';
+      case 2:
+        return 'grid grid-cols-1 md:grid-cols-2 gap-4';
+      default:
+        return 'w-full space-y-0 divide-y divide-navy/10';
+    }
+  }, [eventGridCols]);
+
   // Nearest event logic
   const nearestUpcomingEvent = useMemo(() => {
     if (displayedEvents.length > 0) return null;
+    const refDate = selectedDate ? new Date(selectedDate) : new Date();
+    refDate.setHours(0, 0, 0, 0);
     return events
       .filter(e => {
         const eDate = new Date(e.date);
-        eDate.setHours(0,0,0,0);
+        eDate.setHours(0, 0, 0, 0);
         const matchesCat = selectedCategory === 'ALL' || e.category === selectedCategory;
-        return eDate >= selectedDate && matchesCat;
+        return eDate >= refDate && matchesCat;
       })
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
   }, [events, selectedDate, selectedCategory, displayedEvents]);
@@ -193,108 +233,163 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
           ))}
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
+        <div className={`flex flex-col ${!isEventsLargeSet ? 'lg:flex-row' : ''} gap-8 items-start`}>
           
-          {/* LEFT COLUMN: Sticky Calendar Date Picker & Filter Set */}
-          <aside className="w-full lg:w-[300px] lg:sticky lg:top-24 shrink-0 space-y-6">
-            
-            {/* Calendar Block Container */}
-            <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-navy/5 p-4 sm:p-5 select-none">
+          {/* LEFT COLUMN: Sticky Calendar Date Picker & Filter Set - Hidden if > 500 items */}
+          {!isEventsLargeSet && (
+            <aside className="w-full lg:w-[300px] lg:sticky lg:top-24 shrink-0 space-y-6">
               
-              {/* Header Navigator */}
-              <div className="flex items-center justify-between mb-4 border-b border-navy/5 pb-3">
-                <button 
-                  onClick={handlePrevMonth}
-                  className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-navy/5 text-navy transition-colors active:scale-90"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <span className="font-serif font-bold text-sm tracking-tight text-navy">
-                  {MONTHS[viewMonth]} {viewYear}
-                </span>
-                <button 
-                  onClick={handleNextMonth}
-                  className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-navy/5 text-navy transition-colors active:scale-90"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
+              {/* Calendar Block Container */}
+              <div className="bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-navy/5 p-4 sm:p-5 select-none">
+                
+                {/* Header Navigator */}
+                <div className="flex items-center justify-between mb-4 border-b border-navy/5 pb-3">
+                  <button 
+                    onClick={handlePrevMonth}
+                    className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-navy/5 text-navy transition-colors active:scale-90"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <span className="font-serif font-bold text-sm tracking-tight text-navy">
+                    {MONTHS[viewMonth]} {viewYear}
+                  </span>
+                  <button 
+                    onClick={handleNextMonth}
+                    className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-navy/5 text-navy transition-colors active:scale-90"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
 
-              {/* Day Headers */}
-              <div className="grid grid-cols-7 mb-2 text-center text-[10px] font-black uppercase tracking-wider text-navy/30">
-                {DAYS_SHORT.map(day => (
-                  <div key={day} className="py-1">{day}</div>
-                ))}
-              </div>
+                {/* Day Headers */}
+                <div className="grid grid-cols-7 mb-2 text-center text-[10px] font-black uppercase tracking-wider text-navy/30">
+                  {DAYS_SHORT.map(day => (
+                    <div key={day} className="py-1">{day}</div>
+                  ))}
+                </div>
 
-              {/* Days Grid */}
-              <div className="grid grid-cols-7 gap-y-1 gap-x-1">
-                {/* Pad out empty spaces */}
-                {emptyCells.map((_, i) => (
-                  <div key={`empty-${i}`} className="w-8 h-8" />
-                ))}
+                {/* Days Grid */}
+                <div className="grid grid-cols-7 gap-y-1 gap-x-1">
+                  {/* Pad out empty spaces */}
+                  {emptyCells.map((_, i) => (
+                    <div key={`empty-${i}`} className="w-8 h-8" />
+                  ))}
 
-                {/* Day Buttons */}
-                {daysArray.map(day => {
-                  const sel = isSelectedDate(day);
-                  const isT = isTodayDate(day);
-                  const hasEv = hasEventOnDate(day);
+                  {/* Day Buttons */}
+                  {daysArray.map(day => {
+                    const sel = isSelectedDate(day);
+                    const isT = isTodayDate(day);
+                    const hasEv = hasEventOnDate(day);
 
-                  return (
+                    return (
+                      <button
+                        key={day}
+                        onClick={() => handleDaySelect(day)}
+                        className={`relative mx-auto w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all ${
+                          sel 
+                            ? 'bg-navy text-white shadow-md' 
+                            : isT 
+                            ? 'border-2 border-safari text-safari' 
+                            : 'text-navy hover:bg-navy/5'
+                        }`}
+                      >
+                        <span>{day}</span>
+                        {/* Active Event Dot */}
+                        {hasEv && !sel && (
+                          <span className="absolute bottom-[2px] left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-safari" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Jump to Today & All Events Buttons */}
+                <div className="mt-4 flex gap-2">
+                  <button
+                    onClick={handleJumpToToday}
+                    className="flex-1 h-9 bg-navy/5 text-navy hover:bg-navy hover:text-white transition-all text-[9px] font-black uppercase tracking-widest rounded-lg flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <Calendar size={12} className="text-safari" />
+                    <span>Today</span>
+                  </button>
+                  {selectedDate && (
                     <button
-                      key={day}
-                      onClick={() => handleDaySelect(day)}
-                      className={`relative mx-auto w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all ${
-                        sel 
-                          ? 'bg-navy text-white shadow-md' 
-                          : isT 
-                          ? 'border-2 border-safari text-safari' 
-                          : 'text-navy hover:bg-navy/5'
-                      }`}
+                      onClick={handleClearDate}
+                      className="flex-1 h-9 bg-safari/10 text-safari hover:bg-safari hover:text-white transition-all text-[9px] font-black uppercase tracking-widest rounded-lg flex items-center justify-center gap-1.5 cursor-pointer"
                     >
-                      <span>{day}</span>
-                      {/* Active Event Dot */}
-                      {hasEv && !sel && (
-                        <span className="absolute bottom-[2px] left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-safari" />
-                      )}
+                      <span>All Dates</span>
                     </button>
-                  );
-                })}
+                  )}
+                </div>
               </div>
 
-              {/* Jump to Today Button */}
-              <button
-                onClick={handleJumpToToday}
-                className="mt-4 w-full h-9 bg-navy/5 text-navy hover:bg-navy hover:text-white transition-all text-[9px] font-black uppercase tracking-widest rounded-lg flex items-center justify-center gap-1.5"
-              >
-                <Calendar size={12} className="text-safari" />
-                <span>Jump To Today</span>
-              </button>
-            </div>
+            </aside>
+          )}
 
-          </aside>
-
-          {/* RIGHT COLUMN: Interactive Events Listing Panel (Explore style list) */}
+          {/* RIGHT COLUMN: Interactive Events Listing Panel */}
           <section className="flex-1 w-full min-w-0">
+            {/* Top Landscape Calendar Bar when > 500 items */}
+            {isEventsLargeSet && (
+              <div className="bg-white rounded-2xl shadow-sm border border-navy/10 p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-[12px] font-bold text-navy">Filter Date:</span>
+                  <div className="flex items-center gap-2">
+                    <button onClick={handlePrevMonth} className="w-8 h-8 rounded-lg bg-navy/5 flex items-center justify-center"><ChevronLeft size={16} /></button>
+                    <span className="text-[12px] font-bold text-navy">{MONTHS[viewMonth]} {viewYear}</span>
+                    <button onClick={handleNextMonth} className="w-8 h-8 rounded-lg bg-navy/5 flex items-center justify-center"><ChevronRight size={16} /></button>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleJumpToToday}
+                    className="h-8 px-3 bg-navy text-white rounded-lg text-[12px] font-semibold flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Calendar size={13} /> Today
+                  </button>
+                  {selectedDate && (
+                    <button
+                      onClick={handleClearDate}
+                      className="h-8 px-3 bg-safari/10 text-safari hover:bg-safari hover:text-white rounded-lg text-[12px] font-semibold flex items-center gap-1.5 cursor-pointer"
+                    >
+                      Show All Dates
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
             
             {/* List Header Info */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-navy/5 pb-4 mb-4 gap-3">
               <div className="space-y-0.5">
                 <h2 className="font-serif font-bold text-lg md:text-xl text-navy">
-                  Events on {selectedDate.toLocaleDateString('en-KE', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                  {selectedDate
+                    ? `Events on ${selectedDate.toLocaleDateString('en-KE', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`
+                    : 'All Events & Experiences'}
                 </h2>
                 <p className="text-xs text-navy/40">
-                  Events happening on this date
+                  {selectedDate
+                    ? 'Filtered by chosen date (click date again to clear filter)'
+                    : 'Showing all scheduled events in Kenya'}
                 </p>
               </div>
-              <span className="text-[10px] font-black uppercase tracking-wider bg-navy/5 text-navy/60 h-7 px-3 rounded-full flex items-center w-max">
-                {displayedEvents.length} Active {displayedEvents.length === 1 ? 'Event' : 'Events'}
-              </span>
+              <div className="flex items-center gap-2">
+                {selectedDate && (
+                  <button 
+                    onClick={handleClearDate}
+                    className="text-[10px] font-black uppercase tracking-wider text-safari hover:underline cursor-pointer"
+                  >
+                    Show All Events
+                  </button>
+                )}
+                <span className="text-[10px] font-black uppercase tracking-wider bg-navy/5 text-navy/60 h-7 px-3 rounded-full flex items-center w-max">
+                  {displayedEvents.length} Active {displayedEvents.length === 1 ? 'Event' : 'Events'}
+                </span>
+              </div>
             </div>
 
             <AnimatePresence mode="wait">
               {displayedEvents.length > 0 ? (
-                <div key="events-responsive-wrapper" className="w-full space-y-0 divide-y divide-navy/10">
+                <div key="events-responsive-wrapper" className={eventGridClass}>
                   {displayedEvents.map(event => {
                     const spotsLeft = event.totalCapacity - event.bookedCapacity;
                     const isFull = spotsLeft <= 0;

@@ -28,6 +28,7 @@ import { OperatorSpotlight } from './components/OperatorSpotlight';
 import { StatsBar } from './components/StatsBar';
 import { PartnerInviteStrip } from './components/PartnerInviteStrip';
 import { Container } from './components/Container';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const SkeletonLoader = () => (
     <div className="min-h-screen bg-off-white flex flex-col items-center justify-center space-y-8">
@@ -117,7 +118,7 @@ const App: React.FC = () => {
       if (authMode === 'login') {
         await login(authEmail, authPassword);
       } else {
-        await signup(authEmail, authPassword);
+        await signup(authEmail, authPassword, authEmail.split('@')[0], 'TRAVELER');
       }
       setIsAuthOpen(false);
       setAuthEmail('');
@@ -374,11 +375,13 @@ const App: React.FC = () => {
       />
 
       <div className="pt-0 pb-16 lg:pb-0">
-        <Suspense fallback={<SkeletonLoader />}>
-          <AnimatePresence mode="wait">
-            {renderPage()}
-          </AnimatePresence>
-        </Suspense>
+        <ErrorBoundary>
+          <Suspense fallback={<SkeletonLoader />}>
+            <AnimatePresence mode="wait">
+              {renderPage()}
+            </AnimatePresence>
+          </Suspense>
+        </ErrorBoundary>
       </div>
 
       {/* Footer styled with Niko Free style sheets */}

@@ -114,19 +114,30 @@ export const CategoryEditor: React.FC<CategoryEditorProps> = ({
               <label className="text-xs font-bold uppercase tracking-wider text-navy/70">Thumbnail / Hero Image URL</label>
               <div className="flex gap-2 mt-1">
                 <input 
-                  type="url"
+                  type="text"
                   value={formData.imageUrl || ''}
                   onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
+                  placeholder="https://..."
                   className="flex-1 px-4 py-3 bg-white border border-navy/10 rounded-xl text-sm font-medium text-navy focus:outline-none focus:ring-2 focus:ring-safari"
                 />
                 <button 
                   type="button" 
                   onClick={() => setMediaPickerOpen(true)}
-                  className="px-4 py-3 bg-navy text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2"
+                  className="px-4 py-3 bg-navy text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 shrink-0 hover:bg-navy/90 transition-colors shadow"
                 >
-                  <ImageIcon size={16} /> Media
+                  <ImageIcon size={16} /> Choose from Media Library
                 </button>
               </div>
+              {formData.imageUrl && (
+                <div className="mt-3 aspect-video w-full max-w-sm rounded-2xl overflow-hidden border border-navy/10 shadow-sm relative bg-navy/5">
+                  <img 
+                    src={formData.imageUrl} 
+                    alt="Preview" 
+                    className="w-full h-full object-cover" 
+                    onError={(e) => (e.currentTarget.src = 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?q=80&w=600&auto=format&fit=crop')}
+                  />
+                </div>
+              )}
             </div>
 
             <label className="flex items-center gap-3 pt-2 cursor-pointer">

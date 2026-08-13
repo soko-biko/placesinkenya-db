@@ -60,8 +60,8 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
   );
 
   return (
-    // ── Overlay: Covers full screen, raised z-index to 150 to override bottom navigation bars ──
-    <div className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center p-0 sm:p-6 lg:p-12 overflow-hidden">
+    // ── Overlay: Covers full screen, raised z-index to 9999 to override map controls and all background elements ──
+    <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-6 lg:p-12 overflow-hidden">
       <div className="absolute inset-0 bg-navy/95 backdrop-blur-md sm:backdrop-blur-lg" onClick={onClose}></div>
       
       {/* ── Popup Panel ──
@@ -161,7 +161,7 @@ export const PlaceDetailModal: React.FC<PlaceDetailModalProps> = ({
                 {/* Information Chips */}
                 <div className="flex flex-wrap gap-2 pt-2">
                   <span className="text-[9px] font-black bg-white/5 border border-white/5 uppercase tracking-widest px-3 h-7 flex items-center rounded-full text-white/60">
-                    💵 Ksh {(place.price || 1500).toLocaleString()}
+                    💵 {place.price && place.price > 0 ? `Ksh ${place.price.toLocaleString()}` : 'Free Entrance'}
                   </span>
                   {place.tags?.slice(0, 3).map(tag => (
                     <span key={tag} className="text-[9px] font-black bg-white/5 border border-white/5 uppercase tracking-widest px-3 h-7 flex items-center rounded-full text-white/40">

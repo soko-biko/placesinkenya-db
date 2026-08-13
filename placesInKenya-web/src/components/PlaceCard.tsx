@@ -73,25 +73,29 @@ export const PlaceCard: React.FC<PlaceCardProps> = React.memo(({ place, onClick,
     e.currentTarget.src = 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?q=80&w=600&auto=format&fit=crop';
   };
 
+  const safePlace = place || ({} as Place);
+  const categoryLabel = (safePlace.category || 'EXPLORE').toString().replace(/_/g, ' ');
+  const ratingVal = Number(safePlace.rating || 4.5);
+
   if (layout === 'list') {
     return (
       <div 
-        id={`place-card-${place.id}`}
-        onClick={() => onClick?.(place)}
+        id={`place-card-${safePlace.id || 'item'}`}
+        onClick={() => onClick?.(safePlace)}
         className="group flex flex-col sm:flex-row items-stretch gap-4 sm:gap-6 py-5 border-b border-navy/10 hover:bg-navy/[0.01] transition-colors cursor-pointer w-full text-left"
       >
         {/* Compact Image Section */}
         <div className="relative w-full sm:w-32 md:w-40 aspect-[16/10] sm:aspect-[4/3] rounded-xl overflow-hidden bg-navy/5 shrink-0 z-0">
           <img 
-            src={place.imageUrl || 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?q=80&w=600&auto=format&fit=crop'} 
-            alt={place.name}
+            src={safePlace.imageUrl || 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?q=80&w=600&auto=format&fit=crop'} 
+            alt={safePlace.name || 'Place'}
             loading="lazy"
             onError={handleImageError}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
           />
           <div className="absolute top-2 left-2 z-10">
              <span className="bg-safari text-white text-[7px] font-black uppercase tracking-[0.15em] px-2 h-5 flex items-center rounded-full border border-white/10 select-none">
-               {place.category?.replace('_', ' ')}
+               {categoryLabel}
              </span>
           </div>
         </div>
@@ -101,9 +105,9 @@ export const PlaceCard: React.FC<PlaceCardProps> = React.memo(({ place, onClick,
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <h3 className="text-sm sm:text-base font-serif font-bold text-navy truncate group-hover:text-safari transition-colors">
-                {place.name}
+                {safePlace.name || 'Untitled Destination'}
               </h3>
-              {place.isVerified && (
+              {safePlace.isVerified && (
                  <div className="bg-navy/5 text-navy px-1.5 h-4.5 rounded-full flex items-center gap-0.5 select-none shrink-0" title="Verified">
                     <ShieldCheck size={8} className="text-safari" />
                     <span className="text-[6.5px] font-bold uppercase tracking-wider">Verified</span>
@@ -114,18 +118,18 @@ export const PlaceCard: React.FC<PlaceCardProps> = React.memo(({ place, onClick,
             <div className="flex items-center gap-3 text-navy/40 flex-wrap">
               <div className="flex items-center gap-1">
                 <MapPin size={10} className="text-safari" />
-                <span className="text-[8.5px] font-black uppercase tracking-wider">{place.location}</span>
+                <span className="text-[8.5px] font-black uppercase tracking-wider">{safePlace.location || 'Kenya'}</span>
               </div>
               <div className="flex items-center gap-0.5 text-safari">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={9} fill={i < Math.floor(place.rating) ? "currentColor" : "none"} className={i < Math.floor(place.rating) ? "" : "text-navy/10"} />
+                  <Star key={i} size={9} fill={i < Math.floor(ratingVal) ? "currentColor" : "none"} className={i < Math.floor(ratingVal) ? "" : "text-navy/10"} />
                 ))}
-                <span className="text-[8.5px] font-bold text-navy/30 ml-1">({(place.rating * 12).toFixed(0)})</span>
+                <span className="text-[8.5px] font-bold text-navy/30 ml-1">({(ratingVal * 12).toFixed(0)})</span>
               </div>
             </div>
 
             <p className="text-navy/60 text-[11px] sm:text-xs leading-relaxed line-clamp-1 sm:line-clamp-2 font-sans">
-              {place.description}
+              {safePlace.description || ''}
             </p>
           </div>
 
@@ -133,7 +137,9 @@ export const PlaceCard: React.FC<PlaceCardProps> = React.memo(({ place, onClick,
           <div className="flex items-center justify-between sm:justify-end gap-4 mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-0 border-navy/5">
             <div className="flex flex-col sm:items-end sm:mr-4">
               <span className="text-[7px] text-navy/20 uppercase font-black tracking-widest leading-none mb-0.5">From</span>
-              <span className="text-navy text-xs sm:text-sm font-bold tracking-tight">Ksh {(place.price || 4500).toLocaleString()}</span>
+              <span className="text-navy text-xs sm:text-sm font-bold tracking-tight">
+                {safePlace.price && safePlace.price > 0 ? `Ksh ${safePlace.price.toLocaleString()}` : 'Free Access'}
+              </span>
             </div>
             
             <div className="flex items-center gap-1.5">
@@ -146,7 +152,7 @@ export const PlaceCard: React.FC<PlaceCardProps> = React.memo(({ place, onClick,
               </button>
               
               <button className="h-7.5 px-3 bg-navy hover:bg-safari text-white rounded-full flex items-center justify-center gap-1 transition-all shadow-sm cursor-pointer whitespace-nowrap">
-                <span className="text-[7.5px] font-black uppercase tracking-wider">{getCTAText(place.category)}</span>
+                <span className="text-[7.5px] font-black uppercase tracking-wider">{getCTAText(safePlace.category)}</span>
                 <ArrowRight size={9} />
               </button>
             </div>
@@ -158,15 +164,15 @@ export const PlaceCard: React.FC<PlaceCardProps> = React.memo(({ place, onClick,
 
   return (
     <Card 
-      id={`place-card-${place.id}`}
-      onClick={() => onClick?.(place)}
+      id={`place-card-${safePlace.id || 'item'}`}
+      onClick={() => onClick?.(safePlace)}
       className="flex flex-col h-full"
     >
       {/* Image Section - Fixed 4:3 Aspect Ratio */}
       <div className="relative aspect-[4/3] overflow-hidden bg-navy/5 shrink-0 z-0">
         <img 
-          src={place.imageUrl || 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?q=80&w=600&auto=format&fit=crop'} 
-          alt={place.name}
+          src={safePlace.imageUrl || 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?q=80&w=600&auto=format&fit=crop'} 
+          alt={safePlace.name || 'Place'}
           loading="lazy"
           onError={handleImageError}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
@@ -176,13 +182,13 @@ export const PlaceCard: React.FC<PlaceCardProps> = React.memo(({ place, onClick,
         {/* Category Badge */}
         <div className="absolute top-2.5 left-2.5 z-10">
            <span className="bg-safari text-white text-[8px] font-black uppercase tracking-[0.15em] px-2.5 h-6 flex items-center rounded-full shadow border border-white/10 select-none">
-             {place.category?.replace('_', ' ')}
+             {categoryLabel}
             </span>
         </div>
 
         {/* Badges Overlay Grouped - Guideline 6 */}
         <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 z-10">
-          {place.isVerified && (
+          {safePlace.isVerified && (
              <div className="bg-navy/90 text-white px-2 h-6 rounded-full shadow flex items-center justify-center gap-1 border border-white/10 backdrop-blur-sm select-none">
                 <ShieldCheck size={10} className="shrink-0 text-safari" />
                 <span className="text-[7px] font-black uppercase tracking-widest hidden sm:block">Verified</span>
@@ -211,33 +217,35 @@ export const PlaceCard: React.FC<PlaceCardProps> = React.memo(({ place, onClick,
         <div className="space-y-1.5 flex-1">
           <div className="space-y-0.5">
             <h3 className="text-[13px] sm:text-[14px] font-serif font-bold text-navy tracking-tight line-clamp-1 leading-tight group-hover:text-safari transition-colors">
-              {place.name}
+              {safePlace.name || 'Untitled Destination'}
             </h3>
             <div className="flex items-center gap-1 text-navy/40">
               <MapPin size={9} className="text-safari" />
-              <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.15em] truncate">{place.location}</span>
+              <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.15em] truncate">{safePlace.location || 'Kenya'}</span>
             </div>
           </div>
 
           <p className="text-navy/60 text-[11.5px] sm:text-xs leading-normal line-clamp-2 font-sans">
-            {place.description}
+            {safePlace.description || ''}
           </p>
 
           <div className="flex items-center gap-0.5 text-safari pt-0.5">
             {[...Array(5)].map((_, i) => (
-              <Star key={i} size={10} fill={i < Math.floor(place.rating) ? "currentColor" : "none"} className={i < Math.floor(place.rating) ? "" : "text-navy/10"} />
+              <Star key={i} size={10} fill={i < Math.floor(ratingVal) ? "currentColor" : "none"} className={i < Math.floor(ratingVal) ? "" : "text-navy/10"} />
             ))}
-            <span className="text-[8.5px] font-bold text-navy/30 ml-1.5 uppercase tracking-[0.05em] leading-none">({(place.rating * 12).toFixed(0)})</span>
+            <span className="text-[8.5px] font-bold text-navy/30 ml-1.5 uppercase tracking-[0.05em] leading-none">({(ratingVal * 12).toFixed(0)})</span>
           </div>
         </div>
 
         <div className="flex items-center justify-between pt-2.5 mt-2.5 border-t border-navy/5">
           <div className="flex flex-col">
             <span className="text-[7.5px] text-navy/20 uppercase font-black tracking-[0.15em] leading-none mb-0.5">From</span>
-            <span className="text-navy text-sm sm:text-base font-bold font-sans tracking-tight">Ksh {(place.price || 4500).toLocaleString()}</span>
+            <span className="text-navy text-sm sm:text-base font-bold font-sans tracking-tight">
+              {safePlace.price && safePlace.price > 0 ? `Ksh ${safePlace.price.toLocaleString()}` : 'Free Access'}
+            </span>
           </div>
           <button className="h-7.5 px-3 sm:px-3.5 bg-navy text-white rounded-full flex items-center justify-center gap-1.5 transition-all hover:bg-safari shadow cursor-pointer">
-            <span className="text-[7.5px] font-black uppercase tracking-wider">{getCTAText(place.category)}</span>
+            <span className="text-[7.5px] font-black uppercase tracking-wider">{getCTAText(safePlace.category)}</span>
             <ArrowRight size={10} />
           </button>
         </div>
