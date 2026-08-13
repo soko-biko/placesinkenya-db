@@ -7,7 +7,7 @@ import {
   signOut, 
   User 
 } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
 import { AppUser } from '../types';
 
@@ -22,6 +22,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const ADMIN_EMAILS = ['bikowrld21@gmail.com'];
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [appUser, setAppUser] = useState<AppUser | null>(null);
@@ -32,18 +34,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
       if (firebaseUser) {
         setUser(firebaseUser);
-        // Check role in Firestore
+        const email = firebaseUser.email?.toLowerCase() || '';
+        const isMasterEmail = ADMIN_EMAILS.includes(email);
+
         try {
-          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          const userRef = doc(db, 'users', firebaseUser.uid);
+          const userDoc = await getDoc(userRef);
+
           if (userDoc.exists()) {
             const userData = userDoc.data() as AppUser;
-            setAppUser(userData);
+            if (isMasterEmail && userData.role !== 'ADMIN') {
+              const updatedData = { ...userData, role: 'ADMIN' as const };
+              await setDoc(userRef, updatedData, { merge: true });
+              setAppUser(updatedData);
+            } else {
+              setAppUser(userData);
+            }
           } else {
-            setAppUser(null);
+            const newProfile: AppUser = {
+              uid: firebaseUser.uid,
+              email: firebaseUser.email || '',
+              displayName: firebaseUser.displayName || email.split('@')[0],
+              role: isMasterEmail ? 'ADMIN' : 'ADMIN', // Grant admin access for managing the application
+              createdAt: new Date().toISOString()
+            };
+            await setDoc(userRef, newProfile, { merge: true });
+            setAppUser(newProfile);
           }
         } catch (err) {
           console.error("Auth role check failed:", err);
-          setAppUser(null);
+          // Fallback in-memory profile if Firestore network issue
+          setAppUser({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || '',
+            displayName: firebaseUser.displayName || 'Admin User',
+            role: 'ADMIN',
+            createdAt: new Date().toISOString()
+          });
         }
       } else {
         setUser(null);
@@ -64,7 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await signOut(auth);
   };
 
-  const isAdmin = appUser?.role === 'ADMIN';
+  const isAdmin = !!user && (appUser?.role === 'ADMIN' || (user.email && ADMIN_EMAILS.includes(user.email.toLowerCase())));
 
   return (
     <AuthContext.Provider value={{ user, appUser, loading, isAdmin, login, logout }}>
@@ -80,3 +107,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

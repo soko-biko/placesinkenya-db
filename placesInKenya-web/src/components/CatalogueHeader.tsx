@@ -9,7 +9,7 @@ interface CatalogueHeaderProps {
 
 export const CatalogueHeader: React.FC<CatalogueHeaderProps> = ({ searchQuery, onSearchChange }) => {
   return (
-    <section className="relative pt-44 sm:pt-48 pb-20 overflow-hidden bg-navy">
+    <section className="relative pt-28 sm:pt-36 pb-12 sm:pb-16 overflow-hidden bg-navy">
       {/* Abstract Kenyan Landscape overlay */}
       <div className="absolute inset-0 z-0">
         <img 
@@ -20,22 +20,22 @@ export const CatalogueHeader: React.FC<CatalogueHeaderProps> = ({ searchQuery, o
         <div className="absolute inset-0 bg-gradient-to-b from-navy/60 via-navy to-navy"></div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10 text-center space-y-10">
-        <div className="space-y-4">
+      <div className="max-w-7xl mx-auto px-6 relative z-10 text-center space-y-8">
+        <div className="space-y-3">
           <motion.span 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-safari font-black uppercase tracking-[0.4em] text-[10px] truncate max-w-full block"
           >
-            The Curated Selection
+            Explore Kenya
           </motion.span>
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-3xl sm:text-5xl md:text-7xl font-serif font-bold text-white tracking-tight leading-tight"
+            className="text-3xl sm:text-5xl md:text-6xl font-serif font-bold text-white tracking-tight leading-tight"
           >
-            Catalogue of <span className="italic text-safari">Wonders</span>
+            Catalogue of <span className="italic text-safari">Places</span>
           </motion.h1>
         </div>
 

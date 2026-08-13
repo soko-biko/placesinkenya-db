@@ -21,7 +21,7 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   heroTitleHighlight: "Majesty",
   heroSubtitle: "A curated collective of the most authentic destinations in the heart of Africa.",
   heroBgImage: "https://images.unsplash.com/photo-1516426122078-c23e76319801",
-  heroSearchPlaceholder: "Where will your spirit wander?",
+  heroSearchPlaceholder: "Search by name, location, or experience...",
   eventsTitle: "Ways to Experience Kenya",
   eventsSubtitle: "A sequence of scheduled prestige events, from athletic safaris to jazz festivals in the city.",
   eventsBgImage: "https://images.unsplash.com/photo-1547448415-e9f5b28e570d",

@@ -8,7 +8,7 @@
         "name": { "type": "string", "description": "Name of the place." },
         "description": { "type": "string", "description": "Detailed description." },
         "location": { "type": "string", "description": "Geographical location string." },
-        "category": { "type": "string", "enum": ["RESTAURANT", "ENTERTAINMENT", "HANGOUT_SPOTS", "OUTDOORS", "SAFARI", "ADVENTURES", "HOTEL", "EXPERIENCE"], "description": "Primary category." },
+        "category": { "type": "string", "description": "Primary category." },
         "imageUrl": { "type": "string", "format": "uri", "description": "Main showcase image." },
         "price": { "type": "number", "description": "Starting or estimate price in KES." },
         "rating": { "type": "number", "description": "Current average rating." },
@@ -16,23 +16,69 @@
         "isTrending": { "type": "boolean", "description": "Whether the place is currently trending." },
         "isVerified": { "type": "boolean", "description": "Whether the place has been verified by admins." },
         "tags": { "type": "array", "items": { "type": "string" }, "description": "Searchable tags." },
-        "reviewsCount": { "type": "number", "description": "Total number of reviews for denormalization." },
-        "numRatings": { "type": "number", "description": "Total count of ratings for denormalization." }
+        "status": { "type": "string", "enum": ["PUBLISHED", "DRAFT", "ARCHIVED"], "description": "Publishing status." }
       },
       "required": ["name", "category", "ownerId"]
     },
-    "Review": {
-      "title": "Review",
-      "description": "A user-submitted review for a place.",
+    "Event": {
+      "title": "Event",
+      "description": "An event or upcoming experience.",
       "type": "object",
       "properties": {
-        "userId": { "type": "string", "description": "UID of the reviewer." },
-        "placeId": { "type": "string", "description": "ID of the place being reviewed." },
-        "rating": { "type": "number", "minimum": 1, "maximum": 5, "description": "Star rating." },
-        "comment": { "type": "string", "description": "Review textContent." },
-        "createdAt": { "type": "string", "format": "date-time", "description": "Time of submission." }
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "location": { "type": "string" },
+        "date": { "type": "string" },
+        "price": { "type": "number" },
+        "imageUrl": { "type": "string" },
+        "category": { "type": "string" },
+        "status": { "type": "string", "enum": ["PUBLISHED", "DRAFT", "ARCHIVED"] }
       },
-      "required": ["userId", "placeId", "rating"]
+      "required": ["title", "date"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Content classification category.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "description": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "displayOrder": { "type": "number" },
+        "isActive": { "type": "boolean" }
+      },
+      "required": ["name", "slug"]
+    },
+    "MediaAsset": {
+      "title": "MediaAsset",
+      "description": "Metadata for uploaded media files.",
+      "type": "object",
+      "properties": {
+        "filename": { "type": "string" },
+        "storagePath": { "type": "string" },
+        "downloadURL": { "type": "string" },
+        "contentType": { "type": "string" },
+        "size": { "type": "number" },
+        "uploadedAt": { "type": "string" },
+        "altText": { "type": "string" },
+        "caption": { "type": "string" }
+      },
+      "required": ["filename", "storagePath", "downloadURL"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Record of administrative actions.",
+      "type": "object",
+      "properties": {
+        "action": { "type": "string" },
+        "adminUid": { "type": "string" },
+        "adminEmail": { "type": "string" },
+        "targetType": { "type": "string" },
+        "targetId": { "type": "string" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["action", "adminUid"]
     }
   },
   "firestore": {
@@ -40,16 +86,26 @@
       "schema": "Place",
       "description": "Collection of all curated places and destinations."
     },
-    "/places/{placeId}/reviews/{reviewId}": {
-      "schema": "Review",
-      "description": "Subcollection of reviews for a specific place."
+    "/events/{eventId}": {
+      "schema": "Event",
+      "description": "Collection of upcoming events."
+    },
+    "/categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Content category definitions."
+    },
+    "/media/{mediaId}": {
+      "schema": "MediaAsset",
+      "description": "Media library assets metadata."
+    },
+    "/audit_logs/{logId}": {
+      "schema": "AuditLog",
+      "description": "Administrative audit trail."
     },
     "/users/{userId}": {
-      "schema": "User",
       "description": "User profile data."
     },
     "/registrations/{regId}": {
-      "schema": "Registration",
       "description": "Partner registration applications."
     },
     "/operators/{id}": {
@@ -58,14 +114,8 @@
     "/guides/{id}": {
       "description": "Individual tour guides."
     },
-    "/providers/{id}": {
-      "description": "Consolidated list of experience providers."
-    },
-    "/events/{id}": {
-      "description": "Upcoming experiences and events."
-    },
-    "/itineraries/{id}": {
-      "description": "User custom trip itineraries."
+    "/site_config/main": {
+      "description": "Global website configuration singleton."
     }
   }
 }

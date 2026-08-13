@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { TourOperator, OperatorType } from '../types';
-import { Star, MessageCircle, Calendar, ShieldCheck, Search, MapPin, Languages } from 'lucide-react';
+import { Star, MessageCircle, Calendar, ShieldCheck, Search, MapPin, Languages, LayoutGrid, List } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface OperatorsListProps {
@@ -12,6 +12,7 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
   const [selectedSpecialty, setSelectedSpecialty] = useState('ALL');
   const [selectedLocation, setSelectedLocation] = useState('ALL');
   const [activeTab, setActiveTab] = useState<OperatorType | 'ALL'>('ALL');
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
 
   const specialties = useMemo(() => {
     const all = operators.flatMap(o => o.specialties || []);
@@ -34,6 +35,144 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
     });
   }, [operators, searchQuery, selectedSpecialty, selectedLocation, activeTab]);
 
+  const HorizontalOperatorCard: React.FC<{ operator: TourOperator }> = ({ operator }) => {
+    const isCompany = operator.type === OperatorType.COMPANY;
+
+    return (
+      <motion.article
+        layout
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.98 }}
+        className="group flex flex-col sm:flex-row items-stretch gap-4 sm:gap-6 py-5 border-b border-navy/10 hover:bg-navy/[0.01] transition-colors cursor-pointer w-full text-left"
+      >
+        {/* Left Image Section - Pure image container without badges */}
+        <div className="relative w-full sm:w-36 md:w-48 aspect-[16/10] sm:aspect-[4/3] rounded-xl overflow-hidden bg-navy/5 shrink-0 z-0">
+          <img 
+            src={operator.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(operator.name)}&background=0D1B2A&color=fff`} 
+            alt={operator.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
+          />
+        </div>
+
+        {/* Right Info Section */}
+        <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+          <div className="space-y-1.5">
+            {/* Category Tag & Verified Badge outside image div */}
+            <div className="flex items-center gap-2">
+              <span className="bg-safari/10 text-safari text-[8px] font-black uppercase tracking-[0.15em] px-2.5 py-0.5 rounded-full border border-safari/20 select-none">
+                {isCompany ? 'Fleet Operator' : operator.title || 'Elite Guide'}
+              </span>
+              {operator.isVerified && (
+                <span className="bg-green-500/10 text-green-700 border border-green-500/20 px-2 py-0.5 rounded-full flex items-center gap-1 text-[8px] font-black uppercase tracking-wider">
+                  <ShieldCheck size={10} className="text-green-600 shrink-0" />
+                  Verified
+                </span>
+              )}
+            </div>
+
+            {/* Header: Name and Rating */}
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-sm sm:text-base md:text-lg font-serif font-bold text-navy truncate group-hover:text-safari transition-colors">
+                {operator.name}
+              </h3>
+
+              <div className="flex items-center gap-0.5 text-safari shrink-0">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={10} fill={i < Math.floor(operator.rating) ? "currentColor" : "none"} className="text-safari border-0" />
+                ))}
+                <span className="text-[10px] font-bold text-navy ml-1 font-sans">
+                  {operator.rating.toFixed(1)}
+                </span>
+                <span className="text-[9px] text-navy/40 font-medium font-sans">
+                  ({operator.reviewsCount || operator.tripsCompleted || 0})
+                </span>
+              </div>
+            </div>
+
+            {/* Meta Items: Location & Languages */}
+            <div className="flex flex-wrap items-center gap-2.5 text-[8.5px] sm:text-[9px] font-black uppercase tracking-wider text-navy/50">
+              {operator.location && (
+                <span className="flex items-center gap-1">
+                  <MapPin size={11} className="text-safari" />
+                  {operator.location}
+                </span>
+              )}
+              {operator.languages && operator.languages.length > 0 && (
+                <>
+                  <span>•</span>
+                  <span className="flex items-center gap-1">
+                    <Languages size={11} className="text-safari" />
+                    {operator.languages.slice(0, 3).join(', ')}
+                  </span>
+                </>
+              )}
+            </div>
+
+            {/* Bio */}
+            <p className="text-navy/60 text-[11px] sm:text-xs leading-relaxed line-clamp-2 font-sans">
+              {operator.bio}
+            </p>
+
+            {/* Specialties Chips */}
+            {operator.specialties && operator.specialties.length > 0 && (
+              <div className="flex flex-wrap gap-1 pt-0.5">
+                {operator.specialties.slice(0, 4).map(s => (
+                  <span key={s} className="bg-navy/5 text-navy/60 text-[7.5px] sm:text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded border border-navy/5">
+                    {s}
+                  </span>
+                ))}
+                {operator.specialties.length > 4 && (
+                  <span className="text-navy/30 text-[7.5px] font-black uppercase tracking-wider px-1 py-0.5">
+                    +{operator.specialties.length - 4}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Pricing & CTA */}
+          <div className="flex items-center justify-between sm:justify-end gap-3 mt-3 pt-2.5 border-t border-navy/5">
+            <div className="flex flex-col sm:items-end sm:mr-3">
+              <span className="text-[7px] text-navy/30 uppercase font-black tracking-widest leading-none mb-0.5">
+                {isCompany ? 'Rates From' : 'Daily Guide Rate'}
+              </span>
+              <span className="text-navy text-xs sm:text-sm font-bold tracking-tight font-sans">
+                Ksh {operator.basePrice.toLocaleString()} {!isCompany && <span className="text-[8.5px] font-normal text-navy/30"> / day</span>}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1.5 select-none">
+              <button 
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const text = encodeURIComponent(`Hi, I'm interested in booking ${operator.name} on PlacesInKenya!`);
+                  window.open(`https://wa.me/?text=${text}`, '_blank');
+                }}
+                className="w-8 h-8 rounded-full flex items-center justify-center border border-navy/10 hover:border-navy text-navy hover:bg-navy/5 transition-all cursor-pointer"
+                title="Contact Operator"
+              >
+                <MessageCircle size={12} />
+              </button>
+
+              <a 
+                href={operator.bookingLink || 'about:blank'}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="h-8 px-3.5 bg-navy hover:bg-safari text-white rounded-full flex items-center justify-center gap-1 transition-all shadow-sm cursor-pointer whitespace-nowrap"
+              >
+                <span className="text-[7.5px] font-black uppercase tracking-wider">{isCompany ? 'Reserve' : 'Book Guide'}</span>
+                <Calendar size={11} />
+              </a>
+            </div>
+          </div>
+        </div>
+      </motion.article>
+    );
+  };
+
   const CompanyCard: React.FC<{ operator: TourOperator }> = ({ operator }) => (
     <motion.div 
       layout
@@ -48,15 +187,6 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-navy/35 via-transparent to-transparent font-sans"></div>
-        
-        {operator.isVerified && (
-          <div className="absolute top-2.5 right-2.5">
-             <div className="bg-green-500 text-white px-2.5 h-6 rounded-full flex items-center gap-1 shadow">
-                <ShieldCheck size={10} />
-                <span className="text-[7.5px] font-black uppercase tracking-widest">Verified</span>
-             </div>
-          </div>
-        )}
 
         <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between text-white font-sans">
            <div className="space-y-0.5 min-w-0">
@@ -73,6 +203,19 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
 
       <div className="p-4 sm:p-5 flex flex-col flex-1">
         <div className="space-y-3 flex-1">
+           {/* Category & Verified Badges outside image div */}
+           <div className="flex items-center gap-2">
+              <span className="bg-safari/10 text-safari text-[8px] font-black uppercase tracking-[0.15em] px-2.5 py-0.5 rounded-full border border-safari/20 select-none">
+                Fleet Operator
+              </span>
+              {operator.isVerified && (
+                 <span className="bg-green-500/10 text-green-700 border border-green-500/20 px-2 py-0.5 rounded-full flex items-center gap-1 text-[8px] font-black uppercase tracking-wider">
+                    <ShieldCheck size={10} className="text-green-600 shrink-0" />
+                    Verified
+                 </span>
+              )}
+           </div>
+
            <p className="text-navy/50 text-xs leading-normal line-clamp-2">
              {operator.bio}
            </p>
@@ -120,24 +263,30 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
       className="bg-white rounded-2xl p-4 sm:p-5 border border-navy/5 shadow-sm hover:shadow-md hover:-translate-y-[2px] transition-all duration-300 group"
     >
       <div className="flex flex-col items-center text-center space-y-4">
-        <div className="relative">
-           <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white shadow shadow-navy/5 relative z-10">
-              <img 
-                src={operator.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(operator.name)}&background=0D1B2A&color=fff&rounded=true`} 
-                className="w-full h-full object-cover" 
-                alt={operator.name} 
-              />
-           </div>
+        {/* Pure Avatar image div without absolute badges */}
+        <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white shadow shadow-navy/5">
+           <img 
+             src={operator.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(operator.name)}&background=0D1B2A&color=fff&rounded=true`} 
+             className="w-full h-full object-cover" 
+             alt={operator.name} 
+           />
+        </div>
+
+        {/* Category & Verified Badges outside avatar image div */}
+        <div className="flex items-center gap-2 justify-center flex-wrap">
+           <span className="bg-safari/10 text-safari text-[8px] font-black uppercase tracking-[0.15em] px-2.5 py-0.5 rounded-full border border-safari/20">
+             {operator.title || 'Elite Guide'}
+           </span>
            {operator.isVerified && (
-             <div className="absolute top-0 right-0 z-20 w-6.5 h-6.5 bg-green-500 text-white rounded-full flex items-center justify-center border-2 border-white shadow">
-                <ShieldCheck size={11} />
-             </div>
+              <span className="bg-green-500/10 text-green-700 border border-green-500/20 px-2 py-0.5 rounded-full flex items-center gap-1 text-[8px] font-black uppercase tracking-wider">
+                 <ShieldCheck size={10} className="text-green-600 shrink-0" />
+                 Verified
+              </span>
            )}
         </div>
 
         <div className="space-y-0.5">
            <h3 className="text-base sm:text-[17px] font-serif font-bold text-navy">{operator.name}</h3>
-           <p className="text-[8px] font-black uppercase tracking-[0.2em] text-safari leading-none">{operator.title}</p>
         </div>
 
         <div className="flex items-center gap-0.5 justify-center text-safari">
@@ -196,85 +345,10 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
     </motion.div>
   );
 
-  const MobileOperatorListItem: React.FC<{ operator: TourOperator }> = ({ operator }) => (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0 }}
-      className="py-5 flex gap-4 items-start w-full border-b border-navy/10 last:border-b-0"
-    >
-      {/* Left Side: Image/Avatar */}
-      <div className="relative shrink-0 select-none">
-        <div className="w-20 h-20 rounded-xl overflow-hidden bg-navy/5 border border-navy/5">
-          <img 
-            src={operator.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(operator.name)}&background=0D1B2A&color=fff`} 
-            alt={operator.name}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        {operator.isVerified && (
-          <div className="absolute -top-1 -right-1 bg-green-500 text-white w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow">
-            <ShieldCheck size={11} />
-          </div>
-        )}
-      </div>
-
-      {/* Right Side: Info and CTA */}
-      <div className="flex-1 min-w-0 flex flex-col justify-between h-20">
-        <div className="space-y-1">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <span className="text-[7.5px] font-black uppercase tracking-widest text-safari leading-none block mb-0.5">
-                {operator.type === OperatorType.COMPANY ? 'Featured Fleet' : operator.title || 'Elite Guide'}
-              </span>
-              <h3 className="text-sm font-serif font-bold text-navy truncate leading-none">
-                {operator.name}
-              </h3>
-            </div>
-            
-            <div className="flex items-center gap-0.5 text-safari shrink-0">
-              <Star size={10} fill="currentColor" />
-              <span className="text-[10px] font-bold text-navy ml-1 leading-none">
-                {operator.rating.toFixed(1)}
-              </span>
-            </div>
-          </div>
-
-          <p className="text-navy/60 text-[11px] leading-relaxed line-clamp-1 pr-2">
-            {operator.bio}
-          </p>
-        </div>
-
-        <div className="flex items-center justify-between gap-4 border-t border-navy/5 pt-1.5">
-          <div>
-            <span className="text-[11px] font-bold text-navy font-sans leading-none">
-              Ksh {operator.basePrice.toLocaleString()} {operator.type === OperatorType.INDIVIDUAL && <span className="text-[8.5px] font-normal text-navy/30"> / day</span>}
-            </span>
-          </div>
-
-          <div className="flex gap-1 shrink-0 select-none">
-            <button className="w-7.5 h-7.5 flex items-center justify-center bg-navy/5 text-navy/40 rounded-lg hover:bg-safari hover:text-white transition-all cursor-pointer">
-              <MessageCircle size={12} />
-            </button>
-            <a 
-              href={operator.bookingLink || 'about:blank'}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="h-7.5 px-3 bg-safari text-white rounded-lg font-black uppercase tracking-widest text-[8px] flex items-center justify-center gap-1 shadow shadow-safari/10 hover:opacity-90 transition-opacity cursor-pointer"
-            >
-              Book <Calendar size={11} />
-            </a>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-
   return (
-    <div className="space-y-8 select-none">
+    <div className="space-y-6 select-none">
       {/* Search & Filter Header */}
-      <div className="bg-white rounded-2xl p-4 sm:p-5 md:p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-navy/5 space-y-4">
+      <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-navy/5 space-y-4">
         <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 justify-between">
            <div className="relative group flex-1 max-w-sm">
               <div className="absolute inset-y-0 left-4 flex items-center text-navy/25 group-focus-within:text-safari transition-colors pointer-events-none">
@@ -284,7 +358,7 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
                 type="text" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search partners..."
+                placeholder="Search operators or guides..."
                 className="w-full h-10 bg-navy/5 hover:bg-navy/10 focus:bg-white focus:ring-1 focus:ring-safari rounded-xl pl-10 pr-4 text-xs text-navy outline-none transition-all placeholder:text-navy/20"
               />
            </div>
@@ -328,35 +402,61 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
               </div>
            </div>
         </div>
+
+        {/* Info & View Layout Toggle Bar */}
+        <div className="flex items-center justify-between border-t border-navy/5 pt-3">
+          <span className="text-[10px] font-black uppercase tracking-wider text-navy/40">
+            {filteredOperators.length} {filteredOperators.length === 1 ? 'Partner' : 'Partners & Guides'}
+          </span>
+
+          <div className="flex items-center gap-1 bg-navy/5 p-1 rounded-xl">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-1.5 rounded-lg transition-all cursor-pointer ${viewMode === 'list' ? 'bg-white text-navy shadow-sm' : 'text-navy/30 hover:text-navy'}`}
+              title="Horizontal List Presentation"
+            >
+              <List size={16} />
+            </button>
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-1.5 rounded-lg transition-all cursor-pointer ${viewMode === 'grid' ? 'bg-white text-navy shadow-sm' : 'text-navy/30 hover:text-navy'}`}
+              title="Grid Presentation"
+            >
+              <LayoutGrid size={16} />
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Responsive Layout Representation */}
+      {/* Main Listing View */}
       <AnimatePresence mode="popLayout">
          {filteredOperators.length > 0 ? (
            <div className="w-full">
-             {/* Mobile View: List-based Layout */}
-             <motion.div 
-               className="flex flex-col w-full divide-y divide-navy/5 md:hidden"
-               initial={{ opacity: 0 }}
-               animate={{ opacity: 1 }}
-               exit={{ opacity: 0 }}
-             >
-               {filteredOperators.map(o => (
-                 <MobileOperatorListItem key={o.id} operator={o} />
-               ))}
-             </motion.div>
-
-             {/* Big Screen View: Grid of Cards Layout */}
-             <motion.div 
-               className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-               initial={{ opacity: 0 }}
-               animate={{ opacity: 1 }}
-               exit={{ opacity: 0 }}
-             >
-               {filteredOperators.map(o => (
-                 o.type === OperatorType.COMPANY ? <CompanyCard key={o.id} operator={o} /> : <GuideCard key={o.id} operator={o} />
-               ))}
-             </motion.div>
+             {viewMode === 'list' ? (
+               /* Horizontal Listing Presentation */
+               <motion.div 
+                 className="flex flex-col w-full divide-y divide-navy/10"
+                 initial={{ opacity: 0 }}
+                 animate={{ opacity: 1 }}
+                 exit={{ opacity: 0 }}
+               >
+                 {filteredOperators.map(o => (
+                   <HorizontalOperatorCard key={o.id} operator={o} />
+                 ))}
+               </motion.div>
+             ) : (
+               /* Grid Presentation */
+               <motion.div 
+                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                 initial={{ opacity: 0 }}
+                 animate={{ opacity: 1 }}
+                 exit={{ opacity: 0 }}
+               >
+                 {filteredOperators.map(o => (
+                   o.type === OperatorType.COMPANY ? <CompanyCard key={o.id} operator={o} /> : <GuideCard key={o.id} operator={o} />
+                 ))}
+               </motion.div>
+             )}
            </div>
          ) : (
            <motion.div 

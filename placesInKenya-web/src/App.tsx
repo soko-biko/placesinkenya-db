@@ -34,7 +34,7 @@ const SkeletonLoader = () => (
         <div className="w-20 h-20 bg-navy/5 rounded-[2rem] animate-pulse flex items-center justify-center">
             <div className="w-10 h-10 border-4 border-safari border-t-transparent rounded-full animate-spin"></div>
         </div>
-        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-navy/20 animate-pulse">Synchronizing Registry Data...</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-navy/20 animate-pulse">Loading...</p>
     </div>
 );
 
@@ -299,17 +299,17 @@ const App: React.FC = () => {
                        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                        className="text-safari font-black uppercase tracking-[0.4em] text-[10px]"
                      >
-                       The Human Connection
+                       Local Guides & Partners
                      </motion.span>
                      <motion.h1 
                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                       className="text-5xl md:text-8xl font-serif font-bold text-white tracking-tight"
+                       className="text-4xl sm:text-5xl md:text-7xl font-serif font-bold text-white tracking-tight"
                      >
                        Guides & <span className="italic text-safari font-light">Trusted</span> Partners
                      </motion.h1>
                      <motion.p 
                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-                       className="text-white/40 max-w-2xl mx-auto text-lg font-light italic"
+                       className="text-white/40 max-w-2xl mx-auto text-base sm:text-lg font-light italic"
                      >
                        Connect with Kenya's most respected safari specialists, coastal masters, and local cultural hosts.
                      </motion.p>
@@ -336,17 +336,17 @@ const App: React.FC = () => {
             reviews={userReviews}
           />
         ) : (
-          <div className="flex-1 flex items-center justify-center py-40 bg-navy">
-            <div className="max-w-[450px] mx-auto px-6 text-center space-y-10">
-              <div className="w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mx-auto text-safari border border-white/10 shadow-2xl animate-bounce-slow"><Lock size={40} /></div>
+          <div className="flex-1 flex items-center justify-center py-24 sm:py-32 bg-navy">
+            <div className="max-w-[450px] mx-auto px-6 text-center space-y-8">
+              <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto text-safari border border-white/10 shadow-2xl"><Lock size={32} /></div>
               <div className="space-y-3">
-                <span className="text-safari font-bold uppercase tracking-[0.4em] text-[10px]">Private Explorer Hub</span>
-                <h2 className="text-4xl font-serif font-bold text-white">Your Kenya, Personalized</h2>
-                <p className="text-white/40 text-base font-light italic leading-relaxed">Sign in to access your custom itinerary repository, saved aesthetic gems, and exclusive collective reviews.</p>
+                <span className="text-safari font-bold uppercase tracking-[0.4em] text-[10px]">My Kenya</span>
+                <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white">Your Saved Places & Events</h2>
+                <p className="text-white/40 text-sm sm:text-base font-light italic leading-relaxed">Sign in to access your custom itinerary, saved places, and your reviews.</p>
               </div>
               <button 
                 onClick={() => { setAuthMode('login'); setIsAuthOpen(true); }} 
-                className="w-full h-16 bg-safari text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-2xl shadow-safari/20 transition-all active:scale-95 flex items-center justify-center gap-4 group"
+                className="w-full h-14 bg-safari text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-2xl shadow-safari/20 transition-all active:scale-95 flex items-center justify-center gap-4 group"
               >
                 Sign In to Start Planning <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
               </button>
@@ -382,12 +382,12 @@ const App: React.FC = () => {
       </div>
 
       {/* Footer styled with Niko Free style sheets */}
-      <footer className="bg-navy pt-20 pb-12 text-white relative overflow-hidden">
+      <footer className="bg-navy pt-16 pb-12 text-white relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-safari/30 to-transparent"></div>
         <Container>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-16 mb-20">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-16 mb-12 md:mb-16">
             {/* Brand Column */}
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div 
                 className="flex items-center cursor-pointer group" 
                 onClick={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
@@ -395,12 +395,12 @@ const App: React.FC = () => {
                 <img 
                   src="https://lh3.googleusercontent.com/d/1G9iYeJQ4q67zu7dBwjXm9BTz_boLAzco" 
                   alt="PlacesInKenya Logo" 
-                  className="h-16 w-16 object-contain -ml-4 -mr-4.5 shrink-0 transition-transform duration-300 group-hover:scale-105" 
+                  className="h-14 w-14 object-contain -ml-4 -mr-4.5 shrink-0 transition-transform duration-300 group-hover:scale-105" 
                 />
-                <span className="font-serif text-2xl font-bold text-white group-hover:text-safari transition-colors">PlacesInKenya</span>
+                <span className="font-serif text-xl sm:text-2xl font-bold text-white group-hover:text-safari transition-colors">PlacesInKenya</span>
               </div>
-              <p className="text-white/40 text-sm leading-relaxed max-w-xs">
-                Kenya's most comprehensive destination guide. Discover the magic of the wild and the pulse of the city through our curated aesthetic database.
+              <p className="text-white/40 text-xs sm:text-sm leading-relaxed max-w-xs">
+                Kenya's most comprehensive destination guide. Discover amazing places and experiences across Kenya.
               </p>
               {/* Social icons with hover lift */}
               <div className="flex gap-4 pt-2">

@@ -46,20 +46,23 @@ export const OperatorSpotlight: React.FC<OperatorSpotlightProps> = ({ operators 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-navy/35 via-transparent to-transparent"></div>
-                  
-                  {/* Verified Badge - grouped z-10 */}
-                  {op.isVerified && (
-                    <div className="absolute top-2.5 right-2.5 z-10">
-                      <div className="bg-[#E8621A] text-white px-2 h-6 rounded-full shadow flex items-center justify-center gap-1 border border-white/10 backdrop-blur-sm">
-                        <ShieldCheck size={10} className="shrink-0 text-white" />
-                        <span className="text-[7px] font-black uppercase tracking-widest">Verified</span>
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* Content Section - matching PlaceCard sizes */}
                 <div className="p-4 flex flex-col flex-1 space-y-2">
+                  {/* Category and Verified Badges outside image div */}
+                  <div className="flex items-center gap-2">
+                    <span className="bg-[#E8621A]/10 text-[#E8621A] text-[8px] font-black uppercase tracking-[0.15em] px-2.5 py-0.5 rounded-full border border-[#E8621A]/20">
+                      {op.type === 'COMPANY' ? 'Fleet Operator' : op.title || 'Tour Guide'}
+                    </span>
+                    {op.isVerified && (
+                      <span className="bg-green-500/10 text-green-700 border border-green-500/20 px-2 py-0.5 rounded-full flex items-center gap-1 text-[8px] font-black uppercase tracking-wider">
+                        <ShieldCheck size={10} className="text-green-600 shrink-0" />
+                        Verified
+                      </span>
+                    )}
+                  </div>
+
                   <div className="space-y-1.5 flex-1">
                     <div className="space-y-0.5">
                       <h3 className="text-[13px] sm:text-[14px] font-serif font-bold text-navy tracking-tight line-clamp-1 leading-tight group-hover:text-[#E8621A] transition-colors">

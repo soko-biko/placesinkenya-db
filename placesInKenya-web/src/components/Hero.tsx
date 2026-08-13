@@ -77,7 +77,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, trendingPlaces }) => {
               type="text"
               value={val}
               onChange={(e) => setVal(e.target.value)}
-              placeholder={settings.heroSearchPlaceholder || "Where will your spirit wander?"}
+              placeholder={settings.heroSearchPlaceholder || "Search by name, location, or experience..."}
               className="absolute inset-0 bg-transparent pl-16 pr-32 md:pr-40 text-white group-focus-within:text-navy text-base md:text-lg font-medium outline-none placeholder:text-white/60 group-focus-within:placeholder:text-navy/45 tap-target text-left"
             />
 

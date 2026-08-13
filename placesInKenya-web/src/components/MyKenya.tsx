@@ -261,41 +261,41 @@ export const MyKenya: React.FC<MyKenyaProps> = ({
   return (
     <div className="min-h-screen bg-off-white pb-32">
        {/* Hero / Greeting */}
-       <header className="bg-navy pt-48 pb-24 overflow-hidden relative">
+       <header className="bg-navy pt-28 sm:pt-36 pb-12 sm:pb-16 overflow-hidden relative">
           <div className="absolute inset-0 opacity-10">
              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-safari via-transparent to-transparent"></div>
           </div>
           
           <div className="max-w-7xl mx-auto px-6 relative z-10">
-             <div className="flex flex-col md:flex-row items-center gap-12">
+             <div className="flex flex-col md:flex-row items-center gap-8">
                 <div className="relative group">
-                   <div className="w-40 h-40 rounded-[54px] overflow-hidden border-4 border-white/10 shadow-2xl relative z-10 bg-white/5 flex items-center justify-center">
+                   <div className="w-24 sm:w-32 h-24 sm:h-32 rounded-3xl overflow-hidden border-2 border-white/10 shadow-2xl relative z-10 bg-white/5 flex items-center justify-center">
                       {userProfile.photoURL ? (
                         <img src={userProfile.photoURL} className="w-full h-full object-cover" alt="Profile" />
                       ) : (
-                        <span className="text-4xl font-serif font-bold text-white/20">{userProfile.name?.charAt(0)}</span>
+                        <span className="text-3xl font-serif font-bold text-white/20">{userProfile.name?.charAt(0)}</span>
                       )}
                    </div>
-                   <button className="absolute bottom-2 right-2 z-20 w-12 h-12 bg-safari text-white rounded-2xl flex items-center justify-center shadow-xl hover:scale-110 transition-transform cursor-pointer">
-                      <Camera size={20} />
+                   <button className="absolute -bottom-1 -right-1 z-20 w-8 h-8 bg-safari text-white rounded-xl flex items-center justify-center shadow-xl hover:scale-110 transition-transform cursor-pointer">
+                      <Camera size={14} />
                    </button>
-                   <div className="absolute -inset-4 bg-safari/20 rounded-[60px] blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                   <div className="absolute -inset-4 bg-safari/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
 
-                <div className="text-center md:text-left space-y-4">
+                <div className="text-center md:text-left space-y-3">
                    <motion.span 
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                     className="text-safari font-black uppercase tracking-[0.4em] text-[10px]"
                    >
-                     {userProfile.persona?.replace('_', ' ')} Member
+                     {userProfile.persona?.replace('_', ' ')}
                    </motion.span>
-                   <h1 className="text-5xl md:text-7xl font-serif font-bold text-white tracking-tight">Your Kenya, <span className="italic text-safari font-light">{userProfile.name?.split(' ')[0]}</span></h1>
-                   <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-2">
-                       <div className="px-4 h-9 bg-white/5 rounded-full border border-white/10 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/40">
-                          <ShieldCheck size={14} className="text-safari" /> Verified Explorer
+                   <h1 className="text-3xl sm:text-5xl md:text-6xl font-serif font-bold text-white tracking-tight">Your Kenya, <span className="italic text-safari font-light">{userProfile.name?.split(' ')[0]}</span></h1>
+                   <div className="flex flex-wrap justify-center md:justify-start gap-3 pt-1">
+                       <div className="px-3.5 h-8 bg-white/5 rounded-full border border-white/10 flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-white/60">
+                          <ShieldCheck size={13} className="text-safari" /> Verified User
                        </div>
-                       <div className="px-4 h-9 bg-white/5 rounded-full border border-white/10 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/40">
-                          <Compass size={14} className="text-safari" /> 4 Regions Explored
+                       <div className="px-3.5 h-8 bg-white/5 rounded-full border border-white/10 flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-white/60">
+                          <Compass size={13} className="text-safari" /> Saved Places & Itinerary
                        </div>
                    </div>
                 </div>
@@ -422,7 +422,7 @@ export const MyKenya: React.FC<MyKenyaProps> = ({
                     {activeItineraries.length === 0 ? (
                       <div className="py-24 bg-white rounded-[40px] border border-dashed border-navy/10 text-center space-y-6">
                          <MapIcon size={40} className="mx-auto text-navy/10" />
-                         <p className="text-navy/40 italic">No active items scheduled. Add saved gems to your itinerary.</p>
+                         <p className="text-navy/40 italic">No active items scheduled. Add saved places to your itinerary.</p>
                       </div>
                     ) : (
                       <div className="space-y-4">
@@ -559,7 +559,7 @@ export const MyKenya: React.FC<MyKenyaProps> = ({
                      <div className="space-y-4">
                         {[
                           { id: 'notifications', title: 'System Alerts', desc: 'Real-time updates on saved itinerary changes and booking status.' },
-                          { id: 'newsletter', title: 'The Kenya Dispatch', desc: 'A monthly editorial on hidden Kenyan gems and aesthetic routes.' }
+                          { id: 'newsletter', title: 'The Kenya Dispatch', desc: 'A monthly editorial on hidden places and travel routes.' }
                         ].map((pref) => (
                           <div key={pref.id} className="flex items-center justify-between p-6 bg-[#FAFAF8] rounded-3xl border border-navy/5">
                              <div className="space-y-1">

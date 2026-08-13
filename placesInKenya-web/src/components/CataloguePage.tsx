@@ -133,8 +133,8 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
                 <div className="flex flex-col flex-1 max-w-md">
                     <div className="flex justify-between items-end mb-3">
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-safari leading-none">Discovery Report</span>
-                        <span className="text-[10px] font-bold text-navy/30 uppercase tracking-widest">{Math.min(visibleCount, filteredPlaces.length)} / {filteredPlaces.length} Collections</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-safari leading-none">Places</span>
+                        <span className="text-[10px] font-bold text-navy/30 uppercase tracking-widest">{Math.min(visibleCount, filteredPlaces.length)} / {filteredPlaces.length} Places</span>
                     </div>
                     <div className="h-1.5 w-full bg-navy/5 rounded-full overflow-hidden">
                         <motion.div 
@@ -158,7 +158,7 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
                     onClick={() => setIsSidebarOpen(true)}
                     className="lg:hidden flex-1 sm:flex-initial flex items-center justify-center gap-2.5 px-6 h-12 bg-navy text-white rounded-xl font-black uppercase tracking-widest text-[10px] shadow-md tap-target"
                   >
-                    <SlidersHorizontal size={14} /> <span>Filter Treasures</span>
+                    <SlidersHorizontal size={14} /> <span>Filter Places</span>
                   </button>
                 </div>
               </div>
@@ -235,7 +235,7 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
                     {visibleCount < filteredPlaces.length && (
                         <div className="flex flex-col items-center gap-4 py-8 border-t border-navy/5">
                             <p className="text-[10px] font-bold text-navy/30 uppercase tracking-[0.2em]">
-                                You've revealed {displayedPlaces.length} of {filteredPlaces.length} gems
+                                Showing {displayedPlaces.length} of {filteredPlaces.length} places
                             </p>
                             <button 
                                 onClick={handleLoadMore}
@@ -243,7 +243,7 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
                                 className="group h-12 px-10 bg-white hover:bg-navy text-navy hover:text-white border-2 border-navy rounded-full font-black uppercase tracking-[0.3em] text-[10px] sm:text-[11px] transition-all flex items-center justify-center gap-3 shadow-lux active:scale-95 disabled:opacity-50 cursor-pointer"
                             >
                                 {isLoading ? <Loader2 className="animate-spin" size={16} /> : (
-                                    <>Reveal More Wonders <div className="w-8 h-8 bg-navy/5 group-hover:bg-white/10 rounded-full flex items-center justify-center transition-colors"><LayoutGrid size={14} /></div></>
+                                    <>Load More <div className="w-8 h-8 bg-navy/5 group-hover:bg-white/10 rounded-full flex items-center justify-center transition-colors"><LayoutGrid size={14} /></div></>
                                 )}
                             </button>
                         </div>
@@ -255,9 +255,9 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
                       <Search size={32} />
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-xl sm:text-2xl font-serif font-bold text-navy">No Treasures Found</h3>
+                      <h3 className="text-xl sm:text-2xl font-serif font-bold text-navy">No Places Found</h3>
                       <p className="text-navy/40 max-w-sm mx-auto text-sm leading-relaxed">
-                        The wild spirit is vast, but it seems we couldn't find a match for your current filters. Broaden your horizons.
+                        We couldn't find any places matching your current filters. Try adjusting your search criteria.
                       </p>
                     </div>
                     <button 

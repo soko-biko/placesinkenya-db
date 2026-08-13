@@ -1453,7 +1453,7 @@ export const AdminDashboard: React.FC = () => {
                         type="text" 
                         value={siteSettingsForm.heroSearchPlaceholder} 
                         onChange={e => setSiteSettingsForm(p => ({ ...p, heroSearchPlaceholder: e.target.value }))} 
-                        placeholder="Where will your spirit wander?" 
+                        placeholder="Search by name, location, or experience..." 
                         className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 outline-none focus:border-safari text-white" 
                       />
                     </div>

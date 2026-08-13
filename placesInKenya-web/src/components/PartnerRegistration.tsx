@@ -330,7 +330,7 @@ export const PartnerRegistration: React.FC = () => {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-off-white">
         {/* Hero */}
-        <section className="relative h-[80vh] flex items-center overflow-hidden bg-navy">
+        <section className="relative py-20 md:py-28 flex items-center overflow-hidden bg-navy">
            <div className="absolute inset-0 z-0">
               <img 
                 src="https://images.unsplash.com/photo-1547448415-e9f5b28e570d" 
@@ -340,8 +340,8 @@ export const PartnerRegistration: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/80 to-transparent"></div>
            </div>
            
-           <div className="max-w-7xl mx-auto px-6 relative z-10 w-full grid grid-cols-1 lg:grid-cols-2 gap-20">
-              <div className="space-y-10">
+           <div className="max-w-7xl mx-auto px-6 relative z-10 w-full grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <div className="space-y-8">
                  <motion.span 
                     initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
                     className="text-safari font-black uppercase tracking-[0.4em] text-[10px]"
@@ -350,15 +350,15 @@ export const PartnerRegistration: React.FC = () => {
                  </motion.span>
                  <motion.h1 
                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                    className="text-6xl md:text-8xl font-serif font-bold text-white leading-[0.95] tracking-tighter"
+                    className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold text-white leading-tight tracking-tight"
                  >
-                   Grow Your <br /><span className="italic font-light text-safari text-7xl md:text-9xl">Vocation.</span>
+                   Grow Your <br /><span className="italic font-light text-safari">Business.</span>
                  </motion.h1>
                  <motion.p 
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-                    className="text-white/40 text-xl font-light italic max-w-lg leading-relaxed"
+                    className="text-white/40 text-base sm:text-lg font-light italic max-w-lg leading-relaxed"
                  >
-                    Join 500+ verified businesses reaching thousands of travellers monthly through our curated aesthetic database.
+                    Join 500+ verified businesses reaching thousands of travellers monthly through our travel guide.
                  </motion.p>
                  <div className="flex flex-col sm:flex-row gap-4">
                     <button 
@@ -369,7 +369,7 @@ export const PartnerRegistration: React.FC = () => {
                        }}
                        className="h-11 md:h-12 w-fit self-center sm:w-auto px-6 md:px-8 bg-white text-navy rounded-full font-black uppercase tracking-widest text-[9px] shadow-2xl hover:bg-safari hover:text-white transition-all flex items-center justify-center gap-3 group cursor-pointer"
                     >
-                       Apply for Verification <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
+                       Apply to Register <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
                     </button>
                     
                     <button 
@@ -379,7 +379,7 @@ export const PartnerRegistration: React.FC = () => {
                        }}
                        className="h-11 md:h-12 w-fit self-center sm:w-auto px-6 md:px-8 bg-safari text-white rounded-full font-black uppercase tracking-widest text-[9px] shadow-2xl hover:bg-white hover:text-navy transition-all flex items-center justify-center gap-3 group cursor-pointer"
                     >
-                       Publish Specialized Event <Calendar size={14} />
+                       Submit an Event <Calendar size={14} />
                     </button>
                  </div>
               </div>
@@ -387,13 +387,13 @@ export const PartnerRegistration: React.FC = () => {
         </section>
 
         {/* Benefits */}
-        <section className="py-32 max-w-7xl mx-auto px-6">
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <section className="py-16 sm:py-24 max-w-7xl mx-auto px-6">
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
               {[
                 { title: 'Global Reach', icon: <Globe />, text: 'Be discovered by international and local travellers seeking authenticity.' },
-                { title: 'Verified Badge', icon: <ShieldCheck />, text: 'Build instant trust with our rigorous collective verification program.' },
-                { title: 'Data Engine', icon: <BarChart3 />, text: 'Track views, bookings, and growth through our internal dashboard.' },
-                { title: 'Event Access', icon: <Calendar />, text: 'Feature your exclusive events to our high-intent traveler audience.' }
+                { title: 'Verified Badge', icon: <ShieldCheck />, text: 'Build instant trust with verified partner status.' },
+                { title: 'Data Engine', icon: <BarChart3 />, text: 'Track views and performance through our dashboard.' },
+                { title: 'Event Access', icon: <Calendar />, text: 'Feature your events to a targeted audience of travelers.' }
               ].map((b, i) => (
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }} 
@@ -447,9 +447,9 @@ export const PartnerRegistration: React.FC = () => {
                  className="mt-16 bg-gradient-to-r from-safari/20 to-navy border border-safari/20 rounded-[40px] p-8 sm:p-12 text-left flex flex-col md:flex-row justify-between items-center gap-8 max-w-5xl mx-auto"
                >
                  <div className="space-y-3">
-                   <h3 className="text-2xl sm:text-3xl font-serif font-bold text-white">Are you hosting a Temporal Expedition?</h3>
+                   <h3 className="text-2xl sm:text-3xl font-serif font-bold text-white">Are you hosting an Event?</h3>
                    <p className="text-white/60 text-sm leading-relaxed max-w-xl">
-                     Publish curated workshops, food gatherings, safaris, and artistic cultural events directly to the PlacesInKenya temporal feed.
+                     Publish workshops, food gatherings, safaris, and cultural events directly to PlacesInKenya events.
                    </p>
                  </div>
                  <button 
