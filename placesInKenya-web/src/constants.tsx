@@ -11,9 +11,11 @@ export const COLORS = {
 };
 
 // Using the attached image logo
+export const LOGO_URL = "https://lh3.googleusercontent.com/d/1G9iYeJQ4q67zu7dBwjXm9BTz_boLAzco";
+
 export const LOGO = (
   <img 
-    src="https://lh3.googleusercontent.com/d/1G9iYeJQ4q67zu7dBwjXm9BTz_boLAzco" 
+    src={LOGO_URL} 
     alt="PlacesInKenya" 
     className="h-14 w-14 object-contain -ml-3.5 -mr-4 shrink-0"
     referrerPolicy="no-referrer"

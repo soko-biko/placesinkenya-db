@@ -261,52 +261,51 @@ export const MyKenya: React.FC<MyKenyaProps> = ({
   return (
     <div className="min-h-screen bg-off-white pb-32">
        {/* Hero / Greeting */}
-       <header className="bg-navy pt-28 sm:pt-36 pb-12 sm:pb-16 overflow-hidden relative">
+       <header className="bg-navy pt-28 sm:pt-32 lg:pt-36 pb-8 sm:pb-12 overflow-hidden relative">
           <div className="absolute inset-0 opacity-10">
              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-safari via-transparent to-transparent"></div>
           </div>
           
           <div className="max-w-7xl mx-auto px-6 relative z-10">
-             <div className="flex flex-col md:flex-row items-center gap-8">
+             <div className="flex flex-col md:flex-row items-center gap-6 sm:gap-8">
                 <div className="relative group">
-                   <div className="w-24 sm:w-32 h-24 sm:h-32 rounded-3xl overflow-hidden border-2 border-white/10 shadow-2xl relative z-10 bg-white/5 flex items-center justify-center">
+                   <div className="w-20 sm:w-28 h-20 sm:h-28 rounded-2xl overflow-hidden border-2 border-white/10 shadow-xl relative z-10 bg-white/5 flex items-center justify-center">
                       {userProfile.photoURL ? (
                         <img src={userProfile.photoURL} className="w-full h-full object-cover" alt="Profile" />
                       ) : (
-                        <span className="text-3xl font-serif font-bold text-white/20">{userProfile.name?.charAt(0)}</span>
+                        <span className="text-2xl sm:text-3xl font-serif font-bold text-white/20">{userProfile.name?.charAt(0)}</span>
                       )}
                    </div>
-                   <button className="absolute -bottom-1 -right-1 z-20 w-8 h-8 bg-safari text-white rounded-xl flex items-center justify-center shadow-xl hover:scale-110 transition-transform cursor-pointer">
-                      <Camera size={14} />
+                   <button className="absolute -bottom-1 -right-1 z-20 w-7 h-7 bg-safari text-white rounded-lg flex items-center justify-center shadow-lg hover:scale-110 transition-transform cursor-pointer">
+                      <Camera size={13} />
                    </button>
-                   <div className="absolute -inset-4 bg-safari/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
 
-                <div className="text-center md:text-left space-y-3">
+                <div className="text-center md:text-left space-y-2">
                    <motion.span 
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    className="text-safari font-black uppercase tracking-[0.4em] text-[10px]"
+                    className="text-safari font-black uppercase tracking-[0.3em] text-[10px]"
                    >
                      {userProfile.persona?.replace('_', ' ')}
                    </motion.span>
-                   <h1 className="text-3xl sm:text-5xl md:text-6xl font-serif font-bold text-white tracking-tight">Your Kenya, <span className="italic text-safari font-light">{userProfile.name?.split(' ')[0]}</span></h1>
-                   <div className="flex flex-wrap justify-center md:justify-start gap-3 pt-1">
-                       <div className="px-3.5 h-8 bg-white/5 rounded-full border border-white/10 flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-white/60">
-                          <ShieldCheck size={13} className="text-safari" /> Verified User
+                   <h1 className="text-2xl sm:text-4xl md:text-5xl font-serif font-bold text-white tracking-tight">Your Kenya, <span className="italic text-safari font-light">{userProfile.name?.split(' ')[0]}</span></h1>
+                   <div className="flex flex-wrap justify-center md:justify-start gap-2 pt-1">
+                       <div className="px-3 h-7 bg-white/5 rounded-full border border-white/10 flex items-center gap-1.5 text-[8.5px] font-black uppercase tracking-wider text-white/60">
+                          <ShieldCheck size={12} className="text-safari" /> Verified User
                        </div>
-                       <div className="px-3.5 h-8 bg-white/5 rounded-full border border-white/10 flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-white/60">
-                          <Compass size={13} className="text-safari" /> Saved Places & Itinerary
+                       <div className="px-3 h-7 bg-white/5 rounded-full border border-white/10 flex items-center gap-1.5 text-[8.5px] font-black uppercase tracking-wider text-white/60">
+                          <Compass size={12} className="text-safari" /> Saved Places & Itinerary
                        </div>
                    </div>
                 </div>
 
-                <div className="md:ml-auto flex gap-4">
+                <div className="md:ml-auto flex gap-3">
                    <button 
                     onClick={logout}
-                    className="h-14 px-8 bg-white/5 hover:bg-red-500/10 border border-white/10 rounded-2xl flex items-center gap-3 transition-all group cursor-pointer"
+                    className="h-10 px-5 bg-white/5 hover:bg-red-500/10 border border-white/10 rounded-xl flex items-center gap-2.5 transition-all group cursor-pointer"
                    >
-                     <LogOut size={18} className="text-white/20 group-hover:text-red-500" />
-                     <span className="text-[10px] font-black uppercase tracking-widest text-white group-hover:text-red-500">End Session</span>
+                     <LogOut size={15} className="text-white/20 group-hover:text-red-500" />
+                     <span className="text-[9px] font-black uppercase tracking-wider text-white group-hover:text-red-500">End Session</span>
                    </button>
                 </div>
              </div>
@@ -316,15 +315,15 @@ export const MyKenya: React.FC<MyKenyaProps> = ({
        {/* Navigation Tabs */}
        <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-navy/5 shadow-sm">
           <div className="max-w-7xl mx-auto px-6 overflow-x-auto scrollbar-hide">
-             <div className="flex gap-12">
+             <div className="flex gap-8 sm:gap-12">
                 {tabs.map(tab => (
                    <button
                      key={tab.id}
                      onClick={() => setActiveTab(tab.id as any)}
-                     className={`h-20 flex items-center gap-3 relative transition-colors cursor-pointer ${activeTab === tab.id ? 'text-navy' : 'text-navy/30 hover:text-navy/60'}`}
+                     className={`h-14 sm:h-16 flex items-center gap-2.5 relative transition-colors cursor-pointer ${activeTab === tab.id ? 'text-navy' : 'text-navy/30 hover:text-navy/60'}`}
                    >
                      {React.cloneElement(tab.icon as React.ReactElement<any>, { className: activeTab === tab.id ? 'text-safari' : '' })}
-                     <span className="text-[10px] font-black uppercase tracking-widest">{tab.label}</span>
+                     <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">{tab.label}</span>
                      {activeTab === tab.id && (
                        <motion.div layoutId="active-tab" className="absolute bottom-0 left-0 right-0 h-1 bg-safari rounded-t-full" />
                      )}

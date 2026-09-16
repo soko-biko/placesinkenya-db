@@ -134,19 +134,23 @@ body {
 }
 
 h1 {
-  @apply font-serif text-3xl sm:text-5xl lg:text-7xl xl:text-8xl leading-[0.9] tracking-tight;
+  @apply font-serif text-4xl sm:text-5xl font-bold leading-tight tracking-tight;
 }
 
 h2 {
-  @apply font-serif text-2xl sm:text-3xl lg:text-4xl xl:text-5xl leading-tight;
+  @apply font-serif text-2xl sm:text-3xl font-bold leading-tight;
 }
 
 h3 {
-  @apply font-serif text-xl sm:text-2xl lg:text-3xl leading-tight;
+  @apply font-serif text-base font-bold leading-tight;
 }
 
-p, button, input, select, textarea {
-  font-size: 1rem; /* 16px minimum */
+p {
+  font-size: 0.875rem; /* text-sm (14px) default body */
+}
+
+button, input, select, textarea {
+  font-size: 0.875rem; /* 14px */
 }
 
 /* Custom Scrollbar */
@@ -320,7 +324,7 @@ p, button, input, select, textarea {
     padding-inline: 0;
   }
 
-  section {
+  section:not(#explore-search-section):not(#partner-benefits-section) {
     padding-block: 2rem;
   }
 
@@ -328,6 +332,39 @@ p, button, input, select, textarea {
     max-width: 100%;
     height: auto;
   }
+}
+
+/* Partner Registration Landing positioning & clearance */
+#partner-registration-landing {
+  padding-top: 80px !important;
+}
+
+#partner-benefits-section {
+  padding-top: 1.5rem !important;
+}
+
+/* Explore Page Search Bar positioning and visibility */
+#explore-search-section {
+  padding-top: 5.5rem !important; /* 88px, leaving 24px below the 64px fixed navbar on mobile */
+  padding-bottom: 1.25rem !important;
+  position: relative !important;
+  z-index: 20 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+@media (min-width: 640px) {
+  #explore-search-section {
+    padding-top: 6.25rem !important; /* 100px, leaving 36px below the 64px fixed navbar on desktop */
+    padding-bottom: 1.5rem !important;
+  }
+}
+
+#explore-search-input {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
 
 /* Login page — prevent ALL scroll */

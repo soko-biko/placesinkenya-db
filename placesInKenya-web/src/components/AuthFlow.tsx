@@ -21,9 +21,7 @@ export const AuthFlow: React.FC<AuthFlowProps> = ({ onClose, initialMode = 'logi
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    // Prevents iOS Safari bounce scroll on login page
-    document.body.style.position = 'fixed';
-    document.body.style.width = '100%';
+    // Body overflow reset on unmount
     return () => {
       document.body.style.position = '';
       document.body.style.width = '';
@@ -148,74 +146,76 @@ export const AuthFlow: React.FC<AuthFlowProps> = ({ onClose, initialMode = 'logi
               </div>
 
               {/* Social Login */}
-              <button 
-                onClick={handleGoogleLogin}
-                className="w-full h-11 bg-white border border-navy/5 rounded-xl flex items-center justify-center gap-3 hover:bg-stone-50 transition-all shadow-sm active:scale-[0.98] cursor-pointer"
-              >
-                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_活跃用户_logo.svg" className="w-5 h-5" alt="Google" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-navy">Continue with Google</span>
-              </button>
+              <div className="flex justify-start">
+                <button 
+                  onClick={handleGoogleLogin}
+                  className="h-11 px-6 bg-white border border-navy/10 rounded-xl flex items-center justify-center gap-3 hover:bg-stone-50 transition-all shadow-sm active:scale-[0.98] cursor-pointer w-fit text-left"
+                >
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_活跃用户_logo.svg" className="w-5 h-5 shrink-0" alt="Google" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-navy whitespace-nowrap">Continue with Google</span>
+                </button>
+              </div>
 
               <div className="relative">
                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-navy/5"></div></div>
-                 <div className="relative flex justify-center text-[8px] font-black uppercase tracking-widest text-navy/20 bg-stone-50 px-3">OR USE EMAIL</div>
+                 <div className="relative flex justify-start text-[8px] font-black uppercase tracking-widest text-navy/20 bg-stone-50 pr-3">OR USE EMAIL</div>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-3">
                 {mode === 'signup' && (
-                  <div className="space-y-1">
-                    <label className="text-[8px] font-black uppercase tracking-widest text-navy/40 ml-3">Full Name</label>
-                    <div className="relative group">
+                  <div className="space-y-1 text-left">
+                    <label className="text-[8px] font-black uppercase tracking-widest text-navy/40 ml-1">Full Name</label>
+                    <div className="relative group max-w-sm">
                        <input 
                          required
                          type="text" 
                          value={name}
                          onChange={(e) => setName(e.target.value)}
                          placeholder="e.g. Biko Wanderer"
-                         className="w-full h-11 bg-white border border-navy/5 rounded-xl px-4 outline-none focus:ring-2 focus:ring-safari/20 transition-all font-medium text-navy text-sm"
+                         className="w-full h-11 bg-white border border-navy/10 rounded-xl px-4 outline-none focus:ring-2 focus:ring-safari/20 transition-all font-medium text-navy text-sm text-left"
                        />
-                       <UserIcon size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-navy/5 group-focus-within:text-safari" />
+                       <UserIcon size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-navy/20 group-focus-within:text-safari" />
                     </div>
                   </div>
                 )}
 
-                <div className="space-y-1">
-                  <label className="text-[8px] font-black uppercase tracking-widest text-navy/40 ml-3">Email Address</label>
-                  <div className="relative group">
+                <div className="space-y-1 text-left">
+                  <label className="text-[8px] font-black uppercase tracking-widest text-navy/40 ml-1">Email Address</label>
+                  <div className="relative group max-w-sm">
                     <input 
                       required
                       type="email" 
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="biko@placesinkenya.com"
-                      className="w-full h-11 bg-white border border-navy/5 rounded-xl px-4 outline-none focus:ring-2 focus:ring-safari/20 transition-all font-medium text-navy text-sm"
+                      className="w-full h-11 bg-white border border-navy/10 rounded-xl px-4 outline-none focus:ring-2 focus:ring-safari/20 transition-all font-medium text-navy text-sm text-left"
                     />
-                    <Mail size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-navy/5 group-focus-within:text-safari" />
+                    <Mail size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-navy/20 group-focus-within:text-safari" />
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <div className="flex justify-between items-center px-3">
+                <div className="space-y-1 text-left">
+                  <div className="flex justify-between items-center max-w-sm px-1">
                     <label className="text-[8px] font-black uppercase tracking-widest text-navy/40">Password</label>
                     {mode === 'login' && <button type="button" className="text-[8px] font-black uppercase tracking-widest text-safari hover:underline">Forgot?</button>}
                   </div>
-                  <div className="relative group">
+                  <div className="relative group max-w-sm">
                     <input 
                       required
                       type="password" 
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full h-11 bg-white border border-navy/5 rounded-xl px-4 outline-none focus:ring-2 focus:ring-safari/20 transition-all font-medium text-navy text-sm"
+                      className="w-full h-11 bg-white border border-navy/10 rounded-xl px-4 outline-none focus:ring-2 focus:ring-safari/20 transition-all font-medium text-navy text-sm text-left"
                     />
-                    <Lock size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-navy/5 group-focus-within:text-safari" />
+                    <Lock size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-navy/20 group-focus-within:text-safari" />
                   </div>
                 </div>
 
                 {mode === 'signup' && (
-                  <div className="space-y-2 pt-1">
-                    <label className="text-[8px] font-black uppercase tracking-widest text-navy/40 ml-3">Account Focus</label>
-                    <div className="grid grid-cols-3 gap-2">
+                  <div className="space-y-2 pt-1 text-left">
+                    <label className="text-[8px] font-black uppercase tracking-widest text-navy/40 ml-1">Account Focus</label>
+                    <div className="grid grid-cols-3 gap-2 max-w-sm">
                        {[
                          { id: 'TRAVELER', label: 'Traveler' },
                          { id: 'LOCAL_EXPLORER', label: 'Local' },
@@ -225,7 +225,7 @@ export const AuthFlow: React.FC<AuthFlowProps> = ({ onClose, initialMode = 'logi
                            key={opt.id}
                            type="button"
                            onClick={() => setPersona(opt.id as User['persona'])}
-                           className={`h-9 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all border ${persona === opt.id ? 'bg-navy border-navy text-white shadow-md' : 'bg-white border-navy/5 text-navy/30 hover:border-navy/10'}`}
+                           className={`h-9 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all border ${persona === opt.id ? 'bg-navy border-navy text-white shadow-md' : 'bg-white border-navy/10 text-navy/50 hover:border-navy/20'}`}
                          >
                            {opt.label}
                          </button>
@@ -234,12 +234,12 @@ export const AuthFlow: React.FC<AuthFlowProps> = ({ onClose, initialMode = 'logi
                   </div>
                 )}
 
-                {error && <p className="text-red-500 text-[9px] font-bold uppercase tracking-wider text-center">{error}</p>}
+                {error && <p className="text-red-500 text-[9px] font-bold uppercase tracking-wider text-left">{error}</p>}
 
-                <div className="pt-2">
+                <div className="pt-2 flex justify-start">
                   <button 
                     disabled={loading}
-                    className="w-full h-11 bg-safari text-white rounded-xl flex items-center justify-center gap-2 font-black uppercase tracking-[0.2em] text-[10px] shadow-lg hover:bg-safari/90 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+                    className="h-11 px-8 bg-safari text-white rounded-xl flex items-center justify-center gap-2 font-black uppercase tracking-[0.15em] text-[10px] shadow-lg hover:bg-safari/90 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer w-fit whitespace-nowrap"
                   >
                     {loading ? 'Authenticating...' : mode === 'login' ? 'Sign In' : 'Create My Account'}
                     <ArrowRight size={14} />
@@ -247,10 +247,10 @@ export const AuthFlow: React.FC<AuthFlowProps> = ({ onClose, initialMode = 'logi
                 </div>
               </form>
 
-              <div className="text-center pt-3 border-t border-navy/5">
+              <div className="text-left pt-3 border-t border-navy/5">
                  <button 
                    onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-                   className="text-[9px] font-black uppercase tracking-widest text-navy/40 hover:text-navy transition-colors cursor-pointer"
+                   className="text-[9px] font-black uppercase tracking-widest text-navy/50 hover:text-navy transition-colors cursor-pointer"
                  >
                    {mode === 'login' ? 'New to PlacesInKenya? Create an account' : 'Already have an account? Sign In'}
                  </button>

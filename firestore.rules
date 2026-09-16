@@ -103,6 +103,21 @@ service cloud.firestore {
       allow read: if isSignedIn(); 
       allow write: if isAdmin();
     }
+
+    // 10. Itineraries
+    match /itineraries/{itineraryId} {
+      allow get, list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // 11. System & Health checks
+    match /system/{docId} {
+      allow read: if true;
+    }
+    match /test/{docId} {
+      allow read: if true;
+    }
   }
 }
 

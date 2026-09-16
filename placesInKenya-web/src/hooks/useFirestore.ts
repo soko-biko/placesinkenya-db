@@ -143,16 +143,17 @@ export const useTrendingPlaces = () => {
   useEffect(() => {
     const q = query(
       collection(db, 'places'),
-      where('isTrending', '==', true),
-      orderBy('rating', 'desc')
+      where('isTrending', '==', true)
     );
 
     const unsubscribe = onSnapshot(q, 
       (snapshot) => {
-        const data = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        } as Place));
+        const data = snapshot.docs
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          } as Place))
+          .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
         setPlaces(data);
         setLoading(false);
       },
@@ -208,16 +209,17 @@ export const useItineraries = (userId: string | undefined) => {
 
     const q = query(
       collection(db, 'itineraries'),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
+      where('userId', '==', userId)
     );
 
     const unsubscribe = onSnapshot(q, 
       (snapshot) => {
-        const data = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        } as Itinerary));
+        const data = snapshot.docs
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          } as Itinerary))
+          .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
         setItineraries(data);
         setLoading(false);
       },

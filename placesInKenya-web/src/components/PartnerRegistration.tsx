@@ -328,67 +328,16 @@ export const PartnerRegistration: React.FC = () => {
 
   if (step === 0) {
     return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-off-white">
-        {/* Hero */}
-        <section className="relative py-20 md:py-28 flex items-center overflow-hidden bg-navy">
-           <div className="absolute inset-0 z-0">
-              <img 
-                src="https://images.unsplash.com/photo-1547448415-e9f5b28e570d" 
-                className="w-full h-full object-cover opacity-20 grayscale"
-                alt="Partnership"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/80 to-transparent"></div>
-           </div>
-           
-           <div className="max-w-7xl mx-auto px-6 relative z-10 w-full grid grid-cols-1 lg:grid-cols-2 gap-12">
-              <div className="space-y-8">
-                 <motion.span 
-                    initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
-                    className="text-safari font-black uppercase tracking-[0.4em] text-[10px]"
-                 >
-                    Become a Registered Partner
-                 </motion.span>
-                 <motion.h1 
-                    initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                    className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold text-white leading-tight tracking-tight"
-                 >
-                   Grow Your <br /><span className="italic font-light text-safari">Business.</span>
-                 </motion.h1>
-                 <motion.p 
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-                    className="text-white/40 text-base sm:text-lg font-light italic max-w-lg leading-relaxed"
-                 >
-                    Join 500+ verified businesses reaching thousands of travellers monthly through our travel guide.
-                 </motion.p>
-                 <div className="flex flex-col sm:flex-row gap-4">
-                    <button 
-                       onClick={() => {
-                           setIsEventRegistration(false);
-                           const el = document.getElementById('reg-selector');
-                           el?.scrollIntoView({ behavior: 'smooth' });
-                       }}
-                       className="h-11 md:h-12 w-fit self-center sm:w-auto px-6 md:px-8 bg-white text-navy rounded-full font-black uppercase tracking-widest text-[9px] shadow-2xl hover:bg-safari hover:text-white transition-all flex items-center justify-center gap-3 group cursor-pointer"
-                    >
-                       Apply to Register <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
-                    </button>
-                    
-                    <button 
-                       onClick={() => {
-                           setIsEventRegistration(true);
-                           setStep(1);
-                       }}
-                       className="h-11 md:h-12 w-fit self-center sm:w-auto px-6 md:px-8 bg-safari text-white rounded-full font-black uppercase tracking-widest text-[9px] shadow-2xl hover:bg-white hover:text-navy transition-all flex items-center justify-center gap-3 group cursor-pointer"
-                    >
-                       Submit an Event <Calendar size={14} />
-                    </button>
-                 </div>
-              </div>
-           </div>
-        </section>
-
+      <motion.div 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        id="partner-registration-landing"
+        className="min-h-screen bg-off-white"
+        style={{ paddingTop: '80px' }}
+      >
         {/* Benefits */}
-        <section className="py-16 sm:py-24 max-w-7xl mx-auto px-6">
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+        <section id="partner-benefits-section" className="pt-6 sm:pt-8 pb-12 sm:pb-16 max-w-7xl mx-auto px-6">
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
               {[
                 { title: 'Global Reach', icon: <Globe />, text: 'Be discovered by international and local travellers seeking authenticity.' },
                 { title: 'Verified Badge', icon: <ShieldCheck />, text: 'Build instant trust with verified partner status.' },
@@ -401,25 +350,25 @@ export const PartnerRegistration: React.FC = () => {
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
                   key={b.title} 
-                  className="space-y-6"
+                  className="space-y-4"
                 >
-                    <div className="w-14 h-14 bg-navy text-safari flex items-center justify-center rounded-2xl shadow-xl">{b.icon}</div>
-                    <h3 className="text-xl font-serif font-bold text-navy">{b.title}</h3>
-                    <p className="text-navy/40 font-medium text-sm leading-relaxed">{b.text}</p>
+                    <div className="w-12 h-12 bg-navy text-safari flex items-center justify-center rounded-2xl shadow-md">{b.icon}</div>
+                    <h3 className="text-lg font-serif font-bold text-navy">{b.title}</h3>
+                    <p className="text-navy/60 font-medium text-xs sm:text-sm leading-relaxed">{b.text}</p>
                 </motion.div>
               ))}
            </div>
         </section>
 
         {/* Registration Type Selector */}
-        <section id="reg-selector" className="py-32 bg-navy rounded-t-[80px]">
-           <div className="max-w-7xl mx-auto px-6 text-center space-y-20">
-              <div className="space-y-4">
-                 <h2 className="text-4xl md:text-6xl font-serif font-bold text-white">Choose Your Path</h2>
-                 <p className="text-white/40 italic">Select the category that best represents your professional offering.</p>
+        <section id="reg-selector" className="py-16 sm:py-20 bg-navy rounded-t-[40px] sm:rounded-t-[60px]">
+           <div className="max-w-7xl mx-auto px-6 text-center space-y-12">
+              <div className="space-y-2">
+                 <h2 className="text-3xl md:text-5xl font-serif font-bold text-white">Choose Your Path</h2>
+                 <p className="text-white/50 text-xs sm:text-sm italic">Select the category that best represents your professional offering.</p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" style={{ gap: '12px' }}>
                  {REG_TYPES.map((t, i) => (
                     <motion.button 
                       initial={{ opacity: 0, scale: 0.95 }}
@@ -428,12 +377,13 @@ export const PartnerRegistration: React.FC = () => {
                       transition={{ delay: i * 0.05 }}
                       key={t.id}
                       onClick={() => handleTypeSelect(t.id as any)}
-                      className="group bg-white/5 border border-white/10 p-10 rounded-[40px] text-left hover:bg-white transition-all space-y-6 active:scale-95 cursor-pointer"
+                      className="group bg-white/5 border border-white/10 rounded-2xl text-left hover:bg-white transition-all space-y-2.5 active:scale-95 cursor-pointer"
+                      style={{ padding: '12px 16px' }}
                     >
-                       <div className="w-16 h-16 bg-safari/20 text-safari flex items-center justify-center rounded-[20px] group-hover:bg-navy group-hover:text-white transition-colors">{t.icon}</div>
-                       <div className="space-y-2">
-                          <h4 className="text-2xl font-serif font-bold text-white group-hover:text-navy transition-colors">{t.label}</h4>
-                          <p className="text-white/40 group-hover:text-navy/60 transition-colors text-sm font-medium">{t.desc}</p>
+                       <div className="w-10 h-10 bg-safari/20 text-safari flex items-center justify-center rounded-xl group-hover:bg-navy group-hover:text-white transition-colors">{t.icon}</div>
+                       <div className="space-y-1">
+                          <h4 className="text-base sm:text-lg font-serif font-bold text-white group-hover:text-navy transition-colors">{t.label}</h4>
+                          <p className="text-white/40 group-hover:text-navy/60 transition-colors text-xs font-medium leading-snug">{t.desc}</p>
                        </div>
                     </motion.button>
                  ))}
@@ -444,11 +394,11 @@ export const PartnerRegistration: React.FC = () => {
                  initial={{ opacity: 0, y: 20 }}
                  whileInView={{ opacity: 1, y: 0 }}
                  viewport={{ once: true }}
-                 className="mt-16 bg-gradient-to-r from-safari/20 to-navy border border-safari/20 rounded-[40px] p-8 sm:p-12 text-left flex flex-col md:flex-row justify-between items-center gap-8 max-w-5xl mx-auto"
+                 className="mt-12 bg-gradient-to-r from-safari/20 to-navy border border-safari/20 rounded-3xl p-6 sm:p-10 text-left flex flex-col md:flex-row justify-between items-center gap-6 max-w-5xl mx-auto"
                >
-                 <div className="space-y-3">
-                   <h3 className="text-2xl sm:text-3xl font-serif font-bold text-white">Are you hosting an Event?</h3>
-                   <p className="text-white/60 text-sm leading-relaxed max-w-xl">
+                 <div className="space-y-2">
+                   <h3 className="text-xl sm:text-2xl font-serif font-bold text-white">Are you hosting an Event?</h3>
+                   <p className="text-white/60 text-xs sm:text-sm leading-relaxed max-w-xl">
                      Publish workshops, food gatherings, safaris, and cultural events directly to PlacesInKenya events.
                    </p>
                  </div>
@@ -515,34 +465,34 @@ export const PartnerRegistration: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-off-white flex flex-col">
-       <header className="py-12 px-6 flex justify-between items-center bg-white border-b border-navy/5">
+       <header className="pt-24 sm:pt-28 pb-4 sm:pb-6 px-6 flex justify-between items-center bg-white border-b border-navy/5">
           <div className="flex items-center gap-4">
-             <div className="w-12 h-12 bg-navy flex items-center justify-center rounded-xl text-white">
+             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-navy flex items-center justify-center rounded-xl text-white">
                 {isEventRegistration ? <Calendar className="w-5 h-5" /> : REG_TYPES.find(t => t.id === type)?.icon}
              </div>
              <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-navy/40">
                   {isEventRegistration ? 'Event Registry Engine' : 'Partner Application'}
                 </p>
-                <h3 className="font-serif font-bold text-xl text-navy">
+                <h3 className="font-serif font-bold text-lg sm:text-xl text-navy">
                   {isEventRegistration ? 'Publish Curated Event' : REG_TYPES.find(t => t.id === type)?.label}
                 </h3>
              </div>
           </div>
           
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3">
              {STEPS.map(s => (
                 <div 
                    key={s.id} 
-                   className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${step === s.id ? 'bg-navy text-white shadow-xl scale-110' : step > s.id ? 'bg-safari text-white' : 'bg-navy/5 text-navy/20'}`}
+                   className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all ${step === s.id ? 'bg-navy text-white shadow-xl scale-105' : step > s.id ? 'bg-safari text-white' : 'bg-navy/5 text-navy/20'}`}
                 >
-                   {step > s.id ? <CheckCircle2 size={16} /> : s.icon}
+                   {step > s.id ? <CheckCircle2 size={15} /> : s.icon}
                 </div>
              ))}
           </div>
        </header>
 
-       <main className="flex-1 flex items-center justify-center p-6 py-12 md:py-20 lg:py-32">
+       <main className="flex-1 flex items-center justify-center p-4 sm:p-6 py-6 sm:py-10">
           <div className="max-w-4xl w-full">
              <AnimatePresence mode="wait">
                 {/* ══ FLOW A: COMPASS SPECIALIZED EVENT REGISTRATION ══ */}

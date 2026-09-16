@@ -3,7 +3,7 @@ import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { PlaceCard } from './components/PlaceCard';
-import { LOGO, MOCK_PLACES, MOCK_OPERATORS, MOCK_EVENTS } from './constants';
+import { LOGO, LOGO_URL, MOCK_PLACES, MOCK_OPERATORS, MOCK_EVENTS } from './constants';
 import { Place, TourOperator, SavedItem, PlaceCategory, Event, Rating } from './types';
 import { X, Mail, Lock, ShieldCheck, Plus, AlertCircle, CheckCircle2, MapPin, Star, Calendar, ArrowRight, ChevronRight, Search, ChevronDown } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
@@ -31,11 +31,20 @@ import { Container } from './components/Container';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 const SkeletonLoader = () => (
-    <div className="min-h-screen bg-off-white flex flex-col items-center justify-center space-y-8">
-        <div className="w-20 h-20 bg-navy/5 rounded-[2rem] animate-pulse flex items-center justify-center">
-            <div className="w-10 h-10 border-4 border-safari border-t-transparent rounded-full animate-spin"></div>
+    <div className="min-h-screen bg-off-white flex flex-col items-center justify-center space-y-6 relative overflow-hidden">
+        {/* Website Logo as background image */}
+        <div 
+          className="absolute inset-0 bg-center bg-no-repeat bg-contain opacity-10 pointer-events-none scale-75"
+          style={{ backgroundImage: `url("${LOGO_URL}")` }}
+        />
+        <div className="relative z-10 w-24 h-24 bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-navy/5 flex items-center justify-center p-4 animate-pulse">
+            <img 
+              src={LOGO_URL} 
+              alt="PlacesInKenya" 
+              className="w-full h-full object-contain"
+            />
         </div>
-        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-navy/20 animate-pulse">Loading...</p>
+        <p className="relative z-10 text-xs font-bold uppercase tracking-[0.3em] text-navy/40 animate-pulse">Loading PlacesInKenya...</p>
     </div>
 );
 
@@ -213,6 +222,7 @@ const App: React.FC = () => {
   const savedItemIds = savedItems.map(i => i.placeId);
 
   const handleNavigate = (page: string) => {
+    setIsAuthOpen(false);
     setActivePage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => {
@@ -246,7 +256,7 @@ const App: React.FC = () => {
             <TrendingNow 
               places={trendingPlaces.length > 0 ? trendingPlaces : MOCK_PLACES.filter(p => p.isTrending)} 
               onPlaceClick={(place) => setSelectedPlace(place)}
-              onViewAll={() => setActivePage('destinations')}
+              onViewAll={() => handleNavigate('destinations')}
             />
 
             <UpcomingExperiences 
@@ -282,43 +292,9 @@ const App: React.FC = () => {
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             exit={{ opacity: 0 }} 
-            className="min-h-screen bg-off-white pb-32"
+            className="min-h-screen bg-off-white pb-16 pt-24 sm:pt-28"
           >
-            <section className="relative pt-48 pb-24 bg-navy overflow-hidden">
-               <div className="absolute inset-0 z-0">
-                  <img 
-                    src="https://images.unsplash.com/photo-1516426122078-c23e76319801"
-                    className="w-full h-full object-cover opacity-10 grayscale mix-blend-overlay"
-                    alt="Wild"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-b from-navy/40 via-navy to-navy"></div>
-               </div>
-
-               <Container className="relative z-10 text-center space-y-12">
-                  <div className="space-y-4">
-                     <motion.span 
-                       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                       className="text-safari font-black uppercase tracking-[0.4em] text-[10px]"
-                     >
-                       Local Guides & Partners
-                     </motion.span>
-                     <motion.h1 
-                       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                       className="text-4xl sm:text-5xl md:text-7xl font-serif font-bold text-white tracking-tight"
-                     >
-                       Guides & <span className="italic text-safari font-light">Trusted</span> Partners
-                     </motion.h1>
-                     <motion.p 
-                       initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-                       className="text-white/40 max-w-2xl mx-auto text-base sm:text-lg font-light italic"
-                     >
-                       Connect with Kenya's most respected safari specialists, coastal masters, and local cultural hosts.
-                     </motion.p>
-                  </div>
-               </Container>
-            </section>
-
-            <Container className="-mt-10 relative z-20">
+            <Container className="relative z-20">
                <OperatorsList operators={displayOperators} />
             </Container>
           </motion.main>

@@ -35,6 +35,11 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
   const [visibleCount, setVisibleCount] = useState(12);
   const [isMapView, setIsMapView] = useState(false);
 
+  // Scroll to top on page mount
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' as any });
+  }, []);
+
   // Sync with props if search/category changes from outside
   useEffect(() => {
     setSearchQuery(initialSearch);
@@ -86,6 +91,9 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
 
   const activeFilters = useMemo(() => {
     const filters = [];
+    if (searchQuery.trim()) {
+      filters.push({ id: 'search', label: `Search: "${searchQuery}"`, onRemove: () => setSearchQuery('') });
+    }
     if (selectedCategory !== 'ALL') {
       const catLabel = selectedCategory
         .toLowerCase()
@@ -99,7 +107,7 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
     if (maxPrice && maxPrice > 0) filters.push({ id: 'price', label: `Up to Ksh ${(maxPrice * 2).toLocaleString()}`, onRemove: () => setMaxPrice(null) });
     if (verifiedOnly) filters.push({ id: 'verified', label: 'Verified Only', onRemove: () => setVerifiedOnly(false) });
     return filters;
-  }, [selectedCategory, selectedCity, minRating, maxPrice, verifiedOnly]);
+  }, [searchQuery, selectedCategory, selectedCity, minRating, maxPrice, verifiedOnly]);
 
   const gridCols = useMemo(() => {
     const count = filteredPlaces.length;
@@ -135,9 +143,9 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
       <div className={`w-full transition-all duration-300 flex-1 ${
         isMapView 
           ? 'max-w-[1920px] mx-auto px-2 sm:px-4 py-4 sm:py-6' 
-          : 'max-w-6xl xl:max-w-7xl mx-auto px-6 sm:px-8 xl:px-12 py-10'
+          : 'max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-8 xl:px-12 py-6 sm:py-8'
       }`}>
-        <div className={`flex flex-col ${!isLargeSet ? 'lg:flex-row' : ''} gap-8 xl:gap-10`}>
+        <div className={`flex flex-col ${!isLargeSet ? 'lg:flex-row' : ''} gap-6 xl:gap-8`}>
 
           {/* Desktop Sidebar (Sticky) - Hidden if > 500 items (Landscape Filter used instead) */}
           {!isLargeSet && (
@@ -158,7 +166,7 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
           )}
 
           {/* Results Area */}
-          <div className="flex-1 space-y-8 min-w-0">
+          <div className="flex-1 space-y-6 min-w-0">
             {/* Top Landscape Filter Tab when > 500 items */}
             {isLargeSet && (
               <div className="hidden lg:block">
@@ -179,10 +187,10 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
             )}
 
             {/* Mobile Category Chips */}
-            <div className="lg:hidden -mx-6 px-6 overflow-x-auto scrollbar-hide flex gap-2 pb-2">
+            <div className="lg:hidden -mx-4 px-4 overflow-x-auto scrollbar-hide flex gap-2 pb-1">
                 <button 
                   onClick={() => setSelectedCategory('ALL')}
-                  className={`shrink-0 px-4 h-9 rounded-full text-[12px] font-semibold border transition-all ${selectedCategory === 'ALL' ? 'bg-navy text-white border-navy' : 'bg-white text-navy/60 border-navy/5'}`}
+                  className={`shrink-0 px-3.5 h-8 rounded-full text-[10px] font-semibold capitalize border transition-all ${selectedCategory === 'ALL' ? 'bg-navy text-white border-navy' : 'bg-white text-navy/60 border-navy/5'}`}
                 >
                   All
                 </button>
@@ -190,7 +198,7 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
                   <button 
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`shrink-0 px-4 h-9 rounded-full text-[12px] font-semibold border transition-all ${selectedCategory === cat ? 'bg-navy text-white border-navy' : 'bg-white text-navy/60 border-navy/5'}`}
+                    className={`shrink-0 px-3.5 h-8 rounded-full text-[10px] font-semibold capitalize border transition-all ${selectedCategory === cat ? 'bg-navy text-white border-navy' : 'bg-white text-navy/60 border-navy/5'}`}
                   >
                     {cat.toLowerCase().split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                   </button>
@@ -214,29 +222,31 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
                     </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto shrink-0">
+                <div className="flex flex-wrap items-center gap-2 w-auto shrink-0">
                   <button 
+                    id="catalogue-show-map-btn"
                     onClick={() => setIsMapView(!isMapView)}
-                    className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 h-11 rounded-xl text-[12px] font-semibold border transition-all duration-300 shadow-sm cursor-pointer ${isMapView ? 'bg-navy text-white border-navy hover:bg-navy/90' : 'bg-white text-navy border-navy/10 hover:border-navy/20'}`}
+                    className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 h-8 sm:h-8.5 rounded-lg text-xs font-semibold border transition-all duration-300 shadow-xs cursor-pointer whitespace-nowrap w-auto ${isMapView ? 'bg-navy text-white border-navy hover:bg-navy/90' : 'bg-white text-navy border-navy/15 hover:border-navy/30'}`}
                   >
                     {isMapView ? (
                       <>
-                        <List size={15} className="text-safari" />
-                        <span>Show List View</span>
+                        <List size={14} className="text-safari shrink-0" />
+                        <span className="whitespace-nowrap">Show List View</span>
                       </>
                     ) : (
                       <>
-                        <Map size={15} />
-                        <span>Show Map</span>
+                        <Map size={14} className="shrink-0" />
+                        <span className="whitespace-nowrap">Show Map</span>
                       </>
                     )}
                   </button>
 
                   <button 
+                    id="catalogue-filter-places-btn"
                     onClick={() => setIsSidebarOpen(true)}
-                    className="lg:hidden flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 h-11 bg-navy text-white rounded-xl font-semibold text-[12px] shadow-md tap-target"
+                    className="lg:hidden inline-flex items-center justify-center gap-1.5 px-3 py-1.5 h-8 sm:h-8.5 bg-navy text-white rounded-lg font-semibold text-xs shadow-xs cursor-pointer whitespace-nowrap w-auto"
                   >
-                    <SlidersHorizontal size={15} /> <span>Filter Places</span>
+                    <SlidersHorizontal size={14} className="shrink-0" /> <span className="whitespace-nowrap">Filter Places</span>
                   </button>
                 </div>
               </div>
@@ -254,6 +264,7 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
                   ))}
                   <button 
                     onClick={() => {
+                        setSearchQuery('');
                         setSelectedCategory('ALL');
                         setSelectedCity('');
                         setMinRating(0);
@@ -295,19 +306,19 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
                     ))}
                   </div>
                 ) : filteredPlaces.length > 0 ? (
-                  <div className="space-y-8">
-                    <div className={gridClass}>
+                  <div className="space-y-6">
+                    <div className="flex flex-col w-full divide-y divide-navy/10">
                         {displayedPlaces.map((place, i) => (
                         <motion.div
                             key={place.id}
-                            initial={{ opacity: 0, y: 15 }}
+                            initial={{ opacity: 0, y: 12 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ delay: (i % 4) * 0.05 }}
+                            transition={{ delay: (i % 6) * 0.04 }}
                             viewport={{ once: true }}
                         >
                             <PlaceCard 
                               place={place} 
-                              layout={gridCols > 1 ? "grid" : "list"}
+                              layout="list"
                               onClick={onPlaceClick} 
                               onSave={() => onSave(place.id)}
                               isSaved={savedItemIds.includes(place.id)}
@@ -317,17 +328,17 @@ export const CataloguePage: React.FC<CataloguePageProps> = ({
                     </div>
 
                     {visibleCount < filteredPlaces.length && (
-                        <div className="flex flex-col items-center gap-4 py-8 border-t border-navy/5">
+                        <div className="flex flex-col items-center gap-3 py-6 border-t border-navy/5">
                             <p className="text-[10px] font-bold text-navy/30 uppercase tracking-[0.2em]">
                                 Showing {displayedPlaces.length} of {filteredPlaces.length} places
                             </p>
                             <button 
                                 onClick={handleLoadMore}
                                 disabled={isLoading}
-                                className="group h-12 px-10 bg-white hover:bg-navy text-navy hover:text-white border-2 border-navy rounded-full font-black uppercase tracking-[0.3em] text-[10px] sm:text-[11px] transition-all flex items-center justify-center gap-3 shadow-lux active:scale-95 disabled:opacity-50 cursor-pointer"
+                                className="group h-11 px-8 bg-white hover:bg-navy text-navy hover:text-white border border-navy/20 rounded-full font-black uppercase tracking-[0.2em] text-[10px] transition-all flex items-center justify-center gap-3 shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer"
                             >
-                                {isLoading ? <Loader2 className="animate-spin" size={16} /> : (
-                                    <>Load More <div className="w-8 h-8 bg-navy/5 group-hover:bg-white/10 rounded-full flex items-center justify-center transition-colors"><LayoutGrid size={14} /></div></>
+                                {isLoading ? <Loader2 className="animate-spin" size={15} /> : (
+                                    <>Load More <div className="w-7 h-7 bg-navy/5 group-hover:bg-white/10 rounded-full flex items-center justify-center transition-colors"><List size={13} /></div></>
                                 )}
                             </button>
                         </div>

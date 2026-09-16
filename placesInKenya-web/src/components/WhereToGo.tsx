@@ -28,6 +28,7 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
 
   // Initialize selectedDate to null (display all events by default)
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [showCalendar, setShowCalendar] = useState(true);
 
   // Calendar navigation state
   const [viewMonth, setViewMonth] = useState(() => new Date().getMonth());
@@ -172,71 +173,49 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
   }, [events, selectedDate, selectedCategory, displayedEvents]);
 
   return (
-    <div className="min-h-screen bg-off-white pb-24">
-      {/* Dynamic Header Area */}
-      <section className="relative pt-24 sm:pt-28 pb-10 sm:pb-12 bg-navy overflow-hidden">
-        <div id="events-header-bg" className="absolute inset-0 z-0">
-          <img 
-            src={settings.eventsBgImage || "https://images.unsplash.com/photo-1547448415-e9f5b28e570d"}
-            className="w-full h-full object-cover opacity-20 grayscale mix-blend-overlay transition-all duration-700"
-            alt="Scenic Landscape"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-navy/60 via-navy to-navy"></div>
-        </div>
-
-        <div className="max-w-[1280px] mx-auto px-6 relative z-10 text-center space-y-3">
-          <motion.span 
-            initial={{ opacity: 0, y: 10 }} 
-            animate={{ opacity: 1, y: 0 }}
-            className="text-safari font-black uppercase tracking-[0.4em] text-[10px] truncate max-w-full block"
-          >
-            Events & Experiences
-          </motion.span>
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            transition={{ delay: 0.1 }}
-            className="text-3xl sm:text-5xl md:text-6xl font-serif font-bold text-white tracking-tight leading-tight"
-          >
-            {settings.eventsTitle || "Ways to Experience Kenya"}
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            transition={{ delay: 0.2 }}
-            className="text-white/40 max-w-2xl mx-auto text-xs sm:text-sm font-light italic line-clamp-2"
-          >
-            {settings.eventsSubtitle || "Discover upcoming cultural festivals, safaris, live performances, and local experiences across Kenya."}
-          </motion.p>
-        </div>
-      </section>
-
+    <div className="min-h-screen bg-off-white pb-16">
       {/* Main Dual-Panel Layout Container */}
-      <Container className="py-8 md:py-12 space-y-6" id="events-main">
-        {/* Events category filter chips */}
-        <div 
-          className="flex flex-row gap-2 overflow-x-auto pb-2 scrollbar-none w-full"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`shrink-0 h-9 px-5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all duration-150 whitespace-nowrap cursor-pointer ${
-                selectedCategory === cat
-                  ? 'bg-navy text-white border-navy shadow-sm'
-                  : 'bg-white text-navy/65 border-navy/5 hover:border-safari'
-              }`}
-            >
-              {cat.replace('_', ' & ')}
-            </button>
-          ))}
+      <Container className="pt-24 sm:pt-28 pb-6 md:pb-8 space-y-6" id="events-main">
+        {/* Events category filter chips & Calendar Toggle */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full">
+          <div 
+            className="flex flex-row gap-2 overflow-x-auto pb-1 scrollbar-none flex-1 min-w-0"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`shrink-0 h-8 px-4 rounded-full text-[10px] font-semibold capitalize border transition-all duration-150 whitespace-nowrap cursor-pointer ${
+                  selectedCategory === cat
+                    ? 'bg-navy text-white border-navy shadow-sm'
+                    : 'bg-white text-navy/65 border-navy/5 hover:border-safari'
+                }`}
+              >
+                {cat === 'ALL' ? 'All Events' : cat.toLowerCase().replace('_', ' & ')}
+              </button>
+            ))}
+          </div>
+
+          <button
+            id="toggle-calendar-btn"
+            onClick={() => setShowCalendar(prev => !prev)}
+            className={`inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 h-8 rounded-full text-xs font-semibold border transition-all duration-200 cursor-pointer shrink-0 shadow-xs whitespace-nowrap self-start sm:self-auto ${
+              showCalendar 
+                ? 'bg-navy text-white border-navy hover:bg-navy/90' 
+                : 'bg-white text-navy border-navy/15 hover:border-navy/30'
+            }`}
+            title={showCalendar ? "Hide calendar date picker" : "Show calendar date picker"}
+          >
+            <Calendar size={13} className={showCalendar ? 'text-safari' : 'text-navy/50'} />
+            <span>{showCalendar ? 'Hide Calendar' : 'Show Calendar'}</span>
+          </button>
         </div>
 
-        <div className={`flex flex-col ${!isEventsLargeSet ? 'lg:flex-row' : ''} gap-8 items-start`}>
+        <div className={`flex flex-col ${!isEventsLargeSet && showCalendar ? 'lg:flex-row' : ''} gap-8 items-start`}>
           
-          {/* LEFT COLUMN: Sticky Calendar Date Picker & Filter Set - Hidden if > 500 items */}
-          {!isEventsLargeSet && (
+          {/* LEFT COLUMN: Sticky Calendar Date Picker & Filter Set - Hidden if > 500 items or toggled off */}
+          {!isEventsLargeSet && showCalendar && (
             <aside className="w-full lg:w-[300px] lg:sticky lg:top-24 shrink-0 space-y-6">
               
               {/* Calendar Block Container */}
@@ -329,7 +308,7 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
           {/* RIGHT COLUMN: Interactive Events Listing Panel */}
           <section className="flex-1 w-full min-w-0">
             {/* Top Landscape Calendar Bar when > 500 items */}
-            {isEventsLargeSet && (
+            {isEventsLargeSet && showCalendar && (
               <div className="bg-white rounded-2xl shadow-sm border border-navy/10 p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <span className="text-[12px] font-bold text-navy">Filter Date:</span>
@@ -381,6 +360,15 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
                     Show All Events
                   </button>
                 )}
+                <button
+                  id="toggle-calendar-inline-btn"
+                  onClick={() => setShowCalendar(prev => !prev)}
+                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-navy/70 hover:text-navy border border-navy/15 bg-white px-2.5 h-7 rounded-md cursor-pointer hover:border-navy/30 transition-colors shadow-2xs"
+                  title={showCalendar ? "Hide Calendar" : "Show Calendar"}
+                >
+                  <Calendar size={12} className={showCalendar ? 'text-safari' : 'text-navy/40'} />
+                  <span>{showCalendar ? 'Hide Calendar' : 'Calendar'}</span>
+                </button>
                 <span className="text-[10px] font-black uppercase tracking-wider bg-navy/5 text-navy/60 h-7 px-3 rounded-full flex items-center w-max">
                   {displayedEvents.length} Active {displayedEvents.length === 1 ? 'Event' : 'Events'}
                 </span>
@@ -401,15 +389,16 @@ export const WhereToGo: React.FC<WhereToGoProps> = ({ events, onAddToTrip, saved
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.98 }}
-                        className="group flex flex-col sm:flex-row items-stretch gap-4 sm:gap-6 py-5 border-b border-navy/10 hover:bg-navy/[0.01] transition-colors cursor-pointer w-full text-left"
+                        className="group flex flex-row items-stretch gap-3 sm:gap-6 py-3.5 sm:py-5 border-b border-navy/10 hover:bg-navy/[0.01] transition-colors cursor-pointer w-full text-left"
                         onClick={() => setSelectedEvent(event)}
                       >
                         {/* Compact Image Section — matching PlaceCard list thumbnail */}
-                        <div className="relative w-full sm:w-32 md:w-40 aspect-[16/10] sm:aspect-[4/3] rounded-xl overflow-hidden bg-navy/5 shrink-0 z-0">
+                        <div className="relative w-28 sm:w-32 md:w-40 aspect-square sm:aspect-[4/3] rounded-xl overflow-hidden shrink-0 z-0">
                           <img 
                             src={event.imageUrl} 
                             alt={event.title} 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
+                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           />
                           <div className="absolute top-2 left-2 z-10">
                             <span className="bg-safari text-white text-[7px] font-black uppercase tracking-[0.15em] px-2 h-5 flex items-center rounded-full border border-white/10 select-none">

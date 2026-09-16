@@ -68,14 +68,15 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.98 }}
-        className="group flex flex-col sm:flex-row items-stretch gap-4 sm:gap-6 py-5 border-b border-navy/10 hover:bg-navy/[0.01] transition-colors cursor-pointer w-full text-left"
+        className="group flex flex-row items-stretch gap-3 sm:gap-6 py-3.5 sm:py-5 border-b border-navy/10 hover:bg-navy/[0.01] transition-colors cursor-pointer w-full text-left"
       >
         {/* Left Image Section - Pure image container without badges */}
-        <div className="relative w-full sm:w-36 md:w-48 aspect-[16/10] sm:aspect-[4/3] rounded-xl overflow-hidden bg-navy/5 shrink-0 z-0">
+        <div className="relative w-28 sm:w-36 md:w-48 aspect-square sm:aspect-[4/3] rounded-xl overflow-hidden shrink-0 z-0">
           <img 
             src={operator.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(operator.name)}&background=0D1B2A&color=fff`} 
             alt={operator.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         </div>
 
@@ -84,11 +85,11 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
           <div className="space-y-1.5">
             {/* Category Tag & Verified Badge outside image div */}
             <div className="flex items-center gap-2">
-              <span className="bg-safari/10 text-safari text-[8px] font-black uppercase tracking-[0.15em] px-2.5 py-0.5 rounded-full border border-safari/20 select-none">
+              <span className="bg-safari/10 text-safari text-xs font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-safari/20 select-none">
                 {isCompany ? 'Fleet Operator' : operator.title || 'Elite Guide'}
               </span>
               {operator.isVerified && (
-                <span className="bg-green-500/10 text-green-700 border border-green-500/20 px-2 py-0.5 rounded-full flex items-center gap-1 text-[8px] font-black uppercase tracking-wider">
+                <span className="bg-green-500/10 text-green-700 border border-green-500/20 px-2 py-0.5 rounded-full flex items-center gap-1 text-xs font-semibold uppercase tracking-wider">
                   <ShieldCheck size={10} className="text-green-600 shrink-0" />
                   Verified
                 </span>
@@ -97,7 +98,7 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
 
             {/* Header: Name and Rating */}
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-sm sm:text-base md:text-lg font-serif font-bold text-navy truncate group-hover:text-safari transition-colors">
+              <h3 className="text-base font-bold font-serif text-navy truncate group-hover:text-safari transition-colors">
                 {operator.name}
               </h3>
 
@@ -105,17 +106,17 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} size={10} fill={i < Math.floor(operator.rating) ? "currentColor" : "none"} className="text-safari border-0" />
                 ))}
-                <span className="text-[10px] font-bold text-navy ml-1 font-sans">
+                <span className="text-xs font-semibold text-navy ml-1 font-sans">
                   {operator.rating.toFixed(1)}
                 </span>
-                <span className="text-[9px] text-navy/40 font-medium font-sans">
+                <span className="text-xs text-navy/40 font-medium font-sans">
                   ({operator.reviewsCount || operator.tripsCompleted || 0})
                 </span>
               </div>
             </div>
 
             {/* Meta Items: Location & Languages */}
-            <div className="flex flex-wrap items-center gap-2.5 text-[8.5px] sm:text-[9px] font-black uppercase tracking-wider text-navy/50">
+            <div className="flex flex-wrap items-center gap-2.5 text-xs font-semibold uppercase tracking-wider text-navy/50">
               {operator.location && (
                 <span className="flex items-center gap-1">
                   <MapPin size={11} className="text-safari" />
@@ -134,7 +135,7 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
             </div>
 
             {/* Bio */}
-            <p className="text-navy/60 text-[11px] sm:text-xs leading-relaxed line-clamp-2 font-sans">
+            <p className="text-navy/70 text-sm leading-relaxed line-clamp-2 font-sans">
               {operator.bio}
             </p>
 
@@ -204,11 +205,12 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
       animate={{ opacity: 1, y: 0 }}
       className="bg-white rounded-2xl overflow-hidden border border-navy/5 shadow-sm hover:shadow-md hover:-translate-y-[2px] transition-all duration-300 flex flex-col h-full group"
     >
-      <div className="relative aspect-video overflow-hidden">
+      <div className="relative w-full aspect-video overflow-hidden">
         <img 
           src={operator.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(operator.name)}&background=0D1B2A&color=fff`} 
           alt={operator.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-navy/35 via-transparent to-transparent font-sans"></div>
 
@@ -456,7 +458,7 @@ export const OperatorsList: React.FC<OperatorsListProps> = ({ operators }) => {
       <AnimatePresence mode="popLayout">
          {filteredOperators.length > 0 ? (
            <div className="w-full">
-             {viewMode === 'list' && operatorGridCols === 1 ? (
+             {viewMode === 'list' || operatorGridCols === 1 ? (
                /* Horizontal Listing Presentation */
                <motion.div 
                  className="flex flex-col w-full divide-y divide-navy/10"

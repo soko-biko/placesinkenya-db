@@ -12,18 +12,18 @@ interface TrendingNowProps {
 
 export const TrendingNow: React.FC<TrendingNowProps> = ({ places, onPlaceClick, onViewAll }) => {
   return (
-    <section className="py-12 sm:py-20 md:py-24 bg-white">
+    <section className="py-8 sm:py-12 bg-white">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-10 md:mb-14">
-          <div className="space-y-3">
-            <span className="text-safari font-black uppercase tracking-[0.3em] text-[10px]">What's Hot</span>
-            <h2 className="text-[clamp(1.5rem,4vw,2.5rem)] font-serif font-bold text-navy tracking-tight leading-tight">Trending Now</h2>
+        <div className="flex flex-col md:flex-row justify-between items-end gap-4 mb-6 md:mb-8">
+          <div className="space-y-1">
+            <span className="text-safari font-semibold uppercase tracking-wider text-xs">What's Hot</span>
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-navy tracking-tight leading-tight">Trending Now</h2>
           </div>
           <button 
             onClick={onViewAll}
-            className="group flex items-center gap-4 text-[11px] font-black uppercase tracking-[0.3em] text-navy/40 hover:text-safari transition-colors shrink-0"
+            className="group flex items-center gap-3 text-xs font-bold uppercase tracking-wider text-navy/60 hover:text-safari transition-colors shrink-0"
           >
-            Explore All <div className="w-10 h-10 rounded-full border border-navy/5 flex items-center justify-center group-hover:bg-safari group-hover:text-white transition-all"><ArrowRight size={16} /></div>
+            Explore All <div className="w-8 h-8 rounded-full border border-navy/10 flex items-center justify-center group-hover:bg-safari group-hover:text-white transition-all"><ArrowRight size={14} /></div>
           </button>
         </div>
 

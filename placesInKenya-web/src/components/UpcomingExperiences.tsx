@@ -19,21 +19,21 @@ export const UpcomingExperiences: React.FC<UpcomingExperiencesProps> = ({ events
   };
 
   return (
-    <section className="py-12 sm:py-16 lg:py-20 bg-off-white relative">
+    <section className="py-8 sm:py-12 bg-off-white relative">
       {settings.eventsBgImage && (
         <div className="absolute inset-0 z-0 opacity-5 pointer-events-none">
           <img src={settings.eventsBgImage} alt="" className="w-full h-full object-cover" />
         </div>
       )}
       <Container className="relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-10 md:mb-14">
-          <div className="space-y-3">
-            <span className="text-safari font-black uppercase tracking-[0.3em] text-[10px]">Upcoming Events</span>
-            <h2 className="text-[clamp(1.5rem,4vw,2.5rem)] font-serif font-bold text-navy tracking-tight leading-tight">
+        <div className="flex flex-col md:flex-row justify-between items-end gap-4 mb-6 md:mb-8">
+          <div className="space-y-1">
+            <span className="text-safari font-semibold uppercase tracking-wider text-xs">Upcoming Events</span>
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-navy tracking-tight leading-tight">
               {settings.eventsTitle || 'Elite Experiences'}
             </h2>
             {settings.eventsSubtitle && (
-              <p className="text-navy/60 text-xs md:text-sm font-light max-w-xl">
+              <p className="text-navy/70 text-sm font-normal max-w-xl">
                 {settings.eventsSubtitle}
               </p>
             )}
@@ -41,9 +41,9 @@ export const UpcomingExperiences: React.FC<UpcomingExperiencesProps> = ({ events
           <button 
             type="button"
             onClick={onViewAll}
-            className="group flex items-center gap-4 text-[11px] font-black uppercase tracking-[0.3em] text-navy/40 hover:text-safari transition-colors shrink-0 cursor-pointer"
+            className="group flex items-center gap-3 text-xs font-bold uppercase tracking-wider text-navy/60 hover:text-safari transition-colors shrink-0 cursor-pointer"
           >
-            View All Events <div className="w-10 h-10 rounded-full border border-navy/5 flex items-center justify-center group-hover:bg-safari group-hover:text-white transition-all"><ArrowRight size={16} /></div>
+            View All Events <div className="w-8 h-8 rounded-full border border-navy/10 flex items-center justify-center group-hover:bg-safari group-hover:text-white transition-all"><ArrowRight size={14} /></div>
           </button>
         </div>
 
@@ -62,13 +62,14 @@ export const UpcomingExperiences: React.FC<UpcomingExperiencesProps> = ({ events
                 className="py-6 border-b border-navy/10 last:border-b-0 flex flex-col sm:flex-row gap-4 sm:gap-6 hover:bg-navy/[0.01] transition-all duration-200 group cursor-pointer w-full"
               >
                 {/* Event Image Zone */}
-                <div className="relative w-full sm:w-32 md:w-40 aspect-[16/10] sm:aspect-[4/3] rounded-xl overflow-hidden bg-navy/5 shrink-0 z-0">
+                <div className="relative w-full sm:w-32 md:w-40 aspect-[16/10] sm:aspect-[4/3] rounded-xl overflow-hidden shrink-0 z-0">
                   <img 
                     src={event.imageUrl || 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?q=80&w=600&auto=format&fit=crop'} 
                     alt={event.title} 
                     loading="lazy"
                     onError={handleImageError}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-out" 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                   <div className="absolute top-1.5 left-1.5 z-10">
                     <span className="bg-navy/80 backdrop-blur-md text-white font-black text-[7px] uppercase tracking-widest px-2 h-5 flex items-center border border-white/5 select-none">
@@ -140,45 +141,46 @@ export const UpcomingExperiences: React.FC<UpcomingExperiencesProps> = ({ events
                 onClick={onViewAll}
                 className="bg-white rounded-2xl overflow-hidden border border-navy/5 shadow-sm hover:shadow-md hover:-translate-y-[2px] transition-all duration-300 flex flex-col h-full group cursor-pointer"
               >
-                {/* Event Image Zone */}
-                <div className="relative aspect-[16/10] overflow-hidden bg-navy/5 shrink-0">
+                {/* Event Image Zone - 16:9 Aspect Ratio */}
+                <div className="relative w-full aspect-[16/9] overflow-hidden shrink-0">
                   <img 
                     src={event.imageUrl || 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?q=80&w=600&auto=format&fit=crop'} 
                     alt={event.title} 
                     loading="lazy"
                     onError={handleImageError}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                   <div className="absolute top-2.5 left-2.5 z-10 w-max">
-                    <span className="bg-navy/80 backdrop-blur-md text-white font-black text-[7.5px] uppercase tracking-widest px-2.5 h-6 flex items-center border border-white/5 select-none rounded-full">
+                    <span className="bg-navy/80 backdrop-blur-md text-white font-semibold text-xs uppercase tracking-wider px-2.5 py-0.5 flex items-center border border-white/5 select-none rounded-full">
                       {event?.category?.replace('_', ' ')}
                     </span>
                   </div>
                 </div>
 
                 {/* Event Content & Actions Zone */}
-                <div className="p-4 sm:p-5 flex flex-col flex-1 justify-between">
+                <div className="p-4 flex flex-col flex-1 justify-between space-y-2">
                   <div className="space-y-1.5 flex-1">
-                    {/* Meta items */}
-                    <div className="flex flex-wrap items-center gap-2.5 text-[9px] text-navy/50 font-semibold uppercase tracking-wider">
-                      <span className="flex items-center gap-1 text-safari font-black">
-                        <Calendar size={10} />
+                    {/* Meta items - text-xs metadata */}
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-navy/50 font-semibold uppercase tracking-wider">
+                      <span className="flex items-center gap-1 text-safari font-bold">
+                        <Calendar size={11} />
                         {new Date(event.date).toLocaleDateString('en-KE', { month: 'short', day: 'numeric' })}
                       </span>
                       <span>•</span>
                       <span className="flex items-center gap-1">
-                        <MapPin size={10} className="text-safari" />
+                        <MapPin size={11} className="text-safari" />
                         {event.location}
                       </span>
                     </div>
 
-                    {/* Title */}
-                    <h3 className="font-serif font-bold text-sm text-navy leading-snug group-hover:text-safari transition-colors line-clamp-1">
+                    {/* Title - h3: text-base font-bold */}
+                    <h3 className="font-serif font-bold text-base text-navy leading-snug group-hover:text-safari transition-colors line-clamp-1">
                       {event.title}
                     </h3>
 
-                    {/* Description */}
-                    <p className="text-navy/60 text-[11px] leading-relaxed line-clamp-2">
+                    {/* Description - text-sm body */}
+                    <p className="text-navy/70 text-sm leading-relaxed line-clamp-2">
                       {event.description}
                     </p>
                   </div>

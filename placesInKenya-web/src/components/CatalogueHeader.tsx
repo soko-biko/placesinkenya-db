@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface CatalogueHeaderProps {
@@ -9,54 +9,41 @@ interface CatalogueHeaderProps {
 
 export const CatalogueHeader: React.FC<CatalogueHeaderProps> = ({ searchQuery, onSearchChange }) => {
   return (
-    <section className="relative pt-28 sm:pt-36 pb-12 sm:pb-16 overflow-hidden bg-navy">
-      {/* Abstract Kenyan Landscape overlay */}
-      <div className="absolute inset-0 z-0">
-        <img 
-          src="https://images.unsplash.com/photo-1547448415-e9f5b28e570d"
-          className="w-full h-full object-cover opacity-30 grayscale mix-blend-overlay"
-          alt="Landscape"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-navy/60 via-navy to-navy"></div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-6 relative z-10 text-center space-y-8">
-        <div className="space-y-3">
-          <motion.span 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-safari font-black uppercase tracking-[0.4em] text-[10px] truncate max-w-full block"
-          >
-            Explore Kenya
-          </motion.span>
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-3xl sm:text-5xl md:text-6xl font-serif font-bold text-white tracking-tight leading-tight"
-          >
-            Catalogue of <span className="italic text-safari">Places</span>
-          </motion.h1>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="max-w-2xl mx-auto relative group"
-        >
-          <div className="absolute inset-0 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl transition-all group-focus-within:bg-white group-focus-within:border-white"></div>
-          <div className="absolute inset-y-0 left-6 flex items-center text-white/30 group-focus-within:text-safari">
-            <Search size={24} />
+    <section 
+      id="explore-search-section" 
+      className="relative w-full bg-off-white z-20 overflow-visible"
+    >
+      <div className="max-w-3xl mx-auto px-4 sm:px-6">
+        <div className="relative group w-full">
+          <div className="relative flex items-center w-full bg-white rounded-2xl border border-navy/15 shadow-sm hover:border-navy/30 focus-within:border-safari focus-within:ring-2 focus-within:ring-safari/20 transition-all z-10 pointer-events-auto">
+            <label 
+              htmlFor="explore-search-input"
+              className="pl-4 sm:pl-5 pr-2 flex items-center text-navy/45 group-focus-within:text-safari transition-colors pointer-events-none cursor-text shrink-0"
+            >
+              <Search size={20} />
+            </label>
+            <input 
+              id="explore-search-input"
+              type="text"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder="Search places by name, category, or location..."
+              className="w-full h-12 sm:h-14 bg-transparent text-navy font-medium outline-none placeholder:text-navy/40 text-sm sm:text-base pr-3 cursor-text pointer-events-auto"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                id="clear-explore-search-btn"
+                onClick={() => onSearchChange('')}
+                className="mr-3 sm:mr-4 p-1.5 rounded-full hover:bg-navy/5 text-navy/40 hover:text-navy transition-colors cursor-pointer pointer-events-auto shrink-0"
+                title="Clear search"
+                aria-label="Clear search input"
+              >
+                <X size={18} />
+              </button>
+            )}
           </div>
-          <input 
-            type="text"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search by name, vibe, or location..."
-            className="relative w-full h-16 bg-transparent px-16 text-white group-focus-within:text-navy font-medium outline-none placeholder:text-white/20 group-focus-within:placeholder:text-navy/20 tap-target"
-          />
-        </motion.div>
+        </div>
       </div>
     </section>
   );

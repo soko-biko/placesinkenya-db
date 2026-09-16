@@ -103,12 +103,16 @@ export const placesService = {
       
       if (filters.isTrending) {
         q = query(q, where('isTrending', '==', true));
+      } else {
+        q = query(q, orderBy('rating', 'desc'));
       }
       
-      q = query(q, orderBy('rating', 'desc'));
-      
       const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Place));
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Place));
+      if (filters.isTrending) {
+        items.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+      }
+      return items;
     } catch (error) {
       handleFirestoreError(error, OperationType.LIST, path);
       return [];
@@ -121,11 +125,12 @@ export const placesService = {
     try {
       const q = query(
         collection(db, path), 
-        where('isTrending', '==', true),
-        orderBy('rating', 'desc')
+        where('isTrending', '==', true)
       );
       const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Place));
+      return snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as Place))
+        .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     } catch (error) {
       handleFirestoreError(error, OperationType.LIST, path);
       return [];
